@@ -1,0 +1,283 @@
+/* --- Reseteo Básico y Fuentes Globales --- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.7;
+    background-color: #f8f9fa; /* Gris muy claro de fondo */
+    color: #343a40; /* Texto principal oscuro */
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3 {
+    font-family: "Georgia", "Times New Roman", Times, serif;
+    font-weight: bold;
+    color: #212529;
+    line-height: 1.3;
+}
+
+a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+a:hover {
+    color: #0056b3;
+    text-decoration: none; /* Quitamos el subrayado global en hover */
+}
+
+
+/* === ESTILOS GLOBALES DEL BLOG === */
+
+/* --- Encabezado del Blog (Hero) --- */
+.site-header {
+    background-color: #343a40; /* Fondo oscuro */
+    color: #ffffff;
+    padding: 4rem 2rem;
+    text-align: center;
+    margin-bottom: 40px;
+}
+.site-header h1 {
+    color: #ffffff;
+    font-size: 3.5rem;
+    margin: 0;
+}
+.site-header .subtitle {
+    font-size: 1.3rem;
+    color: #ced4da; /* Gris claro */
+    margin: 10px 0 0 0;
+}
+
+/* --- NUEVO: Layout Principal (Grid de 2 Columnas) --- */
+.main-layout {
+    display: grid;
+    /* Ancho del menú: 280px. El resto (1fr) para el contenido */
+    grid-template-columns: 280px 1fr; 
+    gap: 30px; /* Espacio entre menú y contenido */
+    
+    /* Ensanchamos el contenedor total para que quepa el menú */
+    max-width: 1200px; 
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+
+/* === NUEVO: Estilos del Menú Lateral (Sidebar) === */
+.sidebar {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    height: fit-content; /* Para que no ocupe más de lo necesario */
+    
+    /* Efecto "Sticky": El menú se queda fijo al hacer scroll */
+    position: sticky;
+    top: 20px; 
+}
+
+.sidebar-nav h3 {
+    font-size: 1.4rem;
+    margin-top: 0;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+}
+
+/* Estilos para <details> y <summary> */
+.sidebar-nav details {
+    margin-bottom: 5px;
+}
+
+.sidebar-nav summary {
+    font-weight: bold;
+    cursor: pointer;
+    list-style: none; /* Oculta la flecha por defecto */
+    padding: 10px 8px;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+}
+.sidebar-nav summary:hover {
+    background-color: #f8f9fa;
+}
+
+/* Flecha personalizada (►) */
+.sidebar-nav summary::before {
+    content: '►';
+    font-size: 0.8em;
+    margin-right: 10px;
+    display: inline-block;
+    transition: transform 0.2s;
+}
+
+/* Gira la flecha cuando el menú está abierto */
+.sidebar-nav details[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+/* Nivel 1 (Patrones de Diseño) */
+.nav-level-1 > summary {
+    font-size: 1.1rem;
+}
+
+/* Contenedor de sub-niveles */
+.sidebar-nav ul {
+    list-style: none;
+    padding-left: 25px; /* Indentación para sub-niveles */
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.sidebar-nav li {
+    margin-bottom: 2px;
+}
+
+/* Nivel 2 (Comportamiento) */
+.nav-level-2 > summary {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #343a40;
+    padding-left: 10px;
+}
+
+/* Nivel 3 (Artículos) */
+.nav-level-2 > ul {
+    padding-left: 15px;
+}
+.sidebar-nav li a {
+    font-weight: 400;
+    font-size: 0.95rem;
+    display: block;
+    padding: 6px 10px;
+    border-radius: 5px;
+    color: #495057;
+}
+.sidebar-nav li a:hover {
+    background-color: #f8f9fa;
+    color: #007bff;
+    text-decoration: none;
+}
+.sidebar-nav li a.disabled {
+    color: #adb5bd;
+    pointer-events: none;
+    font-style: italic;
+}
+
+
+/* === ESTILOS DEL CONTENIDO (Homepage) === */
+/* (El .main-content ahora es el contenedor de la lista) */
+
+/* --- Lista de Artículos (Tarjetas) --- */
+.article-list {
+    display: grid;
+    gap: 30px; /* Espacio entre tarjetas */
+}
+
+.article-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; 
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+.article-card .card-content { padding: 30px; }
+.article-card .card-meta { font-size: 0.9rem; color: #6c757d; margin-bottom: 10px; display: block; }
+.article-card h2 { font-size: 1.8rem; margin-top: 0; margin-bottom: 15px; color: #212529; }
+.article-card p { font-size: 1.05rem; color: #495057; margin-bottom: 20px; }
+.article-card .card-link { font-weight: bold; font-size: 1.05rem; }
+.article-card .card-link.disabled { color: #adb5bd; pointer-events: none; }
+
+
+/* === ESTILOS DEL ARTÍCULO (patron-observer-csharp.html) === */
+
+/* --- Navegador del Artículo (Volver) --- */
+.article-nav-header {
+    background-color: #fff;
+    padding: 15px 40px;
+    border-bottom: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+.article-nav-header .back-link {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* --- Contenedor del Artículo (Post) --- */
+.main-article {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px 40px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.main-article h1 { font-size: 2.8rem; text-align: center; margin-bottom: 10px; }
+.main-article .reading-time { text-align: center; font-size: 0.9rem; color: #6c757d; margin-bottom: 30px; }
+.main-article h2 { font-size: 2.1rem; margin-top: 50px; margin-bottom: 20px; border-bottom: 3px solid #007bff; padding-bottom: 10px; }
+.main-article h3 { font-size: 1.6rem; margin-top: 30px; color: #495057; }
+.main-article p { margin-bottom: 16px; font-size: 1.1rem; }
+.main-article ul, .main-article ol { margin-bottom: 16px; padding-left: 30px; }
+.main-article li { margin-bottom: 8px; }
+
+/* (El resto de estilos de artículo: TOC, blockquote, .info-box, etc.) */
+.toc { background: #fdfdfd; border: 1px solid #e9ecef; padding: 20px 30px; margin-bottom: 40px; border-radius: 8px; }
+.toc h2 { margin-top: 0; border-bottom: none; font-size: 1.8rem; padding-bottom: 0; }
+.toc ul { list-style-type: none; padding-left: 0; margin-bottom: 0; }
+.toc li { margin-bottom: 10px; }
+.toc a { font-weight: 500; }
+blockquote { border-left: 5px solid #007bff; background-color: #f8f9fa; padding: 15px 20px; margin: 20px 0; font-style: italic; font-size: 1.1rem; color: #495057; }
+.image-placeholder { width: 100%; height: 350px; background-color: #e9ecef; border: 1px dashed #ced4da; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-align: center; margin: 25px 0; }
+.image-placeholder p { color: #6c757d; font-style: italic; font-family: "Consolas", "Monaco", monospace; font-size: 1rem; margin-bottom: 0; padding: 20px; }
+.info-box { margin: 30px 0; padding: 20px 30px; border-radius: 8px; border: 1px solid; }
+.info-box h2 { margin-top: 0; border-bottom: none; font-size: 1.8rem; padding-bottom: 0; }
+.warning-box { background-color: #fff8e1; border-color: #ffe57f; color: #6d4c41; }
+.warning-box h2 { color: #ef6c00; }
+.exercise-box { background-color: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; }
+.exercise-box h2 { color: #2e7d32; }
+
+/* Bloques de Código (Prism.js) */
+pre[class*="language-"] { padding: 20px !important; margin: 25px 0; border-radius: 8px; font-size: 0.95rem; line-height: 1.5; overflow-x: auto; }
+code[class*="language-csharp"], code[class*="language-bash"] { font-family: "Fira Code", "Consolas", "Monaco", monospace; }
+
+/* === FOOTER (Global) === */
+.site-footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 30px;
+    border-top: 1px solid #e9ecef;
+    font-size: 0.9rem;
+    color: #6c757d;
+    background-color: #fff;
+}
+
+/* === RESPONSIVE (Global) === */
+/* En pantallas más pequeñas de 992px, el grid se rompe y se apila */
+@media (max-width: 992px) {
+    .main-layout {
+        /* Se convierte en una sola columna */
+        grid-template-columns: 1fr; 
+    }
+    .sidebar {
+        /* El menú ya no es "sticky" en móvil */
+        position: static;
+        margin-bottom: 30px;
+    }
+    .site-header h1 { font-size: 2.5rem; }
+    .site-header .subtitle { font-size: 1.1rem; }
+}
+
+@media (max-width: 768px) {
+    .main-article {
+        margin: 0;
+        padding: 15px;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .main-article h1 { font-size: 2.2rem; }
+    .main-article h2 { font-size: 1.8rem; }
+    .article-nav-header { padding: 15px 20px; }
+}
