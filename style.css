@@ -237,22 +237,6 @@ blockquote { border-left: 5px solid #007bff; background-color: #f8f9fa; padding:
 .exercise-box { background-color: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; }
 .exercise-box h2 { color: #2e7d32; }
 
-/* --- Contenedor de Imagen --- */
-.image-container {
-    width: 100%;
-    max-width: 800px; /* Puedes ajustar este max-width si tus imágenes son más estrechas */
-    margin: 25px auto; /* Centrar el contenedor */
-    border-radius: 8px;
-    overflow: hidden; /* Asegura que la imagen no se salga de las esquinas redondeadas */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sutil sombra para que destaque */
-}
-
-.image-container img {
-    width: 100%; /* La imagen ocupa el 100% del ancho de su contenedor */
-    height: auto; /* Mantiene la proporción de la imagen */
-    display: block; /* Elimina cualquier espacio extra debajo de la imagen */
-}
-
 /* Bloques de Código (Prism.js) */
 pre[class*="language-"] { padding: 20px !important; margin: 25px 0; border-radius: 8px; font-size: 0.95rem; line-height: 1.5; overflow-x: auto; }
 code[class*="language-csharp"], code[class*="language-bash"] { font-family: "Fira Code", "Consolas", "Monaco", monospace; }
@@ -294,9 +278,37 @@ code[class*="language-csharp"], code[class*="language-bash"] { font-family: "Fir
     .main-article h1 { font-size: 2.2rem; }
     .main-article h2 { font-size: 1.8rem; }
     .article-nav-header { padding: 15px 20px; }
-	.image-container {
+	    .image-container {
+        max-width: 100%; /* En móvil, ocupa todo el ancho */
         margin: 20px 0; /* Menos margen vertical en móvil */
         border-radius: 0; /* Sin esquinas redondeadas en móvil para ocupar todo el ancho */
         box-shadow: none; /* Sin sombra en móvil */
     }
+}
+/* --- Contenedor de Imagen (Optimizado) --- */
+.image-container {
+    /* El contenedor ahora tiene un ancho máximo, no la imagen directamente */
+    max-width: 90%; /* Ocupa el 90% del ancho del main-article */
+    width: fit-content; /* Se ajusta al contenido si la imagen es pequeña */
+    margin: 25px auto; /* Centrar el contenedor */
+    
+    border-radius: 8px;
+    overflow: hidden; /* Corta lo que se salga */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sutil sombra */
+    
+    /* Centrar la imagen dentro del contenedor si esta es más pequeña */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-container img {
+    /* La imagen en sí: */
+    max-width: 100%; /* La imagen nunca será más grande que su contenedor */
+    height: auto; /* Mantiene la proporción */
+    display: block; /* Elimina espacio extra */
+    
+    /* Si tienes imágenes con diferentes proporciones y quieres que el contenedor sea fijo,
+       puedes usar object-fit. Pero para un blog, height: auto es mejor. */
+    /* object-fit: cover; /* Ejemplo para forzar el relleno, pero no para este caso */
 }
