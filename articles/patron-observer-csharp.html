@@ -53,9 +53,11 @@
                 </ul>
             </section>
             
-            <div class="image-placeholder">
-                <p>Prompt: Cinematic sunrise in forest, warm golden light, high-detail.</p>
-            </div>
+			<div class="image-container">
+				<img src="../images/01_01.png" 
+				alt="Amanecer en un bosque, simbolizando un cambio de estado y el Patrón Observer."
+				title="Prompt: Cinematic sunrise in forest, warm golden light, high-detail.">
+			</div>
 
             <section id="natural">
                 <h2>1. La Reacción Natural: El Sol y el Bosque</h2>
@@ -72,9 +74,11 @@
                     <li>El <strong>Búho</strong> también recibe la señal, pero su reacción es opuesta: se va a dormir.</li>
                 </ul>
                 <p>Aquí está la clave: el Sol no sabe quiénes son, ni cuántos hay, ni qué hacen. El Sol está <strong>desacoplado</strong> de los Observadores. Solo avisa, y ellos deciden cómo reaccionar.</p>
-                <div class="image-placeholder">
-                    <p>Prompt: A rooster crowing energetically, golden sunrise light from the side.</p>
-                </div>
+                <div class="image-container">
+					<img src="../images/01_02.png" 
+					alt="Gallo cantando al amanecer, un ejemplo natural de un 'Observador' reaccionando a un 'Sujeto' (el sol)."
+					title="Prompt: A rooster crowing energetically, golden sunrise light from the side.">
+				</div>
             </section>
 
             <section id="apps">
@@ -89,9 +93,11 @@
                     <li><strong>El Mecanismo:</strong> La plataforma de YouTube actúa como el gestor de la lista de suscripción.</li>
                 </ul>
                 <p>Cuando el Youtuber sube un vídeo (un <em>cambio de estado</em>), la plataforma notifica a todos sus Observadores (te envía una notificación push).</p>
-                <div class="image-placeholder">
-                    <p>Prompt: Flat UI animation, YouTube subscribe button and bell icon shaking.</p>
-                </div>
+                <div class="image-container">
+					<img src="../images/01_03.png" 
+					alt="Botón de suscripción y campana de YouTube, un ejemplo real del Patrón Observer en aplicaciones."
+					title="Prompt: Flat UI animation, YouTube subscribe button and bell icon shaking.">
+				</div>
             </section>
 
             <section id="implementacion">
@@ -211,12 +217,12 @@ public class Program
         Youtuber miCanal = new Youtuber();
 
         // 2. Creamos a los Observadores
-        IObservador fanPepe = new Suscriptor("Pepe_Gamer");
-        IObservador fanAna = new Suscriptor("Ana_Art");
+        IObservador fanEneko = new Suscriptor("Eneko_Gamer");
+        IObservador fanLola = new Suscriptor("Lola_Art");
 
         // 3. ¡Se suscriben!
-        miCanal.Suscribir(fanPepe);
-        miCanal.Suscribir(fanAna);
+        miCanal.Suscribir(fanEneko);
+        miCanal.Suscribir(fanLola);
 
         // 4. El Youtuber sube un vídeo. Ambos reciben el aviso.
         miCanal.SubirVideo("Aprendiendo Patrones de Diseño");
@@ -225,10 +231,10 @@ public class Program
         IObservador fanLuis = new Suscriptor("Luis_Dev");
         miCanal.Suscribir(fanLuis);
 
-        // 6. Ana se cansa y se va (Importante: Desuscribirse)
-        miCanal.Desuscribir(fanAna);
+        // 6. Lola se cansa y se va (Importante: Desuscribirse)
+        miCanal.Desuscribir(fanLola);
         
-        // 7. El Youtuber sube otro vídeo. Solo Pepe y Luis lo reciben.
+        // 7. El Youtuber sube otro vídeo. Solo Eneko y Luis lo reciben.
         miCanal.SubirVideo("Mi Gato Toca el Piano");
     }
 }
@@ -241,25 +247,25 @@ public class Program
 
 ¡¡NUEVO VIDEO SUBIDO: Aprendiendo Patrones de Diseño!!
 -> [YOUTUBER] Notificando a 2 suscriptores...
-   > Hola soy Pepe_Gamer! Me llegó el aviso: 'Aprendiendo Patrones de Diseño'
-   > Hola soy Ana_Art! Me llegó el aviso: 'Aprendiendo Patrones de Diseño'
+   > Hola soy Eneko_Gamer! Me llegó el aviso: 'Aprendiendo Patrones de Diseño'
+   > Hola soy Lola_Art! Me llegó el aviso: 'Aprendiendo Patrones de Diseño'
 
 -> [YOUTUBER] ¡Un nuevo suscriptor se ha unido!
 -> [YOUTUBER] Un suscriptor se ha ido...
 
 ¡¡NUEVO VIDEO SUBIDO: Mi Gato Toca el Piano!!
 -> [YOUTUBER] Notificando a 2 suscriptores...
-   > Hola soy Pepe_Gamer! Me llegó el aviso: 'Mi Gato Toca el Piano'
+   > Hola soy Eneko_Gamer! Me llegó el aviso: 'Mi Gato Toca el Piano'
    > Hola soy Luis_Dev! Me llegó el aviso: 'Mi Gato Toca el Piano'
 </code></pre>
             </section>
 
             <section id="red">
                 <h2>4. Patrón Observer en Red: SignalR y Aplicaciones Distribuidas</h2>
-                <p>Esto funciona en un solo programa. Pero, ¿qué pasa si Ana y Pepe están en ciudades distintas, conectados a la misma base de datos?</p>
+                <p>Esto funciona en un solo programa. Pero, ¿qué pasa si Lola y Eneko están en ciudades distintas, conectados a la misma base de datos?</p>
                 
                 <h3>Diferencias entre Local y Remoto</h3>
-                <p>No podemos llamar a un método (<code>Actualizar()</code>) en el PC de Ana desde nuestro servidor en la nube. El Patrón Observer necesita un <em>transporte</em>. En .NET, la herramienta estándar para esto es <strong>SignalR</strong>, que usa <strong>WebSockets</strong> por debajo.</p>
+                <p>No podemos llamar a un método (<code>Actualizar()</code>) en el PC de Lola desde nuestro servidor en la nube. El Patrón Observer necesita un <em>transporte</em>. En .NET, la herramienta estándar para esto es <strong>SignalR</strong>, que usa <strong>WebSockets</strong> por debajo.</p>
                 
                 <h3>Cómo Funciona SignalR</h3>
                 <p>SignalR abstrae el patrón Observer para la red:</p>
@@ -269,18 +275,22 @@ public class Program
                     <li><strong>Suscribir:</strong> Cuando un cliente inicia una conexión con el Hub.</li>
                     <li><strong>Notificar:</strong> Cuando el servidor llama a un método del Hub (ej. <code>Clients.All.SendAsync(...)</code>), SignalR <em>empuja</em> (push) el mensaje a todos los clientes conectados.</li>
                 </ol>
-                <p>Imagina una app de inventario. Cuando Pepe actualiza el stock en la base de datos, el servidor (Sujeto) notifica al Hub, y el Hub de SignalR <em>empuja</em> el nuevo stock a la pantalla de Ana (Observador) al instante.</p>
-                <div class="image-placeholder">
-                    <p>Prompt: Glowing data packets from server node to multiple laptops, tech aesthetic.</p>
-                </div>
+                <p>Imagina una app de inventario. Cuando Eneko actualiza el stock en la base de datos, el servidor (Sujeto) notifica al Hub, y el Hub de SignalR <em>empuja</em> el nuevo stock a la pantalla de Lola (Observador) al instante.</p>
+                <div class="image-container">
+					<img src="../images/01_04.png" 
+					alt="Diagrama de SignalR implementando el Patrón Observer en .NET para notificar a múltiples clientes desde un servidor."
+					title="Prompt: Glowing data packets from server node to multiple laptops, tech aesthetic.">
+				</div>
             </section>
 
             <section id="diagrama">
                 <h2>5. Diagrama UML y Definición Formal</h2>
                 <p>Así es como se ve el patrón en un diagrama de clases UML formal:</p>
-                <div class="image-placeholder">
-                    <p>Prompt: Clean UML class diagram of Observer pattern, minimalist, vector style.</p>
-                </div>
+                <div class="image-container">
+					<img src="../images/01_05.png" 
+					alt="Diagrama de clases UML del Patrón Observer, mostrando la relación entre las interfaces ISujeto e IObservador."
+					title="Prompt: Clean UML class diagram of Observer pattern, minimalist, vector style.">
+				</div>
                 <p>Oficialmente, el Patrón Observer:</p>
                 <blockquote>
                     Es un <strong>patrón de diseño de comportamiento</strong> que define una dependencia de <strong>uno-a-muchos</strong> entre objetos. Cuando el estado de un objeto (el <strong>Sujeto</strong>) cambia, todos sus dependientes (los <strong>Observadores</strong>) son notificados y actualizados automáticamente.
@@ -324,7 +334,7 @@ public class Program
                 <p>El Patrón Observer es fundamental. Es la conexión invisible que hace que nuestro software se sienta vivo y reactivo.</p>
                 <p>El Sol sigue sin saber que el gallo canta por él, y tu Youtuber favorito no sabe que existes. Simplemente emiten su cambio, y el patrón se encarga de conectar al que cambia con los que reaccionan.</p>
                 <p>...</p>
-                <p>Y ahora que lo sabes... si este patrón te conectó con algo nuevo hoy, ya sabes qué hacer con esa campanita. 😉</p>
+                <p>Y ahora que lo sabes... si este patrón te conectó con algo nuevo hoy, ya sabes qué hace esa campanita. 😉</p>
             </section>
         
         </article>
