@@ -1,0 +1,221 @@
+/* === CSS PARA PATRON-OBSERVER-CSHARP.HTML (Página de Artículo) === */
+
+/* --- Reseteo Básico y Fuentes Globales --- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.7;
+    background-color: #f8f9fa;
+    color: #343a40;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3 {
+    font-family: "Georgia", "Times New Roman", Times, serif;
+    font-weight: bold;
+    color: #212529;
+    line-height: 1.3;
+}
+
+a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+a:hover {
+    color: #0056b3;
+    text-decoration: none;
+}
+
+/* --- Navegador del Artículo (Volver) --- */
+.article-nav-header {
+    background-color: #fff;
+    padding: 15px 40px;
+    border-bottom: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+.article-nav-header .back-link {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* --- Contenedor del Artículo (Post) --- */
+.main-article {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px 40px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.main-article h1 { 
+    font-size: 2.8rem; 
+    text-align: center; 
+    margin-bottom: 10px; 
+}
+.main-article .reading-time { 
+    text-align: center; 
+    font-size: 0.9rem; 
+    color: #6c757d; 
+    margin-bottom: 30px; 
+}
+.main-article h2 { 
+    font-size: 2.1rem; 
+    margin-top: 50px; 
+    margin-bottom: 20px; 
+    border-bottom: 3px solid #007bff; 
+    padding-bottom: 10px; 
+}
+.main-article h3 { 
+    font-size: 1.6rem; 
+    margin-top: 30px; 
+    color: #495057; 
+}
+.main-article p { 
+    margin-bottom: 16px; 
+    font-size: 1.1rem; 
+}
+.main-article ul, .main-article ol { 
+    margin-bottom: 16px; 
+    padding-left: 30px; 
+}
+.main-article li { 
+    margin-bottom: 8px; 
+}
+
+/* --- Tabla de Contenidos --- */
+.toc { 
+    background: #fdfdfd; 
+    border: 1px solid #e9ecef; 
+    padding: 20px 30px; 
+    margin-bottom: 40px; 
+    border-radius: 8px; 
+}
+.toc h2 { 
+    margin-top: 0; 
+    border-bottom: none; 
+    font-size: 1.8rem; 
+    padding-bottom: 0; 
+}
+.toc ul { 
+    list-style-type: none; 
+    padding-left: 0; 
+    margin-bottom: 0; 
+}
+.toc li { 
+    margin-bottom: 10px; 
+}
+.toc a { 
+    font-weight: 500; 
+}
+
+/* --- Citas (Blockquote) --- */
+blockquote { 
+    border-left: 5px solid #007bff; 
+    background-color: #f8f9fa; 
+    padding: 15px 20px; 
+    margin: 20px 0; 
+    font-style: italic; 
+    font-size: 1.1rem; 
+    color: #495057; 
+}
+
+/* --- Cajas de Información --- */
+.info-box { 
+    margin: 30px 0; 
+    padding: 20px 30px; 
+    border-radius: 8px; 
+    border: 1px solid; 
+}
+.info-box h2 { 
+    margin-top: 0; 
+    border-bottom: none; 
+    font-size: 1.8rem; 
+    padding-bottom: 0; 
+}
+.warning-box { 
+    background-color: #fff8e1; 
+    border-color: #ffe57f; 
+    color: #6d4c41; 
+}
+.warning-box h2 { 
+    color: #ef6c00; 
+}
+.exercise-box { 
+    background-color: #e8f5e9; 
+    border-color: #a5d6a7; 
+    color: #1b5e20; 
+}
+.exercise-box h2 { 
+    color: #2e7d32; 
+}
+
+/* --- Bloques de Código (Prism.js) --- */
+pre[class*="language-"] { 
+    padding: 20px !important; 
+    margin: 25px 0; 
+    border-radius: 8px; 
+    font-size: 0.95rem; 
+    line-height: 1.5; 
+    overflow-x: auto; 
+}
+code[class*="language-csharp"], 
+code[class*="language-bash"] { 
+    font-family: "Fira Code", "Consolas", "Monaco", monospace; 
+}
+
+/* --- Contenedor de Imagen --- */
+.image-container {
+    max-width: 90%;
+    width: fit-content;
+    margin: 25px auto;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* === FOOTER === */
+.site-footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 30px;
+    border-top: 1px solid #e9ecef;
+    font-size: 0.9rem;
+    color: #6c757d;
+    background-color: #fff;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    .main-article {
+        margin: 0;
+        padding: 15px;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .main-article h1 { 
+        font-size: 2.2rem; 
+    }
+    .main-article h2 { 
+        font-size: 1.8rem; 
+    }
+    .article-nav-header { 
+        padding: 15px 20px; 
+    }
+    .image-container {
+        max-width: 100%;
+        margin: 20px 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+}
