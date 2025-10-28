@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MH6TJV68');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patrón Factory Method en C#: Guía Completa con Ejemplos</title>
+    <meta name="description" content="Aprende el Patrón Factory Method en C# con ejemplos prácticos. Guía completa con código ejecutable, diagramas UML y ejercicios.">
+    <meta name="keywords" content="Factory Method, C#, Patrones de Diseño, Gang of Four, Programación Orientada a Objetos">
+    
+    <!-- Open Graph para redes sociales -->
+    <meta property="og:title" content="Patrón Factory Method en C#: Guía Completa">
+    <meta property="og:description" content="Domina el Factory Method con ejemplos del mundo real: talleres de impresión, videojuegos y sistemas de logística.">
+    <meta property="og:type" content="article">
+    
+    <!-- Schema.org para Google -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Patrón Factory Method en C#: Guía Completa con Ejemplos",
+        "description": "Guía completa del patrón Factory Method con implementación en C#, ejemplos prácticos y ejercicios.",
+        "author": {
+            "@type": "Person",
+            "name": "Desarrollador"
+        },
+        "datePublished": "2025-10-28",
+        "programmingLanguage": "C#"
+    }
+    </script>
+    
+    <link rel="stylesheet" href="style-patrones-article.css"> 
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MH6TJV68"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <header class="article-nav-header">
+        <a href="../index.html" class="back-link">&larr; Volver al Blog</a>
+    </header>
+
+    <main class="main-article">
+        <header>
+            <h1>Patrón Factory Method en C#: Guía Completa con Ejemplos</h1>
+            <p class="reading-time">⏱️ 12 min de lectura</p>
+        </header>
+        
+        <nav class="toc">
+            <h2>Tabla de Contenidos</h2>
+            <ul>
+                <li><a href="#introduccion">Introducción</a></li>
+                <li><a href="#taller-impresion">1. El Taller de Impresión</a></li>
+                <li><a href="#selector-personajes">2. El Selector de Personajes</a></li>
+                <li><a href="#implementacion">3. Implementación en C#</a></li>
+                <li><a href="#comparacion">4. Factory Method vs. Otros Patrones</a></li>
+                <li><a href="#diagrama">5. Diagrama UML</a></li>
+                <li><a href="#no-usar">⚠️ Cuándo NO Usarlo</a></li>
+                <li><a href="#ejercicio">💪 Ejercicio Práctico</a></li>
+                <li><a href="#faq">❓ Preguntas Frecuentes</a></li>
+                <li><a href="#conclusion">Conclusión</a></li>
+            </ul>
+        </nav>
+
+        <article>
+            
+            <section id="introduccion">
+                <h2>Introducción: El Patrón que Ves en Cada Menú</h2>
+                <p>Hay patrones de diseño que, una vez entiendes, empiezas a reconocer en todas partes. El <strong>Patrón Factory Method</strong> es uno de ellos. Define una relación elegante: un creador que sabe <em>qué</em> necesita crear, pero delega en otros <em>cómo</em> crearlo.</p>
+                <p>Si alguna vez te has preguntado cómo un videojuego genera personajes con un solo clic, cómo una aplicación decide qué tipo de notificación enviar según la plataforma, o cómo un sistema de logística elige entre camión, barco o avión sin que el código cliente se complique, estás en el lugar correcto.</p>
+                <p>Este patrón creacional es la base de la flexibilidad en el diseño orientado a objetos. En esta guía completa, lo desglosaremos desde cero:</p>
+                <ul>
+                    <li>Empezaremos con una analogía cotidiana del mundo real.</li>
+                    <li>Implementaremos un ejemplo completo en C# paso a paso.</li>
+                    <li>Veremos cuándo usarlo y cuándo evitarlo.</li>
+                    <li>Y terminaremos con un ejercicio práctico para que lo domines.</li>
+                </ul>
+            </section>
+
+			<div class="image-container">
+				<img src="../images/patrones/02_01.png" 
+				alt="Ilustración conceptual del Patrón de Diseño Factory Method. Muestra una interfaz de 'Creador' abstracta que delega la instanciación de 'Productos' (como un camión, un barco, un avión) a 'Creadores Concretos' (Fábrica de camiones, Fábrica de barcos), desacoplando al cliente de la creación de objetos."
+				title="Prompt: Una ilustración conceptual de estilo diagrama de flujo que muestra el Patrón Factory Method. En la parte superior, un 'Cliente' solicita un 'Producto'. El Cliente interactúa con un 'Creador' abstracto (una fábrica genérica). Este Creador tiene un método 'FactoryMethod()' que es implementado por múltiples 'Creadores Concretos' (una fábrica de camiones, una fábrica de barcos, una fábrica de aviones). Cada Creador Concreto produce su 'Producto Concreto' (un camión, un barco, un avión), todos los cuales implementan una interfaz 'Producto' común.">
+			</div>
+			<h6>Prompt: Una ilustración conceptual de estilo diagrama de flujo que muestra el Patrón Factory Method. En la parte superior, un 'Cliente' solicita un 'Producto'. El Cliente interactúa con un 'Creador' abstracto (una fábrica genérica). Este Creador tiene un método 'FactoryMethod()' que es implementado por múltiples 'Creadores Concretos' (una fábrica de camiones, una fábrica de barcos, una fábrica de aviones). Cada Creador Concreto produce su 'Producto Concreto' (un camión, un barco, un avión), todos los cuales implementan una interfaz 'Producto' común.</h6>
+			
+            <section id="taller-impresion">
+                <h2>1. El Taller de Impresión: Crear Sin Saber Cómo</h2>
+                <p>Imagina que trabajas en una oficina moderna y necesitas producir documentos. Vas al <strong>Taller de Producción</strong> y simplemente dices: <em>"Necesito imprimir este archivo"</em>.</p>
+                
+                <h3>El Taller como Abstracción</h3>
+                <p>El Taller tiene un método simple: <code>ProducirDocumento()</code>. Tú no necesitas saber si tu documento se imprimirá en:</p>
+                <ul>
+                    <li>Una <strong>impresora láser</strong> (rápida, para texto).</li>
+                    <li>Una <strong>impresora de inyección de tinta</strong> (para color y fotos).</li>
+                    <li>Una <strong>impresora 3D</strong> (para prototipos físicos).</li>
+                </ul>
+                <p>Simplemente entregas tu archivo y <strong>el taller específico decide</strong> qué máquina usar. Si es texto, vas al "Taller Láser". Si es una maqueta, vas al "Taller 3D".</p>
+
+                <h3>La Magia de la Extensibilidad</h3>
+                <p>Aquí está la clave: mañana, si la empresa compra una <strong>impresora de sublimación textil</strong>, ¿qué necesitas cambiar en tu forma de trabajar? <strong>Nada</strong>.</p>
+                <p>Solo se crea un nuevo "Taller de Sublimación" que implementa el mismo método <code>ProducirDocumento()</code>, y tú sigues haciendo lo mismo: entregas el archivo y recibes un documento producido.</p>
+                <p><strong>Esto es exactamente el Factory Method:</strong></p>
+                <ul>
+                    <li>El <strong>Taller base</strong> es tu clase abstracta <code>Taller</code> (el <strong>Creator</strong>).</li>
+                    <li>Cada <strong>taller específico</strong> (Láser, 3D, Sublimación) es un <strong>ConcreteCreator</strong>.</li>
+                    <li>El <strong>documento producido</strong> (papel impreso, objeto 3D, camiseta) es el <strong>Product</strong>.</li>
+                    <li><strong>Tú</strong>, el empleado, eres el <strong>código cliente</strong> que no sabe (ni le importa) qué máquina se usa.</li>
+                </ul>
+            </section>
+			
+			<div class="image-container">
+				<img src="../images/patrones/02_02.png" 
+				alt="Analogía del Patrón Factory Method usando un taller de impresión. Un cliente entrega un archivo a un 'Taller de Producción' (Creador). El taller delega el trabajo a máquinas específicas como una 'Impresora Láser' o 'Impresora 3D' (Creadores Concretos), que producen diferentes 'Documentos' (Productos)."
+				title="Prompt: Una ilustración de una analogía del Patrón Factory Method. Un empleado (Cliente) está en un mostrador etiquetado 'Taller de Producción' (Creator). El empleado entrega un archivo. Detrás del mostrador, se ven tres máquinas distintas funcionando: una 'Impresora Láser' (ConcreteCreator 1) produciendo papel, una 'Impresora 3D' (ConcreteCreator 2) creando un objeto, y una 'Impresora Textil' (ConcreteCreator 3) imprimiendo una camiseta. El cliente no interactúa directamente con las máquinas.">
+			</div>
+			<h6>Prompt: Una ilustración de una analogía del Patrón Factory Method. Un empleado (Cliente) está en un mostrador etiquetado 'Taller de Producción' (Creator). El empleado entrega un archivo. Detrás del mostrador, se ven tres máquinas distintas funcionando: una 'Impresora Láser' (ConcreteCreator 1) produciendo papel, una 'Impresora 3D' (ConcreteCreator 2) creando un objeto, y una 'Impresora Textil' (ConcreteCreator 3) imprimiendo una camiseta. El cliente no interactúa directamente con las máquinas.</h6>
+
+            <section id="selector-personajes">
+                <h2>2. El Patrón en tu Día a Día: El Selector de Personajes</h2>
+                <p>Este mismo patrón lo usas cada vez que juegas un videojuego de rol.</p>
+
+                <h3>Anatomía de la Creación de Personajes</h3>
+                <p>Entras al juego. Ves la pantalla de selección: <strong>Guerrero</strong>, <strong>Mago</strong>, <strong>Arquero</strong>.</p>
+                <p>Haces clic en "Guerrero". El juego no te pregunta:</p>
+                <ul>
+                    <li>¿Cuántos puntos de vida quieres?</li>
+                    <li>¿Qué arma prefieres?</li>
+                    <li>¿Cuál es tu armadura inicial?</li>
+                </ul>
+                <p>Simplemente <strong>crea un Guerrero completamente configurado</strong> con 150 HP, una espada de acero y armadura pesada. Todo automático.</p>
+                <p>En ese momento, acabas de usar el Factory Method:</p>
+                <ul>
+                    <li><strong>El Sistema de Creación:</strong> El creador abstracto que sabe que necesita un personaje.</li>
+                    <li><strong>El Creador Concreto:</strong> La fábrica de "Guerreros" que sabe exactamente cómo configurar uno.</li>
+                    <li><strong>El Producto:</strong> El personaje Guerrero totalmente funcional.</li>
+                </ul>
+                <p>Si el juego añade una nueva clase "Nigromante" en un DLC, solo agregan una nueva fábrica. <strong>El código de selección de personajes no cambia ni una línea.</strong></p>
+            </section>
+
+			<div class="image-container">
+				<img src="../images/patrones/02_03.png" 
+				alt="Ejemplo del Patrón Factory Method en un videojuego. Una pantalla de 'Selección de Personaje' (Cliente) muestra opciones: 'Guerrero', 'Mago', 'Arquero'. Al seleccionar 'Guerrero', se invoca una 'FábricaDeGuerreros' (ConcreteCreator) que instancia un objeto 'Guerrero' (Producto) con su equipamiento predeterminado."
+				title="Prompt: Ilustración de la interfaz de usuario (UI) de un videojuego de fantasía para 'Creación de Personaje'. Se muestran tres botones grandes: 'Guerrero', 'Mago' y 'Arquero'. Una flecha desde el botón 'Guerrero' apunta a un engranaje o fábrica pequeña etiquetada 'FábricaDeGuerreros' (ConcreteCreator). Esta fábrica emite una figura de un 'Guerrero' completamente equipado (Producto Concreto), con espada y armadura.">
+			</div>
+			<h6>Prompt: Ilustración de la interfaz de usuario (UI) de un videojuego de fantasía para 'Creación de Personaje'. Se muestran tres botones grandes: 'Guerrero', 'Mago' y 'Arquero'. Una flecha desde el botón 'Guerrero' apunta a un engranaje o fábrica pequeña etiquetada 'FábricaDeGuerreros' (ConcreteCreator). Esta fábrica emite una figura de un 'Guerrero' completamente equipado (Producto Concreto), con espada y armadura.</h6>
+
+            <section id="implementacion">
+                <h2>3. Implementación en C#: Código Paso a Paso</h2>
+                <p>Traduzcamos esto a C#. Vamos a construir el ejemplo del <strong>sistema de logística</strong> que decide entre diferentes tipos de transporte. El código debe ser copiable y funcional.</p>
+                
+                <h3 id="interfaces">3.1 El Contrato del Producto (Interfaz ITransporte)</h3>
+                <p>La interfaz <code>ITransporte</code> obliga a todos los transportes a tener un método <code>Entregar()</code>.</p>
+<pre><code class="language-csharp">
+/// &lt;summary&gt;
+/// El contrato del Producto.
+/// Define lo que todos los transportes deben poder hacer.
+/// &lt;/summary&gt;
+public interface ITransporte
+{
+    void Entregar();
+}
+</code></pre>
+
+                <h3 id="productos">3.2 Los Productos Concretos (Camion y Barco)</h3>
+                <p>Ahora creamos las implementaciones concretas.</p>
+<pre><code class="language-csharp">
+/// &lt;summary&gt;
+/// Producto Concreto 1: Transporte terrestre.
+/// &lt;/summary&gt;
+public class Camion : ITransporte
+{
+    public void Entregar()
+    {
+        Console.WriteLine("📦 Entrega realizada por TIERRA (Camión).");
+    }
+}
+
+/// &lt;summary&gt;
+/// Producto Concreto 2: Transporte marítimo.
+/// &lt;/summary&gt;
+public class Barco : ITransporte
+{
+    public void Entregar()
+    {
+        Console.WriteLine("🚢 Entrega realizada por MAR (Barco).");
+    }
+}
+</code></pre>
+
+                <h3 id="creador">3.3 El Creador Base (Clase Abstracta Logistica)</h3>
+                <p>Esta es la clase que <strong>define el Factory Method</strong> pero no lo implementa. También contiene la lógica de negocio que usa el producto.</p>
+<pre><code class="language-csharp">
+/// &lt;summary&gt;
+/// El Creador (Creator).
+/// Declara el Factory Method que retorna un ITransporte.
+/// La lógica de negocio depende del producto, pero no sabe cuál es.
+/// &lt;/summary&gt;
+public abstract class Logistica
+{
+    // ⚡ Este es el FACTORY METHOD
+    // Las subclases deben implementarlo.
+    public abstract ITransporte CrearTransporte();
+
+    // 🔧 Lógica de negocio que usa el producto
+    // No sabe qué transporte concreto se está usando.
+    public void PlanificarEntrega()
+    {
+        // 1. Llama al Factory Method para obtener el producto
+        ITransporte transporte = CrearTransporte();
+
+        // 2. Usa el producto (sin saber qué es exactamente)
+        Console.WriteLine("\n⏳ Planificando la logística...");
+        transporte.Entregar();
+        Console.WriteLine("✅ Entrega completada.\n");
+    }
+}
+</code></pre>
+
+                <h3 id="creadores-concretos">3.4 Los Creadores Concretos (LogisticaTerrestre y LogisticaMaritima)</h3>
+                <p>Estas subclases <strong>implementan el Factory Method</strong> y deciden qué producto concreto crear.</p>
+<pre><code class="language-csharp">
+/// &lt;summary&gt;
+/// Creador Concreto 1.
+/// Implementa el Factory Method para crear un Camion.
+/// &lt;/summary&gt;
+public class LogisticaTerrestre : Logistica
+{
+    public override ITransporte CrearTransporte()
+    {
+        Console.WriteLine("🏭 [Fábrica Terrestre] Creando un Camión...");
+        return new Camion();
+    }
+}
+
+/// &lt;summary&gt;
+/// Creador Concreto 2.
+/// Implementa el Factory Method para crear un Barco.
+/// &lt;/summary&gt;
+public class LogisticaMaritima : Logistica
+{
+    public override ITransporte CrearTransporte()
+    {
+        Console.WriteLine("🏭 [Fábrica Marítima] Creando un Barco...");
+        return new Barco();
+    }
+}
+</code></pre>
+
+                <h3 id="ejecucion">3.5 Ejecutando el Código (El Cliente)</h3>
+                <p>Juntamos todo en un <code>Program.cs</code> para ver la magia.</p>
+<pre><code class="language-csharp">
+using System;
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        Logistica miLogistica;
+
+        // Contexto 1: Necesitamos entrega terrestre
+        Console.WriteLine("=== ESCENARIO 1: Logística Terrestre ===");
+        miLogistica = new LogisticaTerrestre();
+        miLogistica.PlanificarEntrega();
+
+        Console.WriteLine(new string('-', 50));
+
+        // Contexto 2: Necesitamos entrega marítima
+        Console.WriteLine("=== ESCENARIO 2: Logística Marítima ===");
+        miLogistica = new LogisticaMaritima();
+        miLogistica.PlanificarEntrega();
+
+        Console.WriteLine(new string('-', 50));
+
+        // Extensión: Añadimos un nuevo transporte SIN modificar código existente
+        Console.WriteLine("=== ESCENARIO 3: Nueva Logística Aérea (Extensión) ===");
+        miLogistica = new LogisticaAerea();
+        miLogistica.PlanificarEntrega();
+    }
+}
+
+// 🚀 EXTENSIÓN: Añadiendo un nuevo tipo sin tocar el código anterior
+public class Avion : ITransporte
+{
+    public void Entregar()
+    {
+        Console.WriteLine("✈️ Entrega realizada por AIRE (Avión).");
+    }
+}
+
+public class LogisticaAerea : Logistica
+{
+    public override ITransporte CrearTransporte()
+    {
+        Console.WriteLine("🏭 [Fábrica Aérea] Creando un Avión...");
+        return new Avion();
+    }
+}
+</code></pre>
+                
+                <p><strong>Resultado en Consola:</strong></p>
+<pre><code class="language-bash">
+=== ESCENARIO 1: Logística Terrestre ===
+🏭 [Fábrica Terrestre] Creando un Camión...
+
+⏳ Planificando la logística...
+📦 Entrega realizada por TIERRA (Camión).
+✅ Entrega completada.
+
+--------------------------------------------------
+=== ESCENARIO 2: Logística Marítima ===
+🏭 [Fábrica Marítima] Creando un Barco...
+
+⏳ Planificando la logística...
+🚢 Entrega realizada por MAR (Barco).
+✅ Entrega completada.
+
+--------------------------------------------------
+=== ESCENARIO 3: Nueva Logística Aérea (Extensión) ===
+🏭 [Fábrica Aérea] Creando un Avión...
+
+⏳ Planificando la logística...
+✈️ Entrega realizada por AIRE (Avión).
+✅ Entrega completada.
+</code></pre>
+            </section>
+
+            <section id="comparacion">
+                <h2>4. Factory Method vs. Otros Patrones: ¿Cuándo Usar Cada Uno?</h2>
+                <p>Factory Method puede confundirse con otros patrones creacionales. Aclaremos las diferencias.</p>
+
+                <h3>Factory Method vs. Abstract Factory</h3>
+                <ul>
+                    <li><strong>Factory Method:</strong> Crea <em>un</em> producto. Enfocado en <strong>delegar la creación a subclases</strong>.</li>
+                    <li><strong>Abstract Factory:</strong> Crea <em>familias</em> de productos relacionados. Enfocado en <strong>crear conjuntos coherentes</strong> (ej: UI para Windows vs macOS).</li>
+                </ul>
+                <p><strong>Ejemplo:</strong> Factory Method crea "un botón". Abstract Factory crea "un botón, un menú y una ventana" todos con el mismo estilo.</p>
+
+                <h3>Factory Method vs. Builder</h3>
+                <ul>
+                    <li><strong>Factory Method:</strong> Crea objetos simples en un solo paso.</li>
+                    <li><strong>Builder:</strong> Construye objetos complejos paso a paso (ej: configurar un pedido con múltiples opciones).</li>
+                </ul>
+                <p><strong>Ejemplo:</strong> Factory Method crea "una pizza Margarita". Builder te permite elegir masa, salsa, quesos, ingredientes, tamaño, cocción... paso a paso.</p>
+
+                <h3>Factory Method vs. Prototype</h3>
+                <ul>
+                    <li><strong>Factory Method:</strong> Crea objetos nuevos llamando al constructor.</li>
+                    <li><strong>Prototype:</strong> Crea objetos nuevos <strong>clonando</strong> un objeto existente.</li>
+                </ul>
+            </section>
+
+            <section id="diagrama">
+                <h2>5. Diagrama UML y Definición Formal</h2>
+                <p>Así es como se ve el patrón en un diagrama de clases UML formal:</p>
+                
+                <blockquote>
+                    <strong>Oficialmente, el Patrón Factory Method:</strong><br><br>
+                    Es un patrón de diseño creacional que define una interfaz para crear un objeto, pero permite que las subclases alteren el tipo de objetos que se crean. Factory Method delega la instanciación a las subclases.
+                </blockquote>
+
+                <h3>Los Cuatro Actores del Patrón</h3>
+                <ul>
+                    <li><strong>Product (<code>ITransporte</code>):</strong> La interfaz común de los objetos que el factory method crea.</li>
+                    <li><strong>ConcreteProduct (<code>Camion</code>, <code>Barco</code>):</strong> Las implementaciones concretas de Product.</li>
+                    <li><strong>Creator (<code>Logistica</code>):</strong> Declara el factory method que retorna un Product. Contiene lógica de negocio que usa el producto.</li>
+                    <li><strong>ConcreteCreator (<code>LogisticaTerrestre</code>, <code>LogisticaMaritima</code>):</strong> Implementa el factory method para crear un ConcreteProduct específico.</li>
+                </ul>
+            </section>
+
+			<div class="image-container">
+				<img src="../images/patrones/02_04.png" 
+				alt="Diagrama de clases UML del Patrón Factory Method. Muestra la relación entre 'Creator' abstracto, 'ConcreteCreator', 'Product' (interfaz) y 'ConcreteProduct'. El 'Creator' define el 'factoryMethod()' que es implementado por 'ConcreteCreator' para instanciar un 'ConcreteProduct'."
+				title="Prompt: Un diagrama de clases UML claro y profesional que ilustra el Patrón de Diseño Factory Method. El diagrama debe incluir cuatro componentes: 1) Una clase abstracta 'Creator' con un método abstracto 'factoryMethod()' que devuelve un 'Product'. 2) Una o más clases 'ConcreteCreator' que heredan de 'Creator' e implementan el 'factoryMethod()' para devolver un 'ConcreteProduct'. 3) Una interfaz 'Product' con un método 'Operation()'. 4) Una o más clases 'ConcreteProduct' que implementan la interfaz 'Product'. Las flechas de herencia (triángulo hueco) y de implementación (línea discontinua con triángulo hueco) deben ser claras. El 'ConcreteCreator' debe tener una dependencia de 'creación' (línea discontinua con flecha abierta) hacia el 'ConcreteProduct' que crea.">
+			</div>
+			<h6>Prompt: Un diagrama de clases UML claro y profesional que ilustra el Patrón de Diseño Factory Method. El diagrama debe incluir cuatro componentes: 1) Una clase abstracta 'Creator' con un método abstracto 'factoryMethod()' que devuelve un 'Product'. 2) Una o más clases 'ConcreteCreator' que heredan de 'Creator' e implementan el 'factoryMethod()' para devolver un 'ConcreteProduct'. 3) Una interfaz 'Product' con un método 'Operation()'. 4) Una o más clases 'ConcreteProduct' que implementan la interfaz 'Product'. Las flechas de herencia (triángulo hueco) y de implementación (línea discontinua con triángulo hueco) deben ser claras. El 'ConcreteCreator' debe tener una dependencia de 'creación' (línea discontinua con flecha abierta) hacia el 'ConcreteProduct' que crea.</h6>
+
+            <section id="no-usar" class="info-box warning-box">
+                <h2>⚠️ Cuándo NO Usar el Patrón Factory Method</h2>
+                <p>Factory Method es elegante, pero no es la solución para todo. Usarlo mal puede complicar tu código innecesariamente.</p>
+                
+                <h3>Evítalo Si...</h3>
+                <ul>
+                    <li><strong>Solo tienes un tipo de producto:</strong> Si solo vas a crear <code>Camion</code> y nunca habrá otro transporte, no necesitas el patrón. Usa <code>new Camion()</code> directamente.</li>
+                    <li><strong>La creación es trivial:</strong> Si crear el objeto es solo llamar al constructor sin lógica adicional, el patrón añade complejidad innecesaria.</li>
+                    <li><strong>No necesitas extensibilidad:</strong> Si sabes que tu sistema nunca necesitará nuevos tipos de productos, YAGNI (You Aren't Gonna Need It).</li>
+                </ul>
+
+                <h3>Problemas Comunes</h3>
+                <ul>
+                    <li><strong>Jerarquías paralelas:</strong> Terminas con dos jerarquías de clases paralelas (Products y Creators). Esto puede ser confuso si no está bien documentado.</li>
+                    <li><strong>Over-engineering:</strong> Usar Factory Method para crear objetos simples como <code>new Usuario(nombre, email)</code> es matar moscas a cañonazos.</li>
+                </ul>
+
+                <h3>Alternativas Comunes</h3>
+                <ul>
+                    <li><strong>Simple Factory (no es un patrón GoF):</strong> Un método estático que decide qué crear basado en un parámetro. Más simple pero menos flexible.</li>
+                    <li><strong>Abstract Factory:</strong> Si necesitas crear familias de objetos relacionados.</li>
+                    <li><strong>Dependency Injection:</strong> Si quieres invertir completamente el control de las dependencias.</li>
+                </ul>
+            </section>
+            
+            <section id="ejercicio" class="info-box exercise-box">
+                <h2>💪 Ejercicio para Practicar</h2>
+                <p>¿Listo para dominar el patrón? Implementa un <strong>sistema de notificaciones multiplataforma</strong>:</p>
+                
+                <h3>Requisitos</h3>
+                <ol>
+                    <li><strong>Creador Base:</strong> Crea una clase abstracta <code>ServicioNotificacion</code> con un método abstracto <code>CrearNotificacion()</code> y un método concreto <code>EnviarMensaje(string mensaje)</code> que:
+                        <ul>
+                            <li>Llama a <code>CrearNotificacion()</code> para obtener una notificación.</li>
+                            <li>Llama al método <code>Enviar(mensaje)</code> de la notificación.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Productos:</strong> Crea una interfaz <code>INotificacion</code> con el método <code>Enviar(string mensaje)</code>. Luego crea 3 implementaciones:
+                        <ul>
+                            <li><code>NotificacionEmail</code>: Simula enviar un email.</li>
+                            <li><code>NotificacionSMS</code>: Simula enviar un SMS.</li>
+                            <li><code>NotificacionPush</code>: Simula enviar una notificación push.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Creadores Concretos:</strong> Crea 3 servicios que implementen el Factory Method para cada tipo de notificación.</li>
+                </ol>
+                
+                <h3>Bonus</h3>
+                <p>Añade una cuarta notificación: <code>NotificacionSlack</code>, con su correspondiente <code>ServicioSlack</code>, <strong>sin modificar ninguna de las clases existentes</strong>. Esto demuestra el poder del Principio Abierto/Cerrado.</p>
+            </section>
+
+            <section id="faq">
+                <h2>❓ Preguntas Frecuentes</h2>
+                
+                <h3>¿Cuál es la diferencia entre Factory Method y Simple Factory?</h3>
+                <p>Simple Factory usa un método estático y no es extensible sin modificar código. Factory Method usa herencia y permite añadir nuevos productos sin modificar código existente, adhiriéndose al Principio Abierto/Cerrado.</p>
+                
+                <h3>¿Cuándo debería usar Factory Method en lugar de new directo?</h3>
+                <p>Cuando necesites extensibilidad futura, cuando la creación del objeto requiera lógica compleja, o cuando quieras desacoplar el código cliente de las clases concretas. Si solo tienes un tipo de objeto simple, usa <code>new</code> directamente.</p>
+                
+                <h3>¿Factory Method es lo mismo que una interfaz de fábrica?</h3>
+                <p>No exactamente. Factory Method es un patrón que usa herencia (clases abstractas o virtuales). Una interfaz de fábrica es más cercano al patrón Abstract Factory, que trabaja con composición en lugar de herencia.</p>
+                
+                <h3>¿Puedo usar Factory Method con Dependency Injection?</h3>
+                <p>¡Sí! De hecho, se complementan muy bien. Puedes inyectar una fábrica (Creator) en lugar de productos concretos, lo que te da más flexibilidad. Por ejemplo: <code>ILogisticaFactory</code> podría ser inyectada y decidir qué tipo de logística crear en runtime.</p>
+                
+                <h3>¿Es Factory Method un anti-patrón si solo tengo dos productos?</h3>
+                <p>No necesariamente. Si esperas que crezca o si esos dos productos tienen lógica de creación compleja, está justificado. Pero si son objetos simples y nunca crecerán, probablemente sea over-engineering.</p>
+
+                <h3>Casos de Uso Reales</h3>
+                <p>El Factory Method se usa extensivamente en frameworks y aplicaciones profesionales:</p>
+                <ul>
+                    <li><strong>Unity/Unreal Engine:</strong> Creación de enemigos, NPCs o items según el nivel, dificultad o contexto del juego.</li>
+                    <li><strong>ASP.NET Core:</strong> Creación de diferentes tipos de respuestas HTTP (JSON, XML, HTML) según el Accept header.</li>
+                    <li><strong>Entity Framework:</strong> Creación de proveedores de base de datos (SQL Server, PostgreSQL, SQLite) sin cambiar el código de acceso a datos.</li>
+                    <li><strong>Logging Frameworks:</strong> Creación de diferentes loggers (ConsoleLogger, FileLogger, DatabaseLogger) según la configuración.</li>
+                    <li><strong>Payment Gateways:</strong> Creación de procesadores de pago (PayPal, Stripe, Square) según la preferencia del usuario.</li>
+                </ul>
+            </section>
+
+            <section id="conclusion">
+                <h2>Conclusión: La Flexibilidad Elegante</h2>
+                <p>El Patrón Factory Method es fundamental para escribir código extensible y mantenible. Es la diferencia entre un sistema rígido que requiere modificar código existente cada vez que añades una funcionalidad, y un sistema flexible que acepta extensiones sin dolor.</p>
+                <p>El taller de impresión sigue sin saber qué máquina específica usarás mañana, y tu código cliente sigue sin preocuparse. Simplemente pide "un documento", y el patrón se encarga de conectar la abstracción con la implementación correcta.</p>
+                <p>La próxima vez que veas un menú de selección, una pantalla de configuración con opciones, o un sistema que "adapta" su comportamiento según el contexto... ya sabes qué patrón está trabajando silenciosamente detrás.</p>
+                <p>...</p>
+                <p>Y ahora que conoces el secreto, cada vez que hagas clic en "Crear nuevo personaje", sabrás exactamente qué está pasando bajo el capó. 🏭✨</p>
+            </section>
+        
+        </article>
+
+    </main> 
+    
+    <footer class="site-footer">
+        <p>&copy; 2025 - magolo .NET</p>
+    </footer>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

@@ -1,25 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MH6TJV68');</script>
+<!-- End Google Tag Manager -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Patrón Observer en C#: Guía Completa con Ejemplos [2025]</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <title>Patrón Observer en C#: Guía Completa con Ejemplos</title>
     <meta name="description" content="Aprende el Patrón Observer en C# desde cero: ejemplos naturales, código completo, SignalR y aplicaciones reales. Tutorial paso a paso con diagramas.">
+    <meta name="keywords" content="Observer Method, C#, Patrones de Diseño, Gang of Four, Programación Orientada a Objetos">
     
+    <!-- Open Graph para redes sociales -->
+    <meta property="og:title" content="Patrón Observer en C#: Guía Completa">
+    <meta property="og:description" content="Domina el Observer con ejemplos del mundo real: talleres de impresión, videojuegos y sistemas de logística.">
+    <meta property="og:type" content="article">
+    
+    <!-- Schema.org para Google -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Patrón Factory Method en C#: Guía Completa con Ejemplos",
+        "description": "Guía completa del patrón Factory Method con implementación en C#, ejemplos prácticos y ejercicios.",
+        "author": {
+            "@type": "Person",
+            "name": "Desarrollador"
+        },
+        "datePublished": "2025-10-28",
+        "programmingLanguage": "C#"
+    }
+    </script>
+	
     <link rel="stylesheet" href="style-patrones-article.css"> 
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
 </head>
 <body>
-
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MH6TJV68"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
     <header class="article-nav-header">
         <a href="../index.html" class="back-link">&larr; Volver al Blog</a>
     </header>
 
     <main class="main-article">
         <header>
-            <h1>Patrón Observer en C#: Guía Completa con Ejemplos [2025]</h1>
+            <h1>Patrón Observer en C#: Guía Completa con Ejemplos</h1>
             <p class="reading-time">⏱️ 9 min de lectura</p>
         </header>
         
@@ -54,10 +85,11 @@
             </section>
             
 			<div class="image-container">
-				<img src="../images/01_01.png" 
+				<img src="../images/patrones/01_01.png" 
 				alt="Amanecer en un bosque, simbolizando un cambio de estado y el Patrón Observer."
 				title="Prompt: Cinematic sunrise in forest, warm golden light, high-detail.">
 			</div>
+			<h6>Prompt: Cinematic sunrise in forest, warm golden light, high-detail.</h6>
 
             <section id="natural">
                 <h2>1. La Reacción Natural: El Sol y el Bosque</h2>
@@ -75,10 +107,11 @@
                 </ul>
                 <p>Aquí está la clave: el Sol no sabe quiénes son, ni cuántos hay, ni qué hacen. El Sol está <strong>desacoplado</strong> de los Observadores. Solo avisa, y ellos deciden cómo reaccionar.</p>
                 <div class="image-container">
-					<img src="../images/01_02.png" 
+					<img src="../images/patrones/01_02.png" 
 					alt="Gallo cantando al amanecer, un ejemplo natural de un 'Observador' reaccionando a un 'Sujeto' (el sol)."
 					title="Prompt: A rooster crowing energetically, golden sunrise light from the side.">
 				</div>
+				<h6>Prompt: A rooster crowing energetically, golden sunrise light from the side.</h6>
             </section>
 
             <section id="apps">
@@ -94,10 +127,11 @@
                 </ul>
                 <p>Cuando el Youtuber sube un vídeo (un <em>cambio de estado</em>), la plataforma notifica a todos sus Observadores (te envía una notificación push).</p>
                 <div class="image-container">
-					<img src="../images/01_03.png" 
+					<img src="../images/patrones/01_03.png" 
 					alt="Botón de suscripción y campana de YouTube, un ejemplo real del Patrón Observer en aplicaciones."
 					title="Prompt: Flat UI animation, YouTube subscribe button and bell icon shaking.">
 				</div>
+				<h6>Prompt: Flat UI animation, YouTube subscribe button and bell icon shaking.</h6>
             </section>
 
             <section id="implementacion">
@@ -277,20 +311,22 @@ public class Program
                 </ol>
                 <p>Imagina una app de inventario. Cuando Eneko actualiza el stock en la base de datos, el servidor (Sujeto) notifica al Hub, y el Hub de SignalR <em>empuja</em> el nuevo stock a la pantalla de Lola (Observador) al instante.</p>
                 <div class="image-container">
-					<img src="../images/01_04.png" 
+					<img src="../images/patrones/01_04.png" 
 					alt="Diagrama de SignalR implementando el Patrón Observer en .NET para notificar a múltiples clientes desde un servidor."
 					title="Prompt: Glowing data packets from server node to multiple laptops, tech aesthetic.">
 				</div>
+				<h6>Prompt: Glowing data packets from server node to multiple laptops, tech aesthetic.</h6>
             </section>
 
             <section id="diagrama">
                 <h2>5. Diagrama UML y Definición Formal</h2>
                 <p>Así es como se ve el patrón en un diagrama de clases UML formal:</p>
                 <div class="image-container">
-					<img src="../images/01_05.png" 
+					<img src="../images/patrones/01_05.png" 
 					alt="Diagrama de clases UML del Patrón Observer, mostrando la relación entre las interfaces ISujeto e IObservador."
 					title="Prompt: Clean UML class diagram of Observer pattern, minimalist, vector style.">
 				</div>
+				<h6>Prompt: Clean UML class diagram of Observer pattern, minimalist, vector style.</h6>
                 <p>Oficialmente, el Patrón Observer:</p>
                 <blockquote>
                     Es un <strong>patrón de diseño de comportamiento</strong> que define una dependencia de <strong>uno-a-muchos</strong> entre objetos. Cuando el estado de un objeto (el <strong>Sujeto</strong>) cambia, todos sus dependientes (los <strong>Observadores</strong>) son notificados y actualizados automáticamente.
@@ -339,7 +375,9 @@ public class Program
         
         </article>
 
-    </main> <footer class="site-footer">
+    </main> 
+	
+	<footer class="site-footer">
         <p>&copy; 2025 - magolo .NET</p>
     </footer>
     
