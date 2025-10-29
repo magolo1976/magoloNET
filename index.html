@@ -8,41 +8,74 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-MH6TJV68');</script>
 <!-- End Google Tag Manager -->
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Tu Blog de Desarrollo (C# y Mas)</title>
-    <meta name="description" content="Un blog personal sobre desarrollo de software, C#, patrones de diseño y buenas prácticas.">
+    <!-- SEO Meta Tags -->
+    <title>magolo.NET - Arquitecto de Software | .NET, Azure, Kubernetes, IA</title>
+    <meta name="description" content="Blog técnico de Miguel Ángel (magolo). Documentando el camino hacia sistemas autónomos, cloud-native e inteligentes. De .NET a Kubernetes, de microservicios a agentes IA.">
+    <meta name="author" content="Miguel Ángel">
+    <meta name="keywords" content="arquitecto software, .NET, C#, Azure, Kubernetes, microservicios, IA, LLMs, clean architecture, DDD">
 
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.magolo.net/">
+    <meta property="og:title" content="magolo.NET - Arquitecto de Software | .NET, Azure, Kubernetes, IA">
+    <meta property="og:description" content="Documentando el camino hacia sistemas autónomos, cloud-native e inteligentes.">
+    <meta property="og:image" content="https://www.magolo.net/images/og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.magolo.net/">
+    <meta property="twitter:title" content="magolo.NET - Arquitecto de Software">
+    <meta property="twitter:description" content="Documentando el camino hacia sistemas autónomos, cloud-native e inteligentes.">
+    <meta property="twitter:image" content="https://www.magolo.net/images/og-image.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    
+    <!-- RSS Feed -->
+    <link rel="alternate" type="application/rss+xml" title="magolo.NET Feed" href="/feed.xml">
+
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="style-home.css">
 </head>
 <body>
+    
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MH6TJV68"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
+
+    <!-- Header -->
     <header class="site-header">
         <div class="header-content">
-            <h1>magolo .NET</h1>
-            <p class="subtitle">Tutoriales y guías sobre C#, .NET, Cloud, IA y mucho mas</p>
+            <h1>magolo<span class="accent">.NET</span></h1>
+            <p class="subtitle">Arquitectura de Software • Cloud Native • Inteligencia Artificial</p>
+            <p class="tagline">Documentando el viaje hacia <strong>Helios Nexus</strong></p>
         </div>
     </header>
 
+    <!-- Main Layout -->
     <div class="main-layout">
 
+        <!-- Sidebar -->
         <aside class="sidebar">
             <nav class="sidebar-nav">
-                <h3>Categorías</h3>
+                <h3>Explorar</h3>
                 
-                <details class="nav-level-1">
+                <!-- Patrones de Diseño -->
+                <details class="nav-level-1" open>
                     <summary>Patrones de Diseño</summary>
                     <ul>
                         <li>
-                            <details class="nav-level-2">
+                            <details class="nav-level-2" open>
                                 <summary>Comportamiento</summary>
                                 <ul>
                                     <li><a href="articles/comportamiento-patron-observer-csharp.html">Observer</a></li>
-                                    <li><a href="#" class="disabled">Strategy (Próximo)</a></li>
+                                    <li><a href="#" class="disabled">Strategy</a></li>
+                                    <li><a href="#" class="disabled">Command</a></li>
                                 </ul>
                             </details>
                         </li>
@@ -51,8 +84,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <details class="nav-level-2">
                                 <summary>Creacionales</summary>
                                 <ul>
-                                    <li><a href="#" class="disabled">Singleton (Próximo)</a></li>
-                                    <li><a href="#" class="disabled">Factory (Próximo)</a></li>
+                                    <li><a href="#" class="disabled">Factory</a></li>
+                                    <li><a href="#" class="disabled">Builder</a></li>
+                                    <li><a href="#" class="disabled">Singleton</a></li>
                                 </ul>
                             </details>
                         </li>
@@ -61,58 +95,197 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <details class="nav-level-2">
                                 <summary>Estructurales</summary>
                                 <ul>
-                                    <li><a href="#" class="disabled">Adapter (Próximo)</a></li>
+                                    <li><a href="#" class="disabled">Adapter</a></li>
+                                    <li><a href="#" class="disabled">Decorator</a></li>
                                 </ul>
                             </details>
                         </li>
                     </ul>
                 </details>
 
+                <!-- Arquitectura -->
                 <details class="nav-level-1">
-                    <summary>Tutoriales de C#</summary>
-                     <ul>
-                        <li>
-                            <details class="nav-level-2">
-                                <summary>.NET Core</summary>
-                                <ul>
-                                    <li><a href="#" class="disabled">APIs con EF Core (Próximo)</a></li>
-                                </ul>
-                            </details>
-                        </li>
+                    <summary>Arquitectura</summary>
+                    <ul>
+                        <li><a href="#" class="disabled">Clean Architecture</a></li>
+                        <li><a href="#" class="disabled">DDD</a></li>
+                        <li><a href="#" class="disabled">Microservicios</a></li>
+                        <li><a href="#" class="disabled">CQRS + Event Sourcing</a></li>
                     </ul>
                 </details>
+
+                <!-- Cloud & DevOps -->
+                <details class="nav-level-1">
+                    <summary>Cloud & DevOps</summary>
+                    <ul>
+                        <li><a href="#" class="disabled">Azure para Arquitectos</a></li>
+                        <li><a href="#" class="disabled">Kubernetes</a></li>
+                        <li><a href="#" class="disabled">Terraform</a></li>
+                        <li><a href="#" class="disabled">CI/CD</a></li>
+                    </ul>
+                </details>
+
+                <!-- Inteligencia Artificial -->
+                <details class="nav-level-1">
+                    <summary>Inteligencia Artificial</summary>
+                    <ul>
+                        <li><a href="#" class="disabled">LLMs en .NET</a></li>
+                        <li><a href="#" class="disabled">Semantic Kernel</a></li>
+                        <li><a href="#" class="disabled">RAG en Producción</a></li>
+                        <li><a href="#" class="disabled">Agentes IA</a></li>
+                    </ul>
+                </details>
+
+                <!-- Proyecto Helios -->
+                <div class="helios-box">
+                    <h4>🌟 Proyecto Helios Nexus</h4>
+                    <p>Arquitectura de referencia evolutiva</p>
+                    <a href="helios-nexus.html" class="helios-link">Ver proyecto →</a>
+                </div>
 
             </nav>
         </aside>
 
+        <!-- Main Content -->
         <main class="main-content">
             
+            <!-- Status Badge (opcional, muy cool) -->
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                <span>Helios Alpha: En desarrollo | Última actualización: Oct 2025</span>
+            </div>
+
+            <!-- Article List -->
             <section class="article-list">
                 
+                <!-- Artículo Publicado -->
                 <article class="article-card">
                     <div class="card-content">
                         <header>
-                            <span class="card-meta">22 de Octubre, 2025 &bull; ⏱️ 9 min de lectura</span>
+                            <div class="card-tags">
+                                <span class="tag">Patrones de Diseño</span>
+                                <span class="tag">C#</span>
+                            </div>
+                            <span class="card-meta">22 de Octubre, 2025 • ⏱️ 9 min</span>
                             <h2>Patrón Observer en C#: Guía Completa con Ejemplos [2025]</h2>
                         </header>
                         <p>Aprende el Patrón Observer en C# desde cero: ejemplos naturales, código completo, SignalR y aplicaciones reales. Tutorial paso a paso con diagramas.</p>
-                        <a href="articles/comportamiento-patron-observer-csharp.html" class="card-link">Leer más &rarr;</a>
+                        <div class="card-footer">
+                            <a href="articles/comportamiento-patron-observer-csharp.html" class="card-link">Leer artículo →</a>
+                        </div>
                     </div>
                 </article>
 
-                <article class="article-card">
+                <!-- Artículo Próximamente -->
+                <article class="article-card upcoming">
                     <div class="card-content">
                         <header>
-                            <span class="card-meta">Próximamente...</span>
-                            <h2>El Patrón Singleton: Ventajas y Desventajas</h2>
+                            <div class="card-tags">
+                                <span class="tag">Próximamente</span>
+                            </div>
+                            <span class="card-meta">Noviembre 2025</span>
+                            <h2>SOLID en C#: Más Allá de la Teoría</h2>
                         </header>
-                        <p>Un análisis profundo de uno de los patrones más conocidos y controvertidos. Cuándo usarlo y, más importante, cuándo evitarlo a toda costa.</p>
-                        <a href="#" class="card-link disabled">Leer más &rarr;</a>
+                        <p>Los 5 principios SOLID aplicados a proyectos reales. Cómo evitar sobre-ingeniería y cuándo cada principio realmente importa.</p>
+                        <div class="card-footer">
+                            <span class="card-link disabled">Próximamente...</span>
+                        </div>
                     </div>
                 </article>
 
-            </section> </main> </div> <footer class="site-footer">
-        <p>&copy; 2025 - Mi Blog de Desarrollo. Creado con HTML/CSS y hosteado en GitHub Pages.</p>
+                <!-- Más Próximamente -->
+                <article class="article-card upcoming">
+                    <div class="card-content">
+                        <header>
+                            <div class="card-tags">
+                                <span class="tag">Próximamente</span>
+                            </div>
+                            <span class="card-meta">Diciembre 2025</span>
+                            <h2>Docker para Desarrolladores .NET: Guía Completa</h2>
+                        </header>
+                        <p>De cero a Dockerfile multi-stage optimizado. Contenedores, volúmenes, networking y Docker Compose para aplicaciones .NET.</p>
+                        <div class="card-footer">
+                            <span class="card-link disabled">Próximamente...</span>
+                        </div>
+                    </div>
+                </article>
+
+            </section>
+        </main>
+    </div>
+
+    <!-- FOOTER VERSIÓN 2: EL ESTRATÉGICO -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            
+            <!-- Columna 1: Navegación -->
+            <div class="footer-column">
+                <h4>Navegación</h4>
+                <ul class="footer-links">
+                    <li><a href="/">Inicio</a></li>
+                    <li><a href="/articles.html">Artículos</a></li>
+                    <li><a href="/sobre-mi.html">Sobre mí</a></li>
+                    <li><a href="/helios-nexus.html">Proyecto Helios Nexus</a></li>
+                </ul>
+            </div>
+
+            <!-- Columna 2: Conectar -->
+            <div class="footer-column">
+                <h4>Conectar</h4>
+                <div class="social-links">
+                    <a href="https://www.linkedin.com/in/magolo" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        LinkedIn
+                    </a>
+                    <!--<a href="https://github.com/tu-usuario" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                    <a href="mailto:contacto@magolo.net" aria-label="Email">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                        Email
+                    </a>
+                    <a href="/feed.xml" aria-label="RSS Feed">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/>
+                        </svg>
+                        RSS
+                    </a>-->
+                </div>
+            </div>
+
+            <!-- Columna 3: La Misión -->
+            <div class="footer-column footer-mission">
+                <h4>La Misión</h4>
+                <p><strong>magolo.net</strong> documenta el camino hacia sistemas autónomos, cloud-native e inteligentes.</p>
+                <p class="mission-tech">De .NET a Kubernetes, de microservicios a agentes IA. Este blog explora arquitecturas modernas mientras construyo <a href="/helios-nexus.html">Helios Nexus</a>, una arquitectura de referencia evolutiva.</p>
+                
+                <!-- Tech Radar Mini (opcional, muy cool) -->
+                <div class="tech-radar">
+                    <div class="radar-item">🔵 <strong>Adoptando:</strong> Semantic Kernel, .NET Aspire</div>
+                    <div class="radar-item">🟢 <strong>Experimentando:</strong> Dapr, Temporal</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer Bottom: El "Sello Técnico" -->
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p class="copyright">© 2025-2028 Marcelo González</p>
+                <p class="tech-stack">
+                    Stack: HTML5 + CSS3 → GitHub Pages
+                    <!-- <a href="https://github.com/tu-usuario/magolo.net" target="_blank" rel="noopener">Ver código fuente →</a> -->
+                </p>
+            </div>
+        </div>
     </footer>
 
 </body>
