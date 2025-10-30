@@ -1,59 +1,80 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-MH6TJV68');</script>
-<!-- End Google Tag Manager -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
-    <title>Patrón Observer en C#: Guía Completa con Ejemplos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Patrón Observer en C#: Guía Completa con Ejemplos [2025] | magolo.NET</title>
     <meta name="description" content="Aprende el Patrón Observer en C# desde cero: ejemplos naturales, código completo, SignalR y aplicaciones reales. Tutorial paso a paso con diagramas.">
-    <meta name="keywords" content="Observer Method, C#, Patrones de Diseño, Gang of Four, Programación Orientada a Objetos">
+    <meta name="keywords" content="Observer Pattern, C#, Patrones de Diseño, Gang of Four, Programación Orientada a Objetos, SignalR, .NET">
+    <meta name="author" content="Miguel Ángel">
     
-    <!-- Open Graph para redes sociales -->
+    <!-- Open Graph -->
     <meta property="og:title" content="Patrón Observer en C#: Guía Completa">
-    <meta property="og:description" content="Domina el Observer con ejemplos del mundo real: talleres de impresión, videojuegos y sistemas de logística.">
+    <meta property="og:description" content="Domina el Observer con ejemplos del mundo real: naturaleza, YouTube, SignalR y sistemas distribuidos.">
     <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.magolo.net/articles/comportamiento-patron-observer-csharp.html">
+    <meta property="og:image" content="https://www.magolo.net/images/patrones/01_01.png">
     
-    <!-- Schema.org para Google -->
+    <!-- Schema.org -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "TechArticle",
-        "headline": "Patrón Factory Method en C#: Guía Completa con Ejemplos",
-        "description": "Guía completa del patrón Factory Method con implementación en C#, ejemplos prácticos y ejercicios.",
+        "headline": "Patrón Observer en C#: Guía Completa con Ejemplos",
+        "description": "Guía completa del patrón Observer con implementación en C#, ejemplos prácticos y aplicaciones reales.",
         "author": {
             "@type": "Person",
-            "name": "Desarrollador"
+            "name": "Miguel Ángel"
         },
-        "datePublished": "2025-10-28",
-        "programmingLanguage": "C#"
+        "datePublished": "2025-10-22",
+        "dateModified": "2025-10-22",
+        "programmingLanguage": "C#",
+        "articleSection": "Patrones de Diseño",
+        "keywords": ["Observer", "C#", "Patrones de Diseño", "SignalR"]
     }
     </script>
-	
-    <link rel="stylesheet" href="style-patrones-article.css"> 
     
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../style-patrones-article.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
 </head>
 <body>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MH6TJV68"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+
+    <!-- Article Navigation Header -->
     <header class="article-nav-header">
-        <a href="../index.html" class="back-link">&larr; Volver al Blog</a>
+        <nav class="article-nav-content">
+            <a href="../index.html" class="back-link">
+                ← Volver al Blog
+            </a>
+            <div class="breadcrumb">
+                <!--<a href="../index.html">Inicio</a>
+                <span class="breadcrumb-separator">/</span>
+                <a href="../index.html#patrones">Patrones de Diseño</a>
+                <span class="breadcrumb-separator">/</span>
+                <span>Observer</span>-->
+            </div>
+        </nav>
     </header>
 
+    <!-- Main Article Content -->
     <main class="main-article">
+        
+        <!-- Article Header -->
         <header>
             <h1>Patrón Observer en C#: Guía Completa con Ejemplos</h1>
-            <p class="reading-time">⏱️ 9 min de lectura</p>
+            <div class="article-meta">
+                <span class="reading-time">⏱️ 9 min de lectura</span>
+                <div class="article-tags">
+                    <span class="article-tag">Comportamiento</span>
+                    <span class="article-tag">C#</span>
+                    <span class="article-tag">.NET</span>
+                </div>
+            </div>
         </header>
         
+        <!-- Table of Contents -->
         <nav class="toc">
             <h2>Tabla de Contenidos</h2>
             <ul>
@@ -69,6 +90,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </ul>
         </nav>
 
+        <!-- Article Body -->
         <article>
             
             <section id="intro">
@@ -84,12 +106,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </ul>
             </section>
             
-			<div class="image-container">
-				<img src="../images/patrones/01_01.png" 
-				alt="Amanecer en un bosque, simbolizando un cambio de estado y el Patrón Observer."
-				title="Prompt: Cinematic sunrise in forest, warm golden light, high-detail.">
-			</div>
-			<h6>Prompt: Cinematic sunrise in forest, warm golden light, high-detail.</h6>
+            <div class="image-container">
+                <img src="../images/patrones/01_01.png" 
+                alt="Amanecer en un bosque, simbolizando un cambio de estado y el Patrón Observer."
+                title="Prompt: Cinematic sunrise in forest, warm golden light, high-detail.">
+            </div>
+            <h6>Prompt: Cinematic sunrise in forest, warm golden light, high-detail.</h6>
 
             <section id="natural">
                 <h2>1. La Reacción Natural: El Sol y el Bosque</h2>
@@ -107,11 +129,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </ul>
                 <p>Aquí está la clave: el Sol no sabe quiénes son, ni cuántos hay, ni qué hacen. El Sol está <strong>desacoplado</strong> de los Observadores. Solo avisa, y ellos deciden cómo reaccionar.</p>
                 <div class="image-container">
-					<img src="../images/patrones/01_02.png" 
-					alt="Gallo cantando al amanecer, un ejemplo natural de un 'Observador' reaccionando a un 'Sujeto' (el sol)."
-					title="Prompt: A rooster crowing energetically, golden sunrise light from the side.">
-				</div>
-				<h6>Prompt: A rooster crowing energetically, golden sunrise light from the side.</h6>
+                    <img src="../images/patrones/01_02.png" 
+                    alt="Gallo cantando al amanecer, un ejemplo natural de un 'Observador' reaccionando a un 'Sujeto' (el sol)."
+                    title="Prompt: A rooster crowing energetically, golden sunrise light from the side.">
+                </div>
+                <h6>Prompt: A rooster crowing energetically, golden sunrise light from the side.</h6>
             </section>
 
             <section id="apps">
@@ -127,11 +149,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </ul>
                 <p>Cuando el Youtuber sube un vídeo (un <em>cambio de estado</em>), la plataforma notifica a todos sus Observadores (te envía una notificación push).</p>
                 <div class="image-container">
-					<img src="../images/patrones/01_03.png" 
-					alt="Botón de suscripción y campana de YouTube, un ejemplo real del Patrón Observer en aplicaciones."
-					title="Prompt: Flat UI animation, YouTube subscribe button and bell icon shaking.">
-				</div>
-				<h6>Prompt: Flat UI animation, YouTube subscribe button and bell icon shaking.</h6>
+                    <img src="../images/patrones/01_03.png" 
+                    alt="Botón de suscripción y campana de YouTube, un ejemplo real del Patrón Observer en aplicaciones."
+                    title="Prompt: Flat UI animation, YouTube subscribe button and bell icon shaking.">
+                </div>
+                <h6>Prompt: Flat UI animation, YouTube subscribe button and bell icon shaking.</h6>
             </section>
 
             <section id="implementacion">
@@ -140,20 +162,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                 <h3 id="interfaces">3.1 Los Contratos (Interfaces)</h3>
                 <p>La interfaz <code>IObservador</code> obliga a cualquier suscriptor a tener un método <code>Actualizar</code>.</p>
-<pre><code class="language-csharp">
-/// &lt;summary&gt;
+<pre><code class="language-csharp">/// &lt;summary&gt;
 /// El contrato del Observador.
 /// Define el método que el Sujeto llamará cuando ocurra un cambio.
 /// &lt;/summary&gt;
 public interface IObservador
 {
     void Actualizar(string mensajeDelVideo);
-}
-</code></pre>
+}</code></pre>
                 
                 <p>La interfaz <code>ISujeto</code> obliga a cualquier publicador a gestionar una lista de suscriptores y notificarles.</p>
-<pre><code class="language-csharp">
-/// &lt;summary&gt;
+<pre><code class="language-csharp">/// &lt;summary&gt;
 /// El contrato del Sujeto.
 /// Define los métodos para gestionar suscriptores y notificarles.
 /// &lt;/summary&gt;
@@ -162,13 +181,11 @@ public interface ISujeto
     void Suscribir(IObservador observador);
     void Desuscribir(IObservador observador);
     void Notificar();
-}
-</code></pre>
+}</code></pre>
 
                 <h3 id="sujeto">3.2 El Sujeto Concreto (Clase Youtuber)</h3>
                 <p>Ahora creamos la clase <code>Youtuber</code> que implementa <code>ISujeto</code>. Su "secreto" es simplemente una <code>List&lt;IObservador&gt;</code>.</p>
-<pre><code class="language-csharp">
-using System.Collections.Generic;
+<pre><code class="language-csharp">using System.Collections.Generic;
 
 /// &lt;summary&gt;
 /// El Sujeto Concreto. Mantiene una lista de Observadores
@@ -211,13 +228,11 @@ public class Youtuber : ISujeto
         this.tituloDelUltimoVideo = titulo;
         Notificar(); // Avisar a todos
     }
-}
-</code></pre>
+}</code></pre>
 
                 <h3 id="observador">3.3 El Observador Concreto (Clase Suscriptor)</h3>
                 <p>Finalmente, creamos la clase <code>Suscriptor</code> que implementa <code>IObservador</code>. Aquí es donde definimos la <em>reacción</em> específica al aviso.</p>
-<pre><code class="language-csharp">
-/// &lt;summary&gt;
+<pre><code class="language-csharp">/// &lt;summary&gt;
 /// El Observador Concreto. Reacciona al aviso del Sujeto
 /// implementando el método Actualizar().
 /// &lt;/summary&gt;
@@ -235,13 +250,11 @@ public class Suscriptor : IObservador
     {
         Console.WriteLine($"   &gt; Hola soy {nombreDeUsuario}! Me llegó el aviso: '{mensajeDelVideo}'");
     }
-}
-</code></pre>
+}</code></pre>
 
                 <h3 id="ejecucion">3.4 Ejecutando el Código</h3>
                 <p>Juntamos todo en un <code>Program.cs</code> para ver la magia.</p>
-<pre><code class="language-csharp">
-using System;
+<pre><code class="language-csharp">using System;
 
 public class Program
 {
@@ -271,12 +284,10 @@ public class Program
         // 7. El Youtuber sube otro vídeo. Solo Eneko y Luis lo reciben.
         miCanal.SubirVideo("Mi Gato Toca el Piano");
     }
-}
-</code></pre>
+}</code></pre>
                 
                 <p><strong>Resultado en Consola:</strong></p>
-<pre><code class="language-bash">
--> [YOUTUBER] ¡Un nuevo suscriptor se ha unido!
+<pre><code class="language-bash">-> [YOUTUBER] ¡Un nuevo suscriptor se ha unido!
 -> [YOUTUBER] ¡Un nuevo suscriptor se ha unido!
 
 ¡¡NUEVO VIDEO SUBIDO: Aprendiendo Patrones de Diseño!!
@@ -290,8 +301,7 @@ public class Program
 ¡¡NUEVO VIDEO SUBIDO: Mi Gato Toca el Piano!!
 -> [YOUTUBER] Notificando a 2 suscriptores...
    > Hola soy Eneko_Gamer! Me llegó el aviso: 'Mi Gato Toca el Piano'
-   > Hola soy Luis_Dev! Me llegó el aviso: 'Mi Gato Toca el Piano'
-</code></pre>
+   > Hola soy Luis_Dev! Me llegó el aviso: 'Mi Gato Toca el Piano'</code></pre>
             </section>
 
             <section id="red">
@@ -311,22 +321,22 @@ public class Program
                 </ol>
                 <p>Imagina una app de inventario. Cuando Eneko actualiza el stock en la base de datos, el servidor (Sujeto) notifica al Hub, y el Hub de SignalR <em>empuja</em> el nuevo stock a la pantalla de Lola (Observador) al instante.</p>
                 <div class="image-container">
-					<img src="../images/patrones/01_04.png" 
-					alt="Diagrama de SignalR implementando el Patrón Observer en .NET para notificar a múltiples clientes desde un servidor."
-					title="Prompt: Glowing data packets from server node to multiple laptops, tech aesthetic.">
-				</div>
-				<h6>Prompt: Glowing data packets from server node to multiple laptops, tech aesthetic.</h6>
+                    <img src="../images/patrones/01_04.png" 
+                    alt="Diagrama de SignalR implementando el Patrón Observer en .NET para notificar a múltiples clientes desde un servidor."
+                    title="Prompt: Glowing data packets from server node to multiple laptops, tech aesthetic.">
+                </div>
+                <h6>Prompt: Glowing data packets from server node to multiple laptops, tech aesthetic.</h6>
             </section>
 
             <section id="diagrama">
                 <h2>5. Diagrama UML y Definición Formal</h2>
                 <p>Así es como se ve el patrón en un diagrama de clases UML formal:</p>
                 <div class="image-container">
-					<img src="../images/patrones/01_05.png" 
-					alt="Diagrama de clases UML del Patrón Observer, mostrando la relación entre las interfaces ISujeto e IObservador."
-					title="Prompt: Clean UML class diagram of Observer pattern, minimalist, vector style.">
-				</div>
-				<h6>Prompt: Clean UML class diagram of Observer pattern, minimalist, vector style.</h6>
+                    <img src="../images/patrones/01_05.png" 
+                    alt="Diagrama de clases UML del Patrón Observer, mostrando la relación entre las interfaces ISujeto e IObservador."
+                    title="Prompt: Clean UML class diagram of Observer pattern, minimalist, vector style.">
+                </div>
+                <h6>Prompt: Clean UML class diagram of Observer pattern, minimalist, vector style.</h6>
                 <p>Oficialmente, el Patrón Observer:</p>
                 <blockquote>
                     Es un <strong>patrón de diseño de comportamiento</strong> que define una dependencia de <strong>uno-a-muchos</strong> entre objetos. Cuando el estado de un objeto (el <strong>Sujeto</strong>) cambia, todos sus dependientes (los <strong>Observadores</strong>) son notificados y actualizados automáticamente.
@@ -369,18 +379,87 @@ public class Program
                 <h2>Conclusión: La Conexión Invisible</h2>
                 <p>El Patrón Observer es fundamental. Es la conexión invisible que hace que nuestro software se sienta vivo y reactivo.</p>
                 <p>El Sol sigue sin saber que el gallo canta por él, y tu Youtuber favorito no sabe que existes. Simplemente emiten su cambio, y el patrón se encarga de conectar al que cambia con los que reaccionan.</p>
-                <p>...</p>
                 <p>Y ahora que lo sabes... si este patrón te conectó con algo nuevo hoy, ya sabes qué hace esa campanita. 😉</p>
             </section>
         
         </article>
 
-    </main> 
-	
-	<footer class="site-footer">
-        <p>&copy; 2025 - magolo .NET</p>
+    </main>
+
+    <!-- FOOTER COMPLETO (Versión 2) -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            
+            <!-- Columna 1: Navegación -->
+            <div class="footer-column">
+                <h4>Navegación</h4>
+                <ul class="footer-links">
+                    <li><a href="../index.html">Inicio</a></li>
+                    <li><a href="../articles.html">Artículos</a></li>
+                    <li><a href="../sobre-mi.html">Sobre mí</a></li>
+                    <li><a href="../helios-nexus.html">Proyecto Helios Nexus</a></li>
+                </ul>
+            </div>
+
+            <!-- Columna 2: Conectar -->
+            <div class="footer-column">
+                <h4>Conectar</h4>
+                <div class="social-links">
+                    <a href="https://linkedin.com/in/magolo" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        LinkedIn
+                    </a>
+                    <!--<a href="https://github.com/tu-usuario" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                    <a href="mailto:contacto@magolo.net" aria-label="Email">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                        Email
+                    </a>
+                    <a href="../feed.xml" aria-label="RSS Feed">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/>
+                        </svg>
+                        RSS
+                    </a>-->
+                </div>
+            </div>
+
+            <!-- Columna 3: La Misión -->
+            <div class="footer-column footer-mission">
+                <h4>La Misión</h4>
+                <p><strong>magolo.net</strong> documenta el camino hacia sistemas autónomos, cloud-native e inteligentes.</p>
+                <p class="mission-tech">De .NET a Kubernetes, de microservicios a agentes IA. Este blog explora arquitecturas modernas mientras construyo <a href="../helios-nexus.html">Helios Nexus</a>, una arquitectura de referencia evolutiva.</p>
+                
+                <!-- Tech Radar Mini -->
+                <div class="tech-radar">
+                    <div class="radar-item">🔵 <strong>Adoptando:</strong> Semantic Kernel, .NET Aspire</div>
+                    <div class="radar-item">🟢 <strong>Experimentando:</strong> Dapr, Temporal</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p class="copyright">© 2025-2028 Marcelo González</p>
+                <p class="tech-stack">
+                    Stack: HTML5 + CSS3 → GitHub Pages
+                </p>
+            </div>
+        </div>
     </footer>
     
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 </body>

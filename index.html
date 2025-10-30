@@ -65,41 +65,191 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <nav class="sidebar-nav">
                 <h3>Explorar</h3>
                 
-                <!-- Patrones de Diseño -->
-                <details class="nav-level-1" open>
-                    <summary>Patrones de Diseño</summary>
+                <!-- Patrones de Software -->
+                <details class="nav-level-1">
+                    <summary>Patrones de Software</summary>
                     <ul>
-                        <li>
-                            <details class="nav-level-2" open>
-                                <summary>Comportamiento</summary>
-                                <ul>
-                                    <li><a href="articles/comportamiento-patron-observer-csharp.html">Observer</a></li>
-                                    <li><a href="#" class="disabled">Strategy</a></li>
-                                    <li><a href="#" class="disabled">Command</a></li>
-                                </ul>
-                            </details>
-                        </li>
-                        
+                        <!-- PATRONES CREACIONALES -->
                         <li>
                             <details class="nav-level-2">
                                 <summary>Creacionales</summary>
                                 <ul>
-                                    <li><a href="#" class="disabled">Factory</a></li>
-                                    <li><a href="#" class="disabled">Builder</a></li>
                                     <li><a href="#" class="disabled">Singleton</a></li>
+                                    <li><a href="articles/creacionales-patron-factory-method-csharp.html">Factory Method</a></li>
+                                    <li><a href="#" class="disabled">Abstract Factory</a></li>
+                                    <li><a href="#" class="disabled">Builder</a></li>
+                                    <li><a href="#" class="disabled">Prototype</a></li>
+                                    <li><a href="#" class="disabled">Object Pool</a></li>
                                 </ul>
                             </details>
                         </li>
                         
+                        <!-- PATRONES ESTRUCTURALES -->
                         <li>
                             <details class="nav-level-2">
                                 <summary>Estructurales</summary>
                                 <ul>
                                     <li><a href="#" class="disabled">Adapter</a></li>
+                                    <li><a href="#" class="disabled">Bridge</a></li>
+                                    <li><a href="#" class="disabled">Composite</a></li>
                                     <li><a href="#" class="disabled">Decorator</a></li>
+                                    <li><a href="#" class="disabled">Facade</a></li>
+                                    <li><a href="#" class="disabled">Flyweight</a></li>
+                                    <li><a href="#" class="disabled">Proxy</a></li>
                                 </ul>
                             </details>
                         </li>
+                        
+                        <!-- PATRONES DE COMPORTAMIENTO -->
+                        <li>
+                            <details class="nav-level-2">
+                                <summary>De Comportamiento</summary>
+                                <ul>
+                                    <li><a href="#" class="disabled">Chain of Responsibility</a></li>
+                                    <li><a href="#" class="disabled">Command</a></li>
+                                    <li><a href="#" class="disabled">Interpreter</a></li>
+                                    <li><a href="#" class="disabled">Iterator</a></li>
+                                    <li><a href="#" class="disabled">Mediator</a></li>
+                                    <li><a href="#" class="disabled">Memento</a></li>
+                                    <li><a href="articles/comportamiento-patron-observer-csharp.html">Observer</a></li>
+                                    <li><a href="#" class="disabled">State</a></li>
+                                    <li><a href="#" class="disabled">Strategy</a></li>
+                                    <li><a href="#" class="disabled">Template Method</a></li>
+                                    <li><a href="#" class="disabled">Visitor</a></li>
+                                </ul>
+                            </details>
+                        </li>
+                        
+                        <!-- PATRONES ARQUITECTÓNICOS -->
+                        <li>
+                            <details class="nav-level-2">
+                                <summary>Arquitectónicos</summary>
+                                <ul>
+                                    <li><a href="#" class="disabled">MVC (Model-View-Controller)</a></li>
+                                    <li><a href="#" class="disabled">MVP (Model-View-Presenter)</a></li>
+                                    <li><a href="#" class="disabled">MVVM (Model-View-ViewModel)</a></li>
+                                    <li><a href="#" class="disabled">Layered Architecture</a></li>
+                                    <li><a href="#" class="disabled">Microservices</a></li>
+                                    <li><a href="#" class="disabled">Event-Driven</a></li>
+                                    <li><a href="#" class="disabled">Repository</a></li>
+                                    <li><a href="#" class="disabled">Clean Architecture</a></li>
+                                </ul>
+                            </details>
+                        </li>
+                        
+                        <!-- PATRONES DE MENSAJERÍA Y SISTEMAS DISTRIBUIDOS -->
+                        <li>
+                            <details class="nav-level-2">
+                                <summary>De Mensajería y Sistemas Distribuidos</summary>
+                                <ul>
+                                    <li><a href="#" class="disabled">Publish-Subscribe (Pub/Sub) (NUEVO)</a></li>
+                                    <li><a href="#" class="disabled">Request-Reply (NUEVO)</a></li>
+                                    <li><a href="#" class="disabled">Choreography (NUEVO) (Como contraparte a Saga/Orquestación)</a></li>
+                                    <li><a href="#" class="disabled">Outbox Pattern</a></li>
+                                    <li><a href="#" class="disabled">Inbox Pattern</a></li>
+                                    <li><a href="#" class="disabled">Saga Pattern</a></li>
+                                    <li><a href="#" class="disabled">Circuit Breaker</a></li>
+                                    <li><a href="#" class="disabled">Retry Pattern</a></li>
+                                    <li><a href="#" class="disabled">Bulkhead</a></li>
+                                    <li><a href="#" class="disabled">Throttling/Rate Limiting</a></li>
+                                    <li><a href="#" class="disabled">Backpressure</a></li>
+                                </ul>
+                            </details>
+                        </li>
+                        
+                        <!-- PATRONES DE DATOS Y CACHÉ -->
+                        <li>
+                            <details class="nav-level-2">
+                                <summary>De Datos y Caché</summary>
+                                <ul>
+                                    <li><a href="#" class="disabled">Cache-Aside (Lazy Loading)</a></li>
+                                    <li><a href="#" class="disabled">Write-Through</a></li>
+                                    <li><a href="#" class="disabled">Write-Behind (Write-Back)</a></li>
+                                    <li><a href="#" class="disabled">Read-Through</a></li>
+                                    <li><a href="#" class="disabled">CQRS (Command Query Responsibility Segregation)</a></li>
+                                    <li><a href="#" class="disabled">Event Sourcing</a></li>
+                                    <li><a href="#" class="disabled">Materialized View</a></li>
+                                    <li><a href="#" class="disabled">Sharding</a></li>
+                                    <li><a href="#" class="disabled">Unit of Work (NUEVO)</a></li>
+                                    <li><a href="#" class="disabled">Data Mapper (NUEVO)</a></li>
+                                </ul>
+                            </details>
+                        </li>
+                        
+                        <!-- PATRONES DE INTEGRACIÓN -->
+                        <li>
+                            <details class="nav-level-2">
+                                <summary>De Integración</summary>
+                                <ul>
+                                    <li><a href="#" class="disabled">API Gateway</a></li>
+                                    <li><a href="#" class="disabled">Backend for Frontend (BFF)</a></li>
+                                    <li><a href="#" class="disabled">Strangler Fig</a></li>
+                                    <li><a href="#" class="disabled">Anti-Corruption Layer</a></li>
+                                    <li><a href="#" class="disabled">Sidecar</a></li>
+                                    <li><a href="#" class="disabled">Ambassador</a></li>
+                                    <li><a href="#" class="disabled">Service Discovery (NUEVO)</a></li>
+                                </ul>
+                            </details>
+                        </li>
+                        
+                        <!-- PATRONES DE RESILIENCIA -->
+                        <li>
+                            <details class="nav-level-2">
+                                <summary>De Resiliencia</summary>
+                                <ul>
+                                    <li><a href="#" class="disabled">Timeout</a></li>
+                                    <li><a href="#" class="disabled">Fallback</a></li>
+                                    <li><a href="#" class="disabled">Health Check</a></li>
+                                    <li><a href="#" class="disabled">Graceful Degradation</a></li>
+                                </ul>
+                            </details>
+                        </li>
+                        
+                        <!-- PATRONES DE CONCURRENCIA -->
+                        <li>
+                            <details class="nav-level-2">
+                                <summary>De Concurrencia</summary>
+                                <ul>
+                                    <li><a href="#" class="disabled">Leader Election</a></li>
+                                    <li><a href="#" class="disabled">Two-Phase Commit (2PC)</a></li>
+                                    <li><a href="#" class="disabled">Optimistic Locking</a></li>
+                                    <li><a href="#" class="disabled">Pessimistic Locking</a></li>
+                                    <li><a href="#" class="disabled">Double-Checked Locking</a></li>
+                                    <li><a href="#" class="disabled">Actor Model (NUEVO)</a></li>
+                                    <li><a href="#" class="disabled">Thread Pool (NUEVO)</a></li>
+                                </ul>
+                            </details>
+                        </li>
+                        
+                        <!-- PATRONES DE DESARROLLO -->
+                        <li>
+                            <details class="nav-level-2">
+                                <summary>De Desarrollo</summary>
+                                <ul>
+                                    <li><a href="#" class="disabled">Dependency Injection</a></li>
+                                    <li><a href="#" class="disabled">Service Locator</a></li>
+                                    <li><a href="#" class="disabled">Null Object</a></li>
+                                    <li><a href="#" class="disabled">Object Mother/Test Data Builder</a></li>
+                                    <li><a href="#" class="disabled">Specification</a></li>
+                                    <li><a href="#" class="disabled">Pipeline</a></li>
+                                    <li><a href="#" class="disabled">Feature Toggle / Feature Flag (NUEVO)</a></li>
+                                    <li><a href="#" class="disabled">Lazy Initialization (NUEVO)</a></li>
+                                </ul>
+                            </details>
+                        </li>
+                        
+                        <!-- PATRONES DE SEGURIDAD -->
+                        <li>
+                            <details class="nav-level-2">
+                                <summary>De Seguridad</summary>
+                                <ul>
+                                    <li><a href="#" class="disabled">Token Bucket</a></li>
+                                    <li><a href="#" class="disabled">OAuth/JWT</a></li>
+                                    <li><a href="#" class="disabled">Secret Manager Pattern</a></li>
+                                </ul>
+                            </details>
+                        </li>
+                        
                     </ul>
                 </details>
 
@@ -158,13 +308,42 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <!-- Article List -->
             <section class="article-list">
                 
+                <!-- Artículo Publicado (Factory Method) -->
+                <article class="article-card">
+                    <div class="card-content">
+                        <header>
+                            <!-- Extraído de las etiquetas del artículo -->
+                            <div class="card-tags">
+                                <span class="tag">Patrón Creacional</span>
+                                <span class="tag">C#</span>
+                                <span class="tag">.NET</span>
+                            </div>
+                            
+                            <!-- Extraído de schema.org (datePublished) y article-meta (reading-time) -->
+                            <span class="card-meta">28 de Octubre, 2025 • ⏱️ 12 min</span>
+                            
+                            <!-- Extraído del H1 -->
+                            <h2>Patrón Factory Method en C#: Guía Completa con Ejemplos</h2>
+                        </header>
+                        
+                        <!-- Extraído de la meta description -->
+                        <p>Aprende el Patrón Factory Method en C# con ejemplos prácticos. Guía completa con código ejecutable, diagramas UML y ejercicios.</p>
+                        
+                        <div class="card-footer">
+                            <!-- Extraído del og:url y adaptado a link relativo -->
+                            <a href="articles/creacionales-patron-factory-method-csharp.html" class="card-link">Leer artículo →</a>
+                        </div>
+                    </div>
+                </article>
+
                 <!-- Artículo Publicado -->
                 <article class="article-card">
                     <div class="card-content">
                         <header>
                             <div class="card-tags">
-                                <span class="tag">Patrones de Diseño</span>
+                                <span class="tag">Patrón de Comportamiento</span>
                                 <span class="tag">C#</span>
+                                <span class="tag">.NET</span>
                             </div>
                             <span class="card-meta">22 de Octubre, 2025 • ⏱️ 9 min</span>
                             <h2>Patrón Observer en C#: Guía Completa con Ejemplos</h2>
@@ -184,26 +363,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <span class="tag">Próximamente</span>
                             </div>
                             <span class="card-meta">Noviembre 2025</span>
-                            <h2>SOLID en C#: Más Allá de la Teoría</h2>
+                            <h2>Patrón sorpresa</h2>
                         </header>
-                        <p>Los 5 principios SOLID aplicados a proyectos reales. Cómo evitar sobre-ingeniería y cuándo cada principio realmente importa.</p>
-                        <div class="card-footer">
-                            <span class="card-link disabled">Próximamente...</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- Más Próximamente -->
-                <article class="article-card upcoming">
-                    <div class="card-content">
-                        <header>
-                            <div class="card-tags">
-                                <span class="tag">Próximamente</span>
-                            </div>
-                            <span class="card-meta">Diciembre 2025</span>
-                            <h2>Docker para Desarrolladores .NET: Guía Completa</h2>
-                        </header>
-                        <p>De cero a Dockerfile multi-stage optimizado. Contenedores, volúmenes, networking y Docker Compose para aplicaciones .NET.</p>
+                        <p>Patrón de Software encargado de...</p>
                         <div class="card-footer">
                             <span class="card-link disabled">Próximamente...</span>
                         </div>
