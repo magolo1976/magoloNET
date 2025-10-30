@@ -430,7 +430,7 @@ article pre code {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    color: var(--color-text-secondary);
+    color: var(--color-accent);
     font-size: 1rem;
     font-weight: 500;
     transition: all 0.2s ease;
