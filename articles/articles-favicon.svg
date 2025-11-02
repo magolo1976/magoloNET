@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Fondo con gradiente tecnológico -->
+  <defs>
+    <linearGradient id="bgGradArticle" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#343a40;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#495057;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="docGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e9ecef;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#58a6ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#007bff;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Glow effect -->
+    <filter id="glowArticle">
+      <feGaussianBlur stdDeviation="0.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Shadow for document -->
+    <filter id="docShadow">
+      <feDropShadow dx="0.5" dy="1" stdDeviation="0.5" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Fondo redondeado -->
+  <rect width="32" height="32" rx="6" fill="url(#bgGradArticle)"/>
+  
+  <!-- Partículas/nodos de conocimiento en el fondo -->
+  <circle cx="6" cy="6" r="1" fill="#58a6ff" opacity="0.3"/>
+  <circle cx="26" cy="6" r="0.8" fill="#58a6ff" opacity="0.25"/>
+  <circle cx="6" cy="26" r="0.8" fill="#58a6ff" opacity="0.25"/>
+  <circle cx="26" cy="26" r="1" fill="#58a6ff" opacity="0.3"/>
+  <line x1="6" y1="6" x2="16" y2="12" stroke="#58a6ff" stroke-width="0.3" opacity="0.2"/>
+  <line x1="26" y1="6" x2="16" y2="12" stroke="#58a6ff" stroke-width="0.3" opacity="0.2"/>
+  
+  <!-- Documento/Artículo principal -->
+  <g filter="url(#docShadow)">
+    <!-- Papel del documento con esquina doblada -->
+    <path d="M 9 7 L 9 25 L 23 25 L 23 11 L 19 7 Z" fill="url(#docGrad)"/>
+    
+    <!-- Esquina doblada -->
+    <path d="M 19 7 L 19 11 L 23 11 Z" fill="#d1d5db"/>
+    <path d="M 19 7 L 19 11 L 23 11 Z" fill="#007bff" opacity="0.1"/>
+  </g>
+  
+  <!-- Contenido del documento (líneas de código/texto) -->
+  <g filter="url(#glowArticle)">
+    <!-- Líneas de "código" representando el contenido técnico -->
+    <rect x="11" y="13" width="8" height="1.2" rx="0.5" fill="url(#accentGrad)" opacity="0.8"/>
+    <rect x="11" y="16" width="10" height="1.2" rx="0.5" fill="url(#accentGrad)" opacity="0.6"/>
+    <rect x="11" y="19" width="7" height="1.2" rx="0.5" fill="url(#accentGrad)" opacity="0.6"/>
+    <rect x="11" y="22" width="9" height="1.2" rx="0.5" fill="url(#accentGrad)" opacity="0.5"/>
+  </g>
+  
+  <!-- Insignia/Badge "m" de magolo en la esquina -->
+  <g filter="url(#glowArticle)">
+    <circle cx="24" cy="20" r="3.5" fill="#ffc107" opacity="0.95"/>
+    <text x="24" y="22.5" 
+          font-family="Georgia, serif" 
+          font-size="5" 
+          font-weight="bold" 
+          fill="#343a40" 
+          text-anchor="middle">m</text>
+  </g>
+  
+  <!-- Detalles de brillo -->
+  <circle cx="28" cy="5" r="0.8" fill="#ffffff" opacity="0.5"/>
+  <circle cx="29.5" cy="7" r="0.5" fill="#ffffff" opacity="0.4"/>
+  
+  <!-- Borde sutil -->
+  <rect width="32" height="32" rx="6" fill="none" stroke="#000000" stroke-width="0.5" opacity="0.2"/>
+</svg>

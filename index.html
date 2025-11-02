@@ -33,7 +33,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <meta property="twitter:image" content="https://www.magolo.net/images/og-image.png">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     
     <!-- RSS Feed -->
     <link rel="alternate" type="application/rss+xml" title="magolo.NET Feed" href="/feed.xml">
@@ -48,6 +48,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
+    <!-- Botón Hamburguesa (solo visible en móvil) -->
+    <button class="hamburger-button" onclick="toggleMenu()" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
     <!-- Header -->
     <header class="site-header">
         <div class="header-content">
@@ -61,7 +68,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="main-layout">
 
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <nav class="sidebar-nav">
                 <h3>Explorar</h3>
                 
@@ -385,7 +392,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <h4>Navegación</h4>
                 <ul class="footer-links">
                     <li><a href="/">Inicio</a></li>
-                    <li><a href="/articles.html">Artículos</a></li>
                     <li><a href="/sobre-mi.html">Sobre mí</a></li>
                     <li><a href="/helios-nexus.html">Proyecto Helios Nexus</a></li>
                 </ul>
@@ -449,6 +455,47 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
     </footer>
+
+    <script>
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const hamburger = document.querySelector('.hamburger-button');
+            const body = document.body;
+            
+            sidebar.classList.toggle('active');
+            hamburger.classList.toggle('active');
+            body.classList.toggle('menu-open');
+        }
+
+        // Cerrar menú al hacer click en el overlay
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const hamburger = document.querySelector('.hamburger-button');
+            const body = document.body;
+            
+            // Si el menú está abierto y se hace click fuera del sidebar y del botón
+            if (sidebar.classList.contains('active') && 
+                !sidebar.contains(event.target) && 
+                !hamburger.contains(event.target)) {
+                sidebar.classList.remove('active');
+                hamburger.classList.remove('active');
+                body.classList.remove('menu-open');
+            }
+        });
+
+        // Cerrar menú al hacer click en un enlace (opcional, mejora UX en móvil)
+        document.querySelectorAll('.sidebar-nav a').forEach(link => {
+            link.addEventListener('click', function() {
+                const sidebar = document.getElementById('sidebar');
+                const hamburger = document.querySelector('.hamburger-button');
+                const body = document.body;
+                
+                sidebar.classList.remove('active');
+                hamburger.classList.remove('active');
+                body.classList.remove('menu-open');
+            });
+        });
+    </script>
 
 </body>
 </html>

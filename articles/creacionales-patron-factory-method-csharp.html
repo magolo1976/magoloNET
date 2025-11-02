@@ -16,7 +16,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <title>Patrón Factory Method en C#: Guía Completa con Ejemplos [2025] | magolo.NET</title>
     <meta name="description" content="Aprende el Patrón Factory Method en C# con ejemplos prácticos. Guía completa con código ejecutable, diagramas UML y ejercicios.">
     <meta name="keywords" content="Factory Method, C#, Patrones de Diseño, Gang of Four, Programación Orientada a Objetos, .NET">
-    <meta name="author" content="Miguel Ángel">
+    <meta name="author" content="Marcelo González">
     
     <!-- Open Graph -->
     <meta property="og:title" content="Patrón Factory Method en C#: Guía Completa">
@@ -24,7 +24,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://www.magolo.net/articles/creacional-patron-factory-method-csharp.html">
     <meta property="og:image" content="https://www.magolo.net/images/patrones/02_01.png">
-    
+ 
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="articles-favicon.svg">
+
     <!-- Schema.org -->
     <script type="application/ld+json">
     {
@@ -34,7 +37,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         "description": "Guía completa del patrón Factory Method con implementación en C#, ejemplos prácticos y ejercicios.",
         "author": {
             "@type": "Person",
-            "name": "Miguel Ángel"
+            "name": "Marcelo González"
         },
         "datePublished": "2025-10-28",
         "dateModified": "2025-10-28",
@@ -45,7 +48,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     </script>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="../style-patrones-article.css">
+    <link rel="stylesheet" href="style-patrones-article.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
 </head>
 <body>
@@ -61,12 +64,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <a href="../index.html" class="back-link">
                 ← Volver al Blog
             </a>
-            <div class="breadcrumb">
-                <!--<a href="../index.html">Inicio</a>
-                <span class="breadcrumb-separator">/</span>
-                <a href="../index.html#patrones">Patrones de Diseño</a>
-                <span class="breadcrumb-separator">/</span>
-                <span>Observer</span>-->
+            
+            <!-- Flechas de navegación entre artículos -->
+            <div class="article-arrows">
+                <!-- Artículo Anterior -->
+                <a href="#" class="arrow-btn arrow-prev disabled">
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <div class="arrow-text">
+                        <span class="arrow-label">Anterior</span>
+                        <span class="arrow-title">Singleton</span>
+                    </div>
+                </a>
+
+                <!-- Artículo Siguiente -->
+                <a href="#" class="arrow-btn arrow-next disabled">
+                    <div class="arrow-text">
+                        <span class="arrow-label">Siguiente</span>
+                        <span class="arrow-title">Abstract Factory</span>
+                    </div>
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
             </div>
         </nav>
     </header>
@@ -475,7 +496,6 @@ public class LogisticaAerea : Logistica
                 <h4>Navegación</h4>
                 <ul class="footer-links">
                     <li><a href="../index.html">Inicio</a></li>
-                    <li><a href="../articles.html">Artículos</a></li>
                     <li><a href="../sobre-mi.html">Sobre mí</a></li>
                     <li><a href="../helios-nexus.html">Proyecto Helios Nexus</a></li>
                 </ul>
