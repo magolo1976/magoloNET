@@ -1,0 +1,31 @@
+# robots.txt for magolo.net
+
+# Allow access to all bots
+User-agent: *
+Allow: /
+
+# Block private or administrative folders (if you have them)
+# Disallow: /admin/
+# Disallow: /private/
+# Disallow: /tmp/
+
+# Block temporary or development files
+# Disallow: /*.bak$
+# Disallow: /*.tmp$
+
+# Prevent indexing of search parameters (if you use them)
+# Disallow: /*?*
+
+# Sitemap location
+Sitemap: https://www.magolo.net/sitemap.xml
+
+# Specific settings for common bots
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Block malicious bots or aggressive scrapers (optional)
+# User-agent: BadBot
+# Disallow: /
