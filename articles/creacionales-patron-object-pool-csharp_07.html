@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Patrón Object Pool en C#: Reutilización y Rendimiento | magolo.NET</title>
+    <meta name="description" content="Aprende el Patrón Object Pool (Reserva de Objetos) en C# para optimizar el rendimiento y reducir el 'garbage collection'. Guía con código, diagramas y ejemplos.">
+    <meta name="keywords" content="Object Pool, C#, Patrones de Diseño, Rendimiento, .NET, Garbage Collection, Reutilización de Objetos, Pool de Objetos">
+    <meta name="author" content="Marcelo González">
+    
+    <meta property="og:title" content="Patrón Object Pool en C#: Reutilización y Rendimiento">
+    <meta property="og:description" content="Domina el Object Pool para gestionar objetos caros como conexiones de BD o hilos. Evita el costo de creación y destrucción.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.magolo.net/articles/creacional-patron-object-pool-csharp.html">
+    <meta property="og:image" content="https://www.magolo.net/images/patrones/06_01.png">
+
+    <link rel="icon" type="image/svg+xml" href="articles-favicon.svg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Patrón Object Pool en C#: Guía para Reutilización y Rendimiento",
+      "description": "Guía completa del patrón Object Pool (Reserva de Objetos) en C#, mostrando cómo reutilizar objetos caros para mejorar el rendimiento y reducir la presión sobre el Garbage Collector.",
+      "author": {
+        "@type": "Person",
+        "name": "Marcelo González"
+      },
+      "datePublished": "2025-11-01",
+      "dateModified": "2025-11-01",
+      "programmingLanguage": "C#",
+      "articleSection": "Patrones de Diseño",
+      "keywords": ["Object Pool", "C#", "Patrones Creacionales", "Rendimiento", "Garbage Collection"]
+    }
+    </script>
+    
+    <link rel="stylesheet" href="style-patrones-article.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+</head><body>
+
+
+    <header class="article-nav-header">
+        <nav class="article-nav-content">
+            <a href="../index.html" class="back-link">
+                ← Volver al Blog
+            </a>
+            
+            <div class="article-arrows">
+                <a href="creacionales-patron-prototype-csharp.html" class="arrow-btn arrow-prev">
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <div class="arrow-text">
+                        <span class="arrow-label">Anterior</span>
+                        <span class="arrow-title">Prototype</span>
+                    </div>
+                </a>
+
+                <a href="creacionales-patron-singleton-csharp.html" class="arrow-btn arrow-next"> <div class="arrow-text">
+                        <span class="arrow-label">Siguiente</span>
+                        <span class="arrow-title">Singleton</span>
+                    </div>
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-article">
+        
+        <header>
+            <h1>Patrón Object Pool en C#: La Guía Definitiva de Reutilización y Rendimiento</h1>
+            <div class="article-meta">
+                <span class="reading-time">⏱️ 17 min de lectura</span>
+                <div class="article-tags">
+                    <span class="article-tag">Creacional</span>
+                    <span class="article-tag">Rendimiento</span>
+                    <span class="article-tag">C#</span>
+                </div>
+            </div>
+        </header>
+        
+        <nav class="toc">
+            <h2>Tabla de Contenidos</h2>
+            <ul>
+                <li><a href="#introduccion">Introducción: No Destruyas, Recicla</a></li>
+                <li><a href="#naturaleza">1. El Ciclo del Carbono: El Pool de la Vida</a></li>
+                <li><a href="#dia-a-dia">2. La Agencia de Alquiler de Coches</a></li>
+                <li><a href="#implementacion">3. Implementación en C# (Un Pool Genérico)</a></li>
+                <li><a href="#comparacion">4. Object Pool vs. Otros Patrones</a></li>
+                <li><a href="#diagrama">5. Diagrama UML</a></li>
+                <li><a href="#no-usar">⚠️ Cuándo NO Usarlo</a></li>
+                <li><a href="#ejercicio">💪 Ejercicio Práctico</a></li>
+                <li><a href="#conclusion">Conclusión</a></li>
+            </ul>
+        </nav>
+
+        <article>
+            
+            <section id="introduccion">
+                <h2>Introducción: No Destruyas, Recicla</h2>
+                <p>En el mundo del software, la creación y destrucción de objetos tiene un costo. Para objetos pequeños, es insignificante. Pero, ¿qué pasa con objetos que tardan segundos en crearse? Piensa en:</p>
+                <ul>
+                    <li>Una conexión a una base de datos (con autenticación, handshakes de red...).</li>
+                    <li>Un hilo (<code>Thread</code>) del sistema operativo.</li>
+                    <li>Un socket de red complejo.</li>
+                </ul>
+                <p>Crear uno de estos "objetos caros" solo para usarlo 5 milisegundos y luego destruirlo es un desperdicio colosal. El <strong>Garbage Collector (GC)</strong> de .NET trabajará horas extras y tu aplicación sufrirá.</p>
+                
+                <blockquote>
+                    El <strong>Patrón Object Pool (Reserva de Objetos)</strong> es un patrón creacional que gestiona un "pool" de objetos reutilizables. En lugar de crear y destruir objetos caros, los "pides prestados" (Acquire) del pool y los "devuelves" (Release) cuando terminas.
+                </blockquote>
+                
+                <p>Es el patrón de rendimiento por excelencia. De hecho, si has usado <code>SqlConnection</code> o <code>HttpClient</code> en .NET, ¡ya lo has usado! ADO.NET y <code>HttpClientFactory</code> gestionan pools por debajo para ti.</p>
+            </section>
+
+            <div class="image-container">
+                <img src="../images/patrones/06_01.png" 
+                     alt="Ilustración conceptual del Patrón de Diseño Object Pool."
+                     title="Diagrama conceptual Object Pool">
+            </div>
+            <h6>Prompt: Ilustración conceptual del Patrón Object Pool, mostrando un 'Pool Manager' entregando objetos (como coches de alquiler) a los clientes, quienes luego los devuelven.</h6>
+            
+            <section id="naturaleza">
+                <h2>1. El Ciclo del Carbono: El Pool de la Vida</h2>
+                <p>La naturaleza odia el desperdicio. Es la gestora de "pools" definitiva. Pensemos en el <strong>ciclo del carbono</strong>.</p>
+                <p>Los átomos de carbono son un recurso "caro" y finito en el planeta. La vida no crea "nuevos" átomos de carbono. En su lugar, gestiona un pool gigantesco.</p>
+                <ul>
+                    <li><strong>El Pool:</strong> La atmósfera, los océanos y la tierra, que contienen trillones de átomos de carbono (ej. <code>CO2</code>).</li>
+                    <li><strong>El Cliente (Planta):</strong> "Adquiere" carbono del pool mediante la fotosíntesis para construir sus estructuras.</li>
+                    <li><strong>El Cliente (Animal):</strong> "Adquiere" ese carbono comiendo la planta.</li>
+                    <li><strong>La Devolución (Release):</strong> El animal y la planta "devuelven" el carbono al pool al respirar o descomponerse.</li>
+                </ul>
+                <p>El mismo átomo de carbono que estuvo en un dinosaurio puede estar en tu célula hoy. No fue destruido; fue devuelto al pool y reutilizado. La naturaleza no instancia, recicla.</p>
+            </section>
+            
+            <div class="image-container">
+                <img src="../images/patrones/06_02.png" 
+                     alt="Analogía del Patrón Object Pool usando el ciclo del carbono."
+                     title="Ciclo del Carbono como Object Pool">
+            </div>
+            <h6>Prompt: Diagrama de analogía del ciclo del carbono, mostrando un 'pool' de CO2 en la atmósfera siendo 'adquirido' por plantas y 'liberado' por animales/descomposición.</h6>
+
+            <section id="dia-a-dia">
+                <h2>2. La Agencia de Alquiler de Coches</h2>
+                <p>Esta es la analogía clásica y perfecta. Necesitas un coche para un viaje de 3 días. No vas a una fábrica (Factory), pides un coche (Builder) y lo usas, para luego tirarlo a la chatarra (destrucción).</p>
+                <p>Vas a una agencia de alquiler (Hertz, Avis, etc.).</p>
+                <ul>
+                    <li><strong>El Objeto Caro:</strong> Un <code>Coche</code>. Comprarlo es carísimo.</li>
+                    <li><strong>El Object Pool:</strong> La agencia de alquiler (ej. "Hertz").</li>
+                    <li><strong><code>Acquire()</code>:</strong> Alquilas el coche. La agencia te da uno que está limpio y con gasolina (estado reseteado). El coche sale "del pool".</li>
+                    <li><strong><code>Release()</code>:</strong> Devuelves el coche. La agencia no lo destruye; lo toma, lo limpia, le pone gasolina (resetea el estado) y lo vuelve a poner disponible en el pool para el siguiente cliente.</li>
+                </ul>
+                <p>La agencia gestiona un "pool" de coches para maximizar su utilización. Esto es exactamente lo que hace un Pool de Conexiones de Base de Datos.</p>
+            </section>
+
+            <section id="implementacion">
+                <h2>3. Implementación en C# (Un Pool Genérico)</h2>
+                <p>Vamos a construir un <code>ObjectPool&lt;T&gt;</code> genérico y reutilizable en C#. Para hacerlo eficiente y seguro en entornos multihilo, usaremos <code>ConcurrentBag&lt;T&gt;</code>, que es una colección optimizada para escenarios de "productor-consumidor" como este.</p>
+                
+                <h3 id="producto-caro">3.1 El Objeto Caro de Construir</h3>
+                <p>Primero, nuestro <code>HeavyResource</code>, que simula ser costoso.</p>
+<pre><code class="language-csharp">/// &lt;summary&gt;
+/// El Objeto Reutilizable. Es "caro" de crear.
+/// &lt;/summary&gt;
+public class HeavyResource
+{
+    private static int _counter = 0;
+    public int Id { get; }
+
+    public HeavyResource()
+    {
+        Id = ++_counter;
+        // Simula un trabajo de creación muy costoso
+        Console.WriteLine($"[HeavyResource {Id}] CREANDO: Esto tarda 1 segundo...");
+        Thread.Sleep(1000);
+    }
+
+    public void DoWork()
+    {
+        Console.WriteLine($"[HeavyResource {Id}] Haciendo trabajo... (usado)");
+    }
+
+    public void Reset()
+    {
+        // Resetea el estado para el siguiente usuario
+        Console.WriteLine($"[HeavyResource {Id}] Reseteando estado (limpiando)...");
+    }
+}</code></pre>
+
+                <h3 id="object-pool">3.2 El Object Pool Genérico</h3>
+                <p>Esta es la clase principal. Usará un <code>Func&lt;T&gt;</code> como una fábrica para crear objetos cuando el pool esté vacío.</p>
+<pre><code class="language-csharp">using System.Collections.Concurrent;
+
+/// &lt;summary&gt;
+/// El Object Pool. Gestiona la adquisición y liberación de objetos T.
+/// &lt;/summary&gt;
+public class ObjectPool&lt;T&gt; where T : class
+{
+    // Almacén de objetos thread-safe
+    private readonly ConcurrentBag&lt;T&gt; _pool;
+    
+    // Una "fábrica" para crear nuevos objetos si el pool está vacío
+    private readonly Func&lt;T&gt; _objectFactory;
+
+    public ObjectPool(Func&lt;T&gt; objectFactory)
+    {
+        _pool = new ConcurrentBag&lt;T&gt;();
+        _objectFactory = objectFactory ?? throw new ArgumentNullException(nameof(objectFactory));
+    }
+
+    /// &lt;summary&gt;
+    /// Adquiere un objeto del pool.
+    /// &lt;/summary&gt;
+    public T Acquire()
+    {
+        // Intenta sacar uno del pool
+        if (_pool.TryTake(out T item))
+        {
+            Console.WriteLine("POOL: Objeto [REUTILIZADO] del pool.");
+            return item;
+        }
+
+        // Si el pool está vacío, crea uno nuevo usando la fábrica
+        Console.WriteLine("POOL: Pool vacío. Creando nuevo objeto...");
+        return _objectFactory();
+    }
+
+    /// &lt;summary&gt;
+    /// Devuelve un objeto al pool.
+    /// &lt;/summary&gt;
+    public void Release(T item)
+    {
+        Console.WriteLine("POOL: Objeto [DEVUELTO] al pool.");
+        _pool.Add(item);
+    }
+}</code></pre>
+
+                <h3 id="cliente">3.3 El Cliente</h3>
+                <p>Veamos la diferencia de rendimiento.</p>
+<pre><code class="language-csharp">public class Program
+{
+    public static void Main(string[] args)
+    {
+        // 1. Sin Pool: Lento y costoso
+        Console.WriteLine("--- Escenario 1: Sin Pool ---");
+        var startTime1 = DateTime.Now;
+        for (int i = 0; i &lt; 3; i++)
+        {
+            HeavyResource resource = new HeavyResource();
+            resource.DoWork();
+            // El GC tendrá que limpiar 3 objetos HeavyResource
+        }
+        Console.WriteLine($"Tiempo sin pool: {(DateTime.Now - startTime1).TotalSeconds}s\n");
+
+
+        // 2. Con Pool: Rápido y eficiente
+        Console.WriteLine("--- Escenario 2: Con Object Pool ---");
+        
+        // Creamos el pool con la fábrica para crear HeavyResource
+        var pool = new ObjectPool&lt;HeavyResource&gt;(() => new HeavyResource());
+
+        // Pre-calentar el pool (opcional, pero bueno)
+        var primerRecurso = pool.Acquire();
+        pool.Release(primerRecurso);
+        Console.WriteLine("Pool pre-calentado.\n");
+        
+        var startTime2 = DateTime.Now;
+        
+        // Simulación de 3 solicitudes rápidas
+        // Solo la primera será lenta, las demás reutilizarán
+        
+        // Solicitud 1
+        HeavyResource res1 = pool.Acquire();
+        res1.DoWork();
+        res1.Reset(); // El cliente (o el pool) debe resetear
+        pool.Release(res1);
+        
+        // Solicitud 2
+        HeavyResource res2 = pool.Acquire();
+        res2.DoWork();
+        res2.Reset();
+        pool.Release(res2);
+        
+        // Solicitud 3
+        HeavyResource res3 = pool.Acquire();
+        res3.DoWork();
+        res3.Reset();
+        pool.Release(res3);
+
+        Console.WriteLine($"Tiempo con pool: {(DateTime.Now - startTime2).TotalSeconds}s");
+    }
+}</code></pre>
+
+                <p><strong>Resultado en Consola (Aprox):</strong></p>
+<pre><code class="language-bash">--- Escenario 1: Sin Pool ---
+[HeavyResource 1] CREANDO: Esto tarda 1 segundo...
+[HeavyResource 1] Haciendo trabajo... (usado)
+[HeavyResource 2] CREANDO: Esto tarda 1 segundo...
+[HeavyResource 2] Haciendo trabajo... (usado)
+[HeavyResource 3] CREANDO: Esto tarda 1 segundo...
+[HeavyResource 3] Haciendo trabajo... (usado)
+Tiempo sin pool: 3.0...s
+
+--- Escenario 2: Con Object Pool ---
+POOL: Pool vacío. Creando nuevo objeto...
+[HeavyResource 4] CREANDO: Esto tarda 1 segundo...
+POOL: Objeto [DEVUELTO] al pool.
+Pool pre-calentado.
+
+POOL: Objeto [REUTILIZADO] del pool.
+[HeavyResource 4] Haciendo trabajo... (usado)
+[HeavyResource 4] Reseteando estado (limpiando)...
+POOL: Objeto [DEVUELTO] al pool.
+POOL: Objeto [REUTILIZADO] del pool.
+[HeavyResource 4] Haciendo trabajo... (usado)
+[HeavyResource 4] Reseteando estado (limpiando)...
+POOL: Objeto [DEVUELTO] al pool.
+POOL: Objeto [REUTILIZADO] del pool.
+[HeavyResource 4] Haciendo trabajo... (usado)
+[HeavyResource 4] Reseteando estado (limpiando)...
+POOL: Objeto [DEVUELTO] al pool.
+Tiempo con pool: 0.0...s</code></pre>
+                <p>Observa la diferencia: El Escenario 1 tarda 3 segundos. El Escenario 2 tarda 1 segundo para la creación inicial (pre-calentado) y luego las 3 solicitudes son <strong>casi instantáneas</strong>. Solo se creó <strong>un</strong> objeto <code>HeavyResource</code> en lugar de cuatro.</p>
+            </section>
+
+            <section id="comparacion">
+                <h2>4. Object Pool vs. Otros Patrones</h2>
+
+                <h3>Object Pool vs. Singleton</h3>
+                <ul>
+                    <li><strong>Singleton:</strong> Garantiza <strong>una y solo una</strong> instancia de una clase. Es compartida globalmente.</li>
+                    <li><strong>Object Pool:</strong> Gestiona <strong>múltiples</strong> instancias de una clase. Las instancias no se comparten concurrentemente; se prestan y devuelven.</li>
+                </ul>
+
+                <h3>Object Pool vs. Flyweight</h3>
+                <ul>
+                    <li><strong>Flyweight:</strong> Se enfoca en ahorrar <strong>memoria</strong> compartiendo objetos inmutables o con estado intrínseco. Múltiples clientes pueden usar el *mismo* objeto *al mismo tiempo*.</li>
+                    <li><strong>Object Pool:</strong> Se enfoca en ahorrar <strong>costo de creación (CPU)</strong> reutilizando objetos mutables. Un objeto solo puede ser usado por *un* cliente *a la vez*.</li>
+                </ul>
+
+                <h3>Object Pool vs. Factory</h3>
+                <ul>
+                    <li><strong>Factory:</strong> Es un patrón para <strong>crear</strong> nuevos objetos.</li>
+                    <li><strong>Object Pool:</strong> Es un patrón para <strong>reutilizar</strong> objetos existentes. Un Pool *usa* un Factory (nuestro <code>Func&lt;T&gt;</code>) para crear objetos, pero solo cuando el pool está vacío.</li>
+                </ul>
+            </section>
+
+            <section id="diagrama">
+                <h2>5. Diagrama UML</h2>
+                <p>El diagrama UML del Object Pool ilustra la relación entre el pool y los objetos que gestiona.</p>
+                
+                <blockquote>
+                    <strong>Oficialmente, el Patrón Object Pool:</strong><br><br>
+                    Utiliza un conjunto de objetos inicializados y listos para usar ("el pool") en lugar de crearlos y destruirlos bajo demanda. Un cliente del pool solicita un objeto, lo usa y luego lo devuelve al pool.
+                </blockquote>
+
+                <h3>Los Actores del Patrón</h3>
+                <ul>
+                    <li><strong>Client:</strong> El código que necesita un objeto. Llama a <code>Acquire()</code>.</li>
+                    <li><strong>ObjectPool (<code>ObjectPool&lt;T&gt;</code>):</strong> El gestor. Mantiene la lista de objetos disponibles (<code>ConcurrentBag</code>) y sabe cómo crear nuevos (<code>Func&lt;T&gt;</code>).</li>
+                    <li><strong>ReusableObject (<code>HeavyResource</code>):</strong> El objeto caro que se está gestionando. A menudo tiene un método <code>Reset()</code> para limpiar su estado.</li>
+                </ul>
+            </section>
+
+            <div class="image-container">
+                <img src="../images/patrones/06_03.png" 
+                     alt="Diagrama de clases UML del Patrón Object Pool."
+                     title="Diagrama UML Object Pool">
+            </div>
+            <h6>Prompt: Diagrama UML claro del Patrón Object Pool, mostrando un Client, un ObjectPool (con Acquire/Release) y un ReusableObject.</h6>
+
+            <section id="no-usar" class="info-box warning-box">
+                <h2>⚠️ Cuándo NO Usarlo</h2>
+                <p>El Object Pool es un patrón de optimización, y como todas las optimizaciones, introduce complejidad. Usarlo mal es peor que no usarlo.</p>
+                
+                <h3>Evítalo Si...</h3>
+                <ul>
+                    <li><strong>Los objetos son baratos:</strong> Si <code>new MiObjeto()</code> es rápido, el costo de gestionar el pool (locks, <code>ConcurrentBag</code>, lógica de reseteo) será <strong>más lento</strong> que simplemente crear el objeto y dejar que el GC lo limpie.</li>
+                    <li><strong>El reseteo de estado es complejo o propenso a errores:</strong> ¡El mayor peligro! Si olvidas limpiar la <code>UserID</code> del objeto <code>Connection</code> anterior, el siguiente usuario ¡estará logueado como el usuario anterior! El estado debe ser reseteado perfectamente.</li>
+                    <li><strong>Los objetos se usan durante mucho tiempo:</strong> Si un cliente adquiere un objeto y lo mantiene durante horas, el pool se vaciará y no habrá reutilización. El patrón es para usos <strong>frecuentes y breves</strong>.</li>
+                </ul>
+            </section>
+            
+            <section id="ejercicio" class="info-box exercise-box">
+                <h2>💪 Ejercicio Práctico: Pool de Partículas</h2>
+                <p>Estás creando un videojuego con un sistema de partículas. Crear <code>new Particle()</code> 1000 veces por segundo está destruyendo el rendimiento por culpa del GC.</p>
+                
+                <h3>Requisitos</h3>
+                <ol>
+                    <li><strong>El Objeto:</strong> Crea una clase <code>Particle</code>. Debe tener propiedades como <code>Vector2 Position</code>, <code>Vector2 Velocity</code>, <code>int Lifetime</code> y <code>bool IsActive</code>.</li>
+                    <li><strong>El Pool:</strong> Implementa un <code>ParticlePool</code> (puedes reutilizar el genérico <code>ObjectPool&lt;T&gt;</code> si quieres).</li>
+                    <li><strong>La Lógica:</strong>
+                        <ul>
+                            <li>El método <code>AcquireParticle()</code> debe tomar una partícula del pool, establecer <code>IsActive = true</code>, <code>Lifetime = 100</code>, y darle una posición y velocidad inicial.</li>
+                            <li>El método <code>ReleaseParticle(Particle p)</code> debe simplemente establecer <code>p.IsActive = false</code>.</li>
+                            <li>En el bucle del juego, solo actualizas y dibujas partículas donde <code>IsActive == true</code>. Cuando <code>Lifetime</code> llega a 0, llamas a <code>ReleaseParticle()</code>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Objetivo:</strong> Demuestra que puedes disparar 1000 partículas sin llamar a <code>new</code> 1000 veces (después del calentamiento inicial).</li>
+                </ol>
+            </section>
+
+            <section id="conclusion">
+                <h2>Conclusión: El Reciclaje como Optimización</h2>
+                <p>El Patrón Object Pool es uno de los patrones creacionales menos comunes en la programación de aplicaciones de negocio diarias, pero es <strong>fundamental</strong> en sistemas de alto rendimiento.</p>
+                <p>Es la solución directa al problema de "creación cara". Al cambiar el paradigma de "crear y destruir" a "adquirir y liberar", eliminas la presión sobre el Garbage Collector y reduces la latencia de creación de objetos a casi cero.</p>
+                <p>La próxima vez que tu aplicación se sienta lenta y el perfilador culpe al GC o a un constructor, recuerda la agencia de alquiler de coches. No compres uno nuevo, reutiliza uno del pool.</p>
+            </section>
+        
+        </article>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-column">
+                <h4>Navegación</h4>
+                <ul class="footer-links">
+                    <li><a href="../index.html">Inicio</a></li>
+                    <li><a href="../sobre-mi.html">Sobre mí</a></li>
+                    <li><a href="../helios-nexus.html">Proyecto Helios Nexus</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Conectar</h4>
+                <div class="social-links">
+                    <a href="https://linkedin.com/in/magolo" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227._792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        LinkedIn
+                    </a>
+                </div>
+            </div>
+            <div class="footer-column footer-mission">
+                <h4>La Misión</h4>
+                <p><strong>magolo.net</strong> documenta el camino hacia sistemas autónomos, cloud-native e inteligentes.</p>
+                <p class="mission-tech">De .NET a Kubernetes, de microservicios a agentes IA. Este blog explora arquitecturas modernas mientras construyo <a href="../helios-nexus.html">Helios Nexus</a>, una arquitectura de referencia evolutiva.</p>
+                <div class="tech-radar">
+                    <div class="radar-item">🔵 <strong>Adoptando:</strong> Semantic Kernel, .NET Aspire</div>
+                    <div class="radar-item">🟢 <strong>Experimentando:</strong> Dapr, Temporal</div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p class="copyright">© 2025-2028 Marcelo González</p>
+                <p class="tech-stack">Stack: HTML5 + CSS3 → GitHub Pages</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MH6TJV68');</script>
+<!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Patrón Singleton en C#: Guía Completa con Ejemplos Thread-Safe [2025] | magolo.NET</title>
+    <meta name="description" content="Domina el Patrón Singleton en C# con ejemplos prácticos thread-safe. Guía completa con código ejecutable, implementaciones lazy, eager y diagramas UML.">
+    <meta name="keywords" content="Singleton, C#, Patrones de Diseño, Gang of Four, Thread-Safe, Lazy Loading, .NET, Instancia Única">
+    <meta name="author" content="Marcelo González">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Patrón Singleton en C#: Guía Completa Thread-Safe">
+    <meta property="og:description" content="Aprende Singleton con ejemplos del mundo real: presidencia de gobierno, archivo de configuración y gestores de recursos únicos.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.magolo.net/articles/creacional-patron-singleton-csharp.html">
+    <meta property="og:image" content="https://www.magolo.net/images/patrones/03_01.png">
+ 
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="articles-favicon.svg">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Patrón Singleton en C#: Guía Completa con Ejemplos",
+        "description": "Guía completa del patrón Singleton con implementación thread-safe en C#, ejemplos prácticos y mejores prácticas.",
+        "author": {
+            "@type": "Person",
+            "name": "Marcelo González"
+        },
+        "datePublished": "2025-11-03",
+        "dateModified": "2025-11-03",
+        "programmingLanguage": "C#",
+        "articleSection": "Patrones de Diseño",
+        "keywords": ["Singleton", "C#", "Patrones Creacionales", "Thread-Safe"]
+    }
+    </script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="style-patrones-article.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+</head>
+<body>
+    
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MH6TJV68"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+    <!-- Article Navigation Header -->
+    <header class="article-nav-header">
+        <nav class="article-nav-content">
+            <a href="../index.html" class="back-link">
+                ← Volver al Blog
+            </a>
+            
+            <!-- Flechas de navegación entre artículos -->
+            <div class="article-arrows">
+                <!-- Artículo Anterior -->
+                <a href="#" class="arrow-btn arrow-prev disabled">
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <div class="arrow-text">
+                        <span class="arrow-label">Anterior</span>
+                        <span class="arrow-title">Patrón Anterior</span>
+                    </div>
+                </a>
+
+                <!-- Artículo Siguiente -->
+                <a href="creacionales-patron-factory-method-csharp_02.html" class="arrow-btn arrow-next">
+                    <div class="arrow-text">
+                        <span class="arrow-label">Siguiente</span>
+                        <span class="arrow-title">Factory Method</span>
+                    </div>
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Article Content -->
+    <main class="main-article">
+        
+        <!-- Article Header -->
+        <header>
+            <h1>Patrón Singleton en C#: La Instancia Única que Gobierna tu Aplicación</h1>
+            <div class="article-meta">
+                <span class="reading-time">⏱️ 15 min de lectura</span>
+                <div class="article-tags">
+                    <span class="article-tag">Creacional</span>
+                    <span class="article-tag">C#</span>
+                    <span class="article-tag">.NET</span>
+                    <span class="article-tag">Thread-Safe</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Table of Contents -->
+        <nav class="toc">
+            <h2>Tabla de Contenidos</h2>
+            <ul>
+                <li><a href="#introduccion">Introducción</a></li>
+                <li><a href="#naturaleza">1. El Sol: Singleton en el Sistema Solar</a></li>
+                <li><a href="#dia-dia">2. El Presidente del Gobierno</a></li>
+                <li><a href="#implementacion">3. Implementación en C#</a>
+                    <ul>
+                        <li><a href="#basic">3.1 Singleton Básico (No Thread-Safe)</a></li>
+                        <li><a href="#threadsafe">3.2 Singleton Thread-Safe</a></li>
+                        <li><a href="#lazy">3.3 Singleton con Lazy&lt;T&gt;</a></li>
+                        <li><a href="#ejemplo-real">3.4 Ejemplo Real: Gestor de Configuración</a></li>
+                    </ul>
+                </li>
+                <li><a href="#comparacion">4. Singleton vs. Otros Patrones</a></li>
+                <li><a href="#diagrama">5. Diagrama UML</a></li>
+                <li><a href="#no-usar">⚠️ Cuándo NO Usarlo</a></li>
+                <li><a href="#ejercicio">💪 Ejercicio Práctico</a></li>
+                <li><a href="#conclusion">Conclusión</a></li>
+            </ul>
+        </nav>
+
+        <!-- Article Body -->
+        <article>
+            
+            <section id="introduccion">
+                <h2>Introducción: Un Solo Rey para Gobernarlos a Todos</h2>
+                <p>Imagina que estás desarrollando una aplicación y necesitas un <strong>gestor de configuración</strong>. Ese gestor debe cargar los settings una sola vez, mantenerlos en memoria, y proporcionar acceso a ellos desde cualquier parte de tu código. ¿Cuántas instancias de ese gestor necesitas?</p>
+                <p><strong>Una. Solo una.</strong></p>
+                <p>Si creas dos instancias, duplicas la carga de configuración. Si creas tres, multiplicas el consumo de memoria innecesariamente. Y si cada componente crea su propia instancia, tu aplicación se convierte en un caos de configuraciones potencialmente inconsistentes.</p>
+                <p>Esta es precisamente la situación que resuelve el <strong>Patrón Singleton</strong>: garantizar que una clase tenga <em>exactamente una instancia</em> y proporcionar un punto de acceso global a ella.</p>
+                <p>El Singleton es el más simple y a la vez el más controvertido de los patrones creacionales del Gang of Four. Simple porque su implementación básica son pocas líneas de código. Controvertido porque su mal uso puede convertirse en un antipatrón que introduce acoplamiento global y dificulta las pruebas unitarias.</p>
+                <p>En esta guía completa aprenderás:</p>
+                <ul>
+                    <li>Cómo el patrón se manifiesta naturalmente en nuestro universo.</li>
+                    <li>Múltiples implementaciones en C#: básica, thread-safe y con <code>Lazy&lt;T&gt;</code>.</li>
+                    <li>Cuándo usarlo (y más importante, cuándo NO usarlo).</li>
+                    <li>Cómo implementar un Singleton correctamente en aplicaciones multihilo modernas.</li>
+                </ul>
+            </section>
+
+            <div class="image-container">
+                <img src="../images/patrones/03_01.png" 
+                alt="Ilustración conceptual del Patrón de Diseño Singleton mostrando una única instancia."
+                title="Diagrama conceptual Singleton Pattern">
+            </div>
+            <h6>Prompt: Ilustración conceptual minimalista del Patrón Singleton mostrando una sola instancia centralizada con múltiples accesos.</h6>
+            
+            <section id="naturaleza">
+                <h2>1. El Sol: Singleton en el Sistema Solar</h2>
+                <p>La naturaleza nos proporciona el ejemplo perfecto de un Singleton: <strong>nuestro Sol</strong>.</p>
+                
+                <h3>Un Sistema, Una Estrella</h3>
+                <p>En nuestro sistema solar existe exactamente <strong>una estrella</strong>. No dos soles, no tres. Uno solo. Todos los planetas orbitan alrededor de esta única instancia. La Tierra no pregunta "¿cuál de los soles debo seguir?" porque solo hay uno.</p>
+                <p>¿Qué pasaría si tuviéramos dos soles? El sistema completo colapsaría. Las órbitas se desestabilizarían, las estaciones cambiarían caóticamente, la vida tal como la conocemos sería imposible.</p>
+
+                <h3>Características del Sol como Singleton</h3>
+                <ul>
+                    <li><strong>Instancia Única:</strong> Solo existe un Sol en nuestro sistema solar.</li>
+                    <li><strong>Acceso Global:</strong> Todos los planetas pueden "acceder" al Sol (recibir su luz y gravedad).</li>
+                    <li><strong>Recurso Compartido:</strong> Todos comparten la misma fuente de energía y gravedad.</li>
+                    <li><strong>Inicialización Única:</strong> El Sol se formó una vez, hace aproximadamente 4.6 mil millones de años.</li>
+                    <li><strong>Punto Central:</strong> Todo el sistema depende y gira alrededor de esta única instancia.</li>
+                </ul>
+
+                <h3>La Analogía con el Código</h3>
+                <p>En tu aplicación, ciertos recursos deben comportarse como el Sol:</p>
+                <ul>
+                    <li>Un <strong>gestor de logs</strong>: todos los componentes escriben en el mismo archivo de log.</li>
+                    <li>Un <strong>pool de conexiones</strong>: una única instancia administra todas las conexiones a la base de datos.</li>
+                    <li>Un <strong>gestor de caché</strong>: todos acceden a la misma memoria caché.</li>
+                </ul>
+                <p>Si cada componente creara su propio "Sol" (su propia instancia de logger, por ejemplo), terminarías con múltiples archivos de log fragmentados, imposibles de analizar coherentemente. <strong>El Singleton garantiza que solo hay un Sol.</strong></p>
+            </section>
+            
+            <div class="image-container">
+                <img src="../images/patrones/03_02.png" 
+                alt="Analogía del Patrón Singleton usando el Sistema Solar con un único Sol."
+                title="El Sol como ejemplo natural de Singleton">
+            </div>
+            <h6>Prompt: Ilustración del sistema solar con el Sol en el centro y planetas orbitando, representando el concepto de instancia única del patrón Singleton.</h6>
+
+            <section id="dia-dia">
+                <h2>2. El Patrón en tu Día a Día: El Presidente del Gobierno</h2>
+                <p>Llevemos el concepto al mundo real de las instituciones humanas.</p>
+
+                <h3>Un País, Un Presidente</h3>
+                <p>En un país democrático existe <strong>un solo Presidente del Gobierno</strong> a la vez. No dos presidentes compitiendo por firmar leyes. No tres presidentes cada uno con su propia política exterior.</p>
+                <p>Imagina el caos si hubiera múltiples "instancias" del cargo:</p>
+                <ul>
+                    <li>El Ministro de Economía consulta al "Presidente A" sobre el presupuesto.</li>
+                    <li>El Ministro de Defensa recibe órdenes del "Presidente B".</li>
+                    <li>La comunidad internacional negocia con el "Presidente C".</li>
+                </ul>
+                <p>El resultado sería anarquía institucional. Por eso existe <strong>una única instancia</strong> del cargo, accesible desde todos los ministerios, con una <strong>autoridad centralizada</strong>.</p>
+
+                <h3>Acceso Global al Singleton</h3>
+                <p>Todos los ministerios y organismos del Estado acceden a la misma instancia del Presidente. No hay confusión sobre "¿cuál Presidente?". Cuando el Ministro de Sanidad necesita una decisión ejecutiva, sabe exactamente a quién dirigirse.</p>
+                <p>En términos de código:</p>
+                <ul>
+                    <li><strong>El Presidente = La Instancia Singleton</strong></li>
+                    <li><strong>Los Ministerios = Diferentes clases/componentes de tu aplicación</strong></li>
+                    <li><strong>Las Decisiones = Métodos públicos del Singleton</strong></li>
+                    <li><strong>La Constitución = El constructor privado que previene múltiples instancias</strong></li>
+                </ul>
+
+                <h3>Cambio de Gobierno = Nueva Instancia</h3>
+                <p>Cuando hay elecciones y cambia el gobierno, no se crean dos presidentes simultáneos. El anterior deja el cargo, y entra el nuevo. <strong>Siempre hay exactamente uno.</strong> Este es exactamente el comportamiento del Singleton: si necesitas "reiniciar" la instancia, destruyes la anterior antes de crear la nueva.</p>
+            </section>
+
+            <div class="image-container">
+                <img src="../images/patrones/03_03.png" 
+                alt="Ejemplo del Patrón Singleton en gobierno: un presidente, múltiples ministerios."
+                title="Presidente del gobierno como Singleton">
+            </div>
+            <h6>Prompt: Diagrama organizacional mostrando un presidente en el centro con múltiples ministerios conectados, ilustrando el patrón Singleton en gobierno.</h6>
+
+            <section id="implementacion">
+                <h2>3. Implementación en C#: Del Básico al Thread-Safe</h2>
+                <p>Ahora pasemos al código. Implementaremos el Singleton en C# con tres enfoques: básico, thread-safe y moderno con <code>Lazy&lt;T&gt;</code>.</p>
+                
+                <h3 id="basic">3.1 Singleton Básico (No Thread-Safe) ⚠️</h3>
+                <p><strong>Advertencia:</strong> Esta implementación NO es segura en aplicaciones multihilo. La muestro solo con propósitos educativos.</p>
+<pre><code class="language-csharp">/// &lt;summary&gt;
+/// Singleton Básico - NO USAR EN PRODUCCIÓN
+/// No es thread-safe. Dos hilos pueden crear dos instancias simultáneamente.
+/// &lt;/summary&gt;
+public class SingletonBasico
+{
+    // La única instancia (inicialmente null)
+    private static SingletonBasico _instancia;
+
+    // Constructor privado: previene new SingletonBasico()
+    private SingletonBasico()
+    {
+        Console.WriteLine("🔨 Instancia de SingletonBasico creada.");
+    }
+
+    // Propiedad pública para obtener la instancia
+    public static SingletonBasico Instancia
+    {
+        get
+        {
+            // ⚠️ PROBLEMA: Dos hilos pueden pasar este if simultáneamente
+            if (_instancia == null)
+            {
+                _instancia = new SingletonBasico();
+            }
+            return _instancia;
+        }
+    }
+
+    public void MostrarMensaje()
+    {
+        Console.WriteLine("👋 Soy la instancia única (básica).");
+    }
+}</code></pre>
+
+                <p><strong>¿Qué está mal aquí?</strong> En un entorno multihilo, dos threads pueden comprobar <code>_instancia == null</code> al mismo tiempo, y ambos crearán una instancia. Resultado: dos "únicos" Singletons. 💥</p>
+
+                <h3 id="threadsafe">3.2 Singleton Thread-Safe con Double-Check Locking</h3>
+                <p>Esta es la implementación clásica thread-safe, usando un <code>lock</code> para sincronizar el acceso.</p>
+<pre><code class="language-csharp">/// &lt;summary&gt;
+/// Singleton Thread-Safe con Double-Check Locking
+/// Seguro en aplicaciones multihilo.
+/// &lt;/summary&gt;
+public sealed class SingletonThreadSafe
+{
+    // Instancia única
+    private static SingletonThreadSafe _instancia;
+    
+    // Objeto de bloqueo para sincronización
+    private static readonly object _lock = new object();
+
+    // Constructor privado
+    private SingletonThreadSafe()
+    {
+        Console.WriteLine("🔨 Instancia de SingletonThreadSafe creada.");
+    }
+
+    // Propiedad pública thread-safe
+    public static SingletonThreadSafe Instancia
+    {
+        get
+        {
+            // Primera comprobación (sin lock) - optimización de rendimiento
+            if (_instancia == null)
+            {
+                // Bloqueo: solo un hilo puede entrar aquí a la vez
+                lock (_lock)
+                {
+                    // Segunda comprobación (con lock) - garantiza única instancia
+                    if (_instancia == null)
+                    {
+                        _instancia = new SingletonThreadSafe();
+                    }
+                }
+            }
+            return _instancia;
+        }
+    }
+
+    public void MostrarMensaje()
+    {
+        Console.WriteLine($"👋 Soy la instancia única thread-safe. HashCode: {this.GetHashCode()}");
+    }
+}
+
+// ¿Por qué 'sealed'?
+// Para prevenir que una clase herede de nuestro Singleton y rompa la unicidad.</code></pre>
+
+                <p><strong>Double-Check Locking Explicado:</strong></p>
+                <ul>
+                    <li><strong>Primera comprobación (línea 21):</strong> Evita el costo del <code>lock</code> una vez creada la instancia.</li>
+                    <li><strong>Lock (línea 24):</strong> Sincroniza el acceso. Solo un hilo puede entrar.</li>
+                    <li><strong>Segunda comprobación (línea 27):</strong> Por si otro hilo creó la instancia mientras esperábamos el lock.</li>
+                </ul>
+
+                <h3 id="lazy">3.3 Singleton Moderno con Lazy&lt;T&gt; (Recomendado) ✅</h3>
+                <p>En C# moderno (.NET 4.0+), la forma más elegante y segura es usar <code>Lazy&lt;T&gt;</code>. El CLR maneja toda la sincronización por ti.</p>
+<pre><code class="language-csharp">/// &lt;summary&gt;
+/// Singleton Moderno usando Lazy&lt;T&gt;
+/// Thread-safe por defecto. Inicialización perezosa garantizada.
+/// ESTA ES LA IMPLEMENTACIÓN RECOMENDADA.
+/// &lt;/summary&gt;
+public sealed class SingletonModerno
+{
+    // Lazy&lt;T&gt; maneja la inicialización thread-safe automáticamente
+    private static readonly Lazy&lt;SingletonModerno&gt; _lazyInstancia = 
+        new Lazy&lt;SingletonModerno&gt;(() => new SingletonModerno());
+
+    // Constructor privado
+    private SingletonModerno()
+    {
+        Console.WriteLine("🔨 Instancia de SingletonModerno creada con Lazy<T>.");
+    }
+
+    // Propiedad pública - accede a .Value de Lazy
+    public static SingletonModerno Instancia => _lazyInstancia.Value;
+
+    public void MostrarMensaje()
+    {
+        Console.WriteLine($"👋 Soy el Singleton moderno. HashCode: {this.GetHashCode()}");
+    }
+}
+
+// Ventajas de Lazy&lt;T&gt;:
+// ✅ Thread-safe por defecto
+// ✅ Inicialización perezosa (solo se crea cuando se accede por primera vez)
+// ✅ Código más limpio y legible
+// ✅ El CLR optimiza el rendimiento internamente</code></pre>
+
+                <h3 id="ejemplo-real">3.4 Ejemplo Real: Gestor de Configuración</h3>
+                <p>Implementemos un caso de uso real: un gestor de configuración que carga settings desde un archivo JSON una sola vez.</p>
+<pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+
+/// &lt;summary&gt;
+/// Gestor de Configuración Singleton
+/// Carga la configuración una sola vez y la comparte globalmente.
+/// &lt;/summary&gt;
+public sealed class ConfigurationManager
+{
+    private static readonly Lazy&lt;ConfigurationManager&gt; _lazyInstancia =
+        new Lazy&lt;ConfigurationManager&gt;(() => new ConfigurationManager());
+
+    // Configuración en memoria
+    private Dictionary&lt;string, string&gt; _config;
+
+    private ConfigurationManager()
+    {
+        Console.WriteLine("📂 Cargando configuración desde archivo...");
+        
+        // Simula carga desde archivo
+        _config = new Dictionary&lt;string, string&gt;
+        {
+            { "DatabaseConnectionString", "Server=localhost;Database=MiApp;" },
+            { "ApiKey", "abc123xyz789" },
+            { "MaxRetries", "3" },
+            { "TimeoutSeconds", "30" }
+        };
+        
+        Console.WriteLine("✅ Configuración cargada exitosamente.");
+    }
+
+    public static ConfigurationManager Instancia => _lazyInstancia.Value;
+
+    // Obtiene un valor de configuración
+    public string GetSetting(string key)
+    {
+        return _config.ContainsKey(key) ? _config[key] : null;
+    }
+
+    // Actualiza un valor (opcional, según tu caso de uso)
+    public void UpdateSetting(string key, string value)
+    {
+        _config[key] = value;
+        Console.WriteLine($"🔄 Configuración actualizada: {key} = {value}");
+    }
+}
+
+// === PROGRAMA DE EJEMPLO ===
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        Console.WriteLine("=== DEMOSTRACIÓN DE SINGLETON ===\n");
+
+        // Primera llamada: crea la instancia
+        Console.WriteLine("--- Primera solicitud de configuración ---");
+        var config1 = ConfigurationManager.Instancia;
+        Console.WriteLine($"🔑 API Key: {config1.GetSetting("ApiKey")}");
+        Console.WriteLine($"HashCode de config1: {config1.GetHashCode()}\n");
+
+        // Segunda llamada: reutiliza la misma instancia
+        Console.WriteLine("--- Segunda solicitud de configuración ---");
+        var config2 = ConfigurationManager.Instancia;
+        Console.WriteLine($"🔌 Connection String: {config2.GetSetting("DatabaseConnectionString")}");
+        Console.WriteLine($"HashCode de config2: {config2.GetHashCode()}\n");
+
+        // Tercera llamada desde "otro componente"
+        Console.WriteLine("--- Tercera solicitud desde otro componente ---");
+        var config3 = ConfigurationManager.Instancia;
+        Console.WriteLine($"⏱️ Timeout: {config3.GetSetting("TimeoutSeconds")}s");
+        Console.WriteLine($"HashCode de config3: {config3.GetHashCode()}\n");
+
+        // Verificación: todas son la misma instancia
+        Console.WriteLine("=== VERIFICACIÓN DE UNICIDAD ===");
+        Console.WriteLine($"config1 == config2: {config1 == config2}");
+        Console.WriteLine($"config2 == config3: {config2 == config3}");
+        Console.WriteLine($"config1 == config3: {config1 == config3}");
+        
+        Console.WriteLine("\n✅ TODAS son la MISMA instancia. Singleton verificado.");
+    }
+}</code></pre>
+
+                <p><strong>Salida del Programa:</strong></p>
+<pre><code class="language-bash">=== DEMOSTRACIÓN DE SINGLETON ===
+
+--- Primera solicitud de configuración ---
+📂 Cargando configuración desde archivo...
+✅ Configuración cargada exitosamente.
+🔑 API Key: abc123xyz789
+HashCode de config1: 46104728
+
+--- Segunda solicitud de configuración ---
+🔌 Connection String: Server=localhost;Database=MiApp;
+HashCode de config2: 46104728
+
+--- Tercera solicitud desde otro componente ---
+⏱️ Timeout: 30s
+HashCode de config3: 46104728
+
+=== VERIFICACIÓN DE UNICIDAD ===
+config1 == config2: True
+config2 == config3: True
+config1 == config3: True
+
+✅ TODAS son la MISMA instancia. Singleton verificado.</code></pre>
+
+                <p><strong>Observa:</strong> El mensaje "Cargando configuración..." aparece <em>una sola vez</em>, en la primera llamada. Las tres variables (<code>config1</code>, <code>config2</code>, <code>config3</code>) tienen el mismo HashCode: son la misma instancia en memoria.</p>
+            </section>
+
+            <section id="comparacion">
+                <h2>4. Singleton vs. Otros Patrones: Diferencias Clave</h2>
+                <p>El Singleton se confunde frecuentemente con otros patrones. Aclaremos las diferencias.</p>
+
+                <h3>Singleton vs. Static Class (Clase Estática)</h3>
+                <p>Ambos proporcionan acceso global, pero son fundamentalmente diferentes:</p>
+                
+                <table style="width: 100%; border-collapse: collapse; margin: var(--spacing-lg) 0;">
+                    <thead>
+                        <tr style="background: var(--color-bg-secondary);">
+                            <th style="padding: var(--spacing-sm); border: 1px solid var(--color-border);">Característica</th>
+                            <th style="padding: var(--spacing-sm); border: 1px solid var(--color-border);">Singleton</th>
+                            <th style="padding: var(--spacing-sm); border: 1px solid var(--color-border);">Static Class</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: var(--spacing-sm); border: 1px solid var(--color-border);"><strong>Instancia</strong></td>
+                            <td style="padding: var(--spacing-sm); border: 1px solid var(--color-border);">Es un objeto real en memoria</td>
+                            <td style="padding: var(--spacing-sm); border: 1px solid var(--color-border);">No tiene instancia (solo métodos estáticos)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: var(--spacing-sm); border: 1px solid var(--color-border);"><strong>Herencia</strong></td>
+                            <td style="padding: var(--spacing-sm); border: 1px solid var(--color-border);">Puede implementar interfaces y heredar</td>
+                            <td style="padding: var(--spacing-sm); border: 1px solid var(--color-border);">No puede heredar ni implementar interfaces</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: var(--spacing-sm); border: 1px solid var(--color-border);"><strong>Lazy Loading</strong></td>
+                            <td style="padding: var(--spacing-sm); border: 1px solid var(--color-border);">✅ Se crea cuando se necesita</td>
+                            <td style="padding: var(--spacing-sm); border: 1px solid var(--color-border);">❌ Se inicializa al inicio de la app</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: var(--spacing-sm); border: 1px solid var(--color-border);"><strong>Dependency Injection</strong></td>
+                            <td style="padding: var(--spacing-sm); border: 1px solid var(--color-border);">✅ Puede ser inyectada</td>
+                            <td style="padding: var(--spacing-sm); border: 1px solid var(--color-border);">❌ No se puede inyectar</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: var(--spacing-sm); border: 1px solid var(--color-border);"><strong>Testing</strong></td>
+                            <td style="padding: var(--spacing-sm); border: 1px solid var(--color-border);">⚠️ Difícil pero posible (con interfaces)</td>
+                            <td style="padding: var(--spacing-sm); border: 1px solid var(--color-border);">❌ Muy difícil de mockear</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>Cuándo usar cada uno:</strong></p>
+                <ul>
+                    <li><strong>Singleton:</strong> Cuando necesitas mantener estado y posiblemente cambiar la implementación (ej: diferentes estrategias de logging).</li>
+                    <li><strong>Static Class:</strong> Para utilidades sin estado que nunca cambiarán (ej: <code>Math.Sqrt()</code>, validadores).</li>
+                </ul>
+
+                <h3>Singleton vs. Factory Method</h3>
+                <ul>
+                    <li><strong>Singleton:</strong> Garantiza que solo existe <em>una instancia</em> de una clase específica. Enfocado en <strong>controlar la cantidad de instancias</strong>.</li>
+                    <li><strong>Factory Method:</strong> Delega la creación de objetos a subclases. Puede crear <em>múltiples instancias</em> de diferentes tipos. Enfocado en <strong>desacoplar la creación de objetos</strong>.</li>
+                </ul>
+                <p><strong>Ejemplo:</strong> Un Singleton sería "solo hay un gestor de logs". Un Factory Method sería "crea el tipo de logger que necesites (archivo, consola, base de datos)".</p>
+                <p>De hecho, <strong>puedes combinarlos:</strong> Usar Factory Method para decidir qué tipo de Singleton crear la primera vez.</p>
+
+                <h3>Singleton vs. Monostate</h3>
+                <p>El patrón <strong>Monostate</strong> es un patrón menos conocido que logra un objetivo similar con una estrategia opuesta:</p>
+                <ul>
+                    <li><strong>Singleton:</strong> Una sola instancia, acceso global a través de <code>Instancia</code>.</li>
+                    <li><strong>Monostate:</strong> Múltiples instancias, pero todas comparten el mismo estado (usando campos estáticos).</li>
+                </ul>
+<pre><code class="language-csharp">// Ejemplo de Monostate (no es Singleton)
+public class Monostate
+{
+    // Estado compartido (estático)
+    private static string _estadoCompartido = "Inicial";
+
+    // Constructor público (permite múltiples instancias)
+    public Monostate() { }
+
+    // Propiedad que accede al estado compartido
+    public string Estado
+    {
+        get => _estadoCompartido;
+        set => _estadoCompartido = value;
+    }
+}
+
+// Uso:
+var instancia1 = new Monostate();
+var instancia2 = new Monostate();
+instancia1.Estado = "Modificado";
+Console.WriteLine(instancia2.Estado); // "Modificado" - comparten estado</code></pre>
+                <p>Con Monostate, <code>instancia1</code> e <code>instancia2</code> son objetos diferentes, pero modificar el estado en uno afecta al otro. Es un Singleton "disfrazado".</p>
+            </section>
+
+            <section id="diagrama">
+                <h2>5. Diagrama UML del Patrón Singleton</h2>
+                <p>El Singleton tiene una de las estructuras UML más simples de todos los patrones Gang of Four:</p>
+                
+                <blockquote>
+                    <strong>Definición Formal del Patrón Singleton:</strong><br><br>
+                    El patrón Singleton garantiza que una clase tenga una única instancia y proporciona un punto de acceso global a ella. Esto se logra mediante un constructor privado y un método estático que retorna siempre la misma instancia.
+                </blockquote>
+
+                <h3>Elementos del Patrón</h3>
+                <ul>
+                    <li><strong>Constructor Privado:</strong> Previene la creación de instancias mediante <code>new</code> desde fuera de la clase.</li>
+                    <li><strong>Campo Estático Privado:</strong> Almacena la única instancia de la clase.</li>
+                    <li><strong>Método/Propiedad Estática Pública:</strong> Proporciona acceso global a la instancia. Si no existe, la crea (lazy initialization).</li>
+                    <li><strong>Clase Sealed (Opcional pero Recomendado):</strong> Previene que otras clases hereden y rompan la unicidad.</li>
+                </ul>
+
+                <h3>Estructura en C#</h3>
+<pre><code class="language-csharp">public sealed class Singleton
+{
+    // 1. Instancia estática privada
+    private static Singleton _instancia;
+    
+    // 2. Constructor privado
+    private Singleton() { }
+    
+    // 3. Propiedad pública estática
+    public static Singleton Instancia
+    {
+        get
+        {
+            if (_instancia == null)
+                _instancia = new Singleton();
+            return _instancia;
+        }
+    }
+    
+    // 4. Métodos públicos de negocio
+    public void HacerAlgo() { }
+}</code></pre>
+
+                <h3>Flujo de Ejecución</h3>
+                <ol>
+                    <li>Cliente llama a <code>Singleton.Instancia</code></li>
+                    <li>Si <code>_instancia</code> es null (primera vez), se crea con <code>new Singleton()</code></li>
+                    <li>La instancia creada se almacena en <code>_instancia</code></li>
+                    <li>Se retorna la instancia</li>
+                    <li>Siguientes llamadas retornan la misma instancia sin crear nuevas</li>
+                </ol>
+            </section>
+
+            <div class="image-container">
+                <img src="../images/patrones/03_04.png" 
+                alt="Diagrama de clases UML del Patrón Singleton."
+                title="Diagrama UML Singleton Pattern">
+            </div>
+            <h6>Prompt: Diagrama UML limpio del Patrón Singleton mostrando constructor privado, instancia estática y método getInstance().</h6>
+
+            <section id="no-usar" class="info-box warning-box">
+                <h2>⚠️ Cuándo NO Usar el Patrón Singleton</h2>
+                <p>El Singleton es el patrón más debatido del Gang of Four. Muchos desarrolladores lo consideran un <strong>antipatrón</strong> cuando se usa incorrectamente. Aquí está cuándo debes evitarlo.</p>
+                
+                <h3>Problemas Comunes del Singleton</h3>
+                
+                <h4>1. Viola el Principio de Responsabilidad Única (SRP)</h4>
+                <p>Un Singleton tiene <strong>dos responsabilidades</strong>:</p>
+                <ul>
+                    <li>Su lógica de negocio (ej: gestionar configuración).</li>
+                    <li>Controlar su propia creación e instanciación.</li>
+                </ul>
+                <p>Esto viola el SRP de SOLID. La clase está haciendo demasiado.</p>
+
+                <h4>2. Dificulta las Pruebas Unitarias</h4>
+                <p>Los Singletons son notoriamente difíciles de testear porque:</p>
+                <ul>
+                    <li>Crean <strong>estado global</strong> que se mantiene entre tests.</li>
+                    <li>No puedes fácilmente "mockear" un Singleton para aislar tests.</li>
+                    <li>Los tests pueden fallar dependiendo del orden de ejecución.</li>
+                </ul>
+<pre><code class="language-csharp">// ❌ DIFÍCIL DE TESTEAR
+public class MiServicio
+{
+    public void ProcesarDatos()
+    {
+        var config = ConfigurationManager.Instancia; // ¡Dependencia oculta!
+        string connString = config.GetSetting("DB");
+        // ... lógica que usa la conexión
+    }
+}
+
+// ✅ FÁCIL DE TESTEAR (Dependency Injection)
+public class MiServicioMejorado
+{
+    private readonly IConfigurationManager _config;
+    
+    // La dependencia es explícita y puede ser mockeada
+    public MiServicioMejorado(IConfigurationManager config)
+    {
+        _config = config;
+    }
+    
+    public void ProcesarDatos()
+    {
+        string connString = _config.GetSetting("DB");
+        // ... lógica
+    }
+}</code></pre>
+
+                <h4>3. Acoplamiento Global</h4>
+                <p>Cualquier clase que use <code>Singleton.Instancia</code> está <strong>fuertemente acoplada</strong> a esa implementación concreta. Cambiar el Singleton requiere cambiar todo el código que lo usa.</p>
+
+                <h4>4. Problemas con Multithreading</h4>
+                <p>Si no implementas thread-safety correctamente, puedes terminar con múltiples instancias en aplicaciones concurrentes. Y el double-check locking añade complejidad.</p>
+
+                <h3>Alternativas Modernas al Singleton</h3>
+                
+                <h4>Dependency Injection (DI) - La Mejor Alternativa</h4>
+                <p>En lugar de un Singleton tradicional, usa el contenedor de DI de .NET para registrar servicios como singleton:</p>
+<pre><code class="language-csharp">// En Startup.cs o Program.cs (ASP.NET Core)
+services.AddSingleton&lt;IConfigurationManager, ConfigurationManager&gt;();
+
+// Luego inyectas en el constructor
+public class MiController : Controller
+{
+    private readonly IConfigurationManager _config;
+    
+    public MiController(IConfigurationManager config)
+    {
+        _config = config; // El DI container proporciona la misma instancia
+    }
+}</code></pre>
+                <p><strong>Ventajas de DI sobre Singleton manual:</strong></p>
+                <ul>
+                    <li>✅ Testeable: puedes inyectar mocks.</li>
+                    <li>✅ Desacoplado: depende de interfaces, no implementaciones concretas.</li>
+                    <li>✅ Explícito: las dependencias son visibles en el constructor.</li>
+                    <li>✅ Thread-safe: el contenedor lo maneja automáticamente.</li>
+                </ul>
+
+                <h3>Cuándo SÍ Usar Singleton</h3>
+                <p>Usa Singleton solo cuando:</p>
+                <ul>
+                    <li>Necesitas controlar un <strong>recurso físico único</strong> (ej: puerto serial, driver de hardware).</li>
+                    <li>La instancia es <strong>inherentemente única</strong> por naturaleza del problema.</li>
+                    <li>No estás usando un framework con DI (aplicaciones de consola pequeñas, scripts).</li>
+                    <li>El costo de inicialización es <strong>muy alto</strong> y solo quieres hacerlo una vez (ej: cargar un modelo de ML de 5GB).</li>
+                </ul>
+
+                <h3>Red Flags (Señales de Alarma)</h3>
+                <p>Evita Singleton si:</p>
+                <ul>
+                    <li>❌ Podrías necesitar múltiples instancias en el futuro (aunque ahora solo usas una).</li>
+                    <li>❌ La clase mantiene estado mutable que cambia frecuentemente.</li>
+                    <li>❌ Estás en un entorno con DI disponible (usa DI en su lugar).</li>
+                    <li>❌ Necesitas testear extensivamente la clase.</li>
+                    <li>❌ Estás creando un Singleton "porque sí", sin una razón técnica clara.</li>
+                </ul>
+            </section>
+            
+            <section id="ejercicio" class="info-box exercise-box">
+                <h2>💪 Ejercicio Práctico: Sistema de Logging</h2>
+                <p>Implementa un <strong>Logger Singleton thread-safe</strong> con las siguientes características:</p>
+                
+                <h3>Requisitos</h3>
+                <ol>
+                    <li><strong>Implementación Thread-Safe:</strong> Usa <code>Lazy&lt;T&gt;</code> para crear un Singleton seguro.</li>
+                    <li><strong>Niveles de Log:</strong> El logger debe soportar diferentes niveles:
+                        <ul>
+                            <li><code>INFO</code>: Mensajes informativos.</li>
+                            <li><code>WARNING</code>: Advertencias.</li>
+                            <li><code>ERROR</code>: Errores.</li>
+                            <li><code>DEBUG</code>: Mensajes de depuración.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Método Log:</strong> Un método <code>Log(LogLevel level, string message)</code> que:
+                        <ul>
+                            <li>Imprima en consola con formato: <code>[TIMESTAMP] [LEVEL] mensaje</code></li>
+                            <li>Ejemplo: <code>[2025-11-03 14:30:22] [ERROR] Falló la conexión a la base de datos</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Métodos Convenientes:</strong> Crea métodos <code>LogInfo()</code>, <code>LogWarning()</code>, <code>LogError()</code>, <code>LogDebug()</code>.</li>
+                    <li><strong>Configuración de Nivel Mínimo:</strong> Permite configurar un nivel mínimo de logging (por defecto INFO). Si está en INFO, no muestra DEBUG.</li>
+                </ol>
+
+                <h3>Bonus Challenge 🏆</h3>
+                <ul>
+                    <li><strong>Nivel 1:</strong> Añade colores a la consola según el nivel (INFO=verde, WARNING=amarillo, ERROR=rojo).</li>
+                    <li><strong>Nivel 2:</strong> Además de consola, escribe los logs a un archivo <code>app.log</code>.</li>
+                    <li><strong>Nivel 3:</strong> Implementa un método <code>GetEstadisticas()</code> que retorne cuántos logs de cada nivel se han generado.</li>
+                </ul>
+
+                <h3>Solución Esperada</h3>
+                <p>Tu logger debe:</p>
+                <ul>
+                    <li>✅ Ser thread-safe usando <code>Lazy&lt;T&gt;</code>.</li>
+                    <li>✅ Mostrar solo logs >= nivel mínimo configurado.</li>
+                    <li>✅ Formatear correctamente con timestamp.</li>
+                    <li>✅ Tener una única instancia verificable.</li>
+                </ul>
+            </section>
+
+            <section id="conclusion">
+                <h2>Conclusión: La Elegancia de la Unicidad</h2>
+                <p>El Patrón Singleton es como el Sol en nuestro sistema solar: <strong>una presencia única, constante y accesible para todos</strong>. Cuando lo necesitas, es insustituible. Cuando no lo necesitas, puede convertirse en un problema.</p>
+                
+                <h3>Lo que Aprendimos</h3>
+                <ul>
+                    <li>El Singleton garantiza <strong>exactamente una instancia</strong> de una clase.</li>
+                    <li>En C# moderno, <strong><code>Lazy&lt;T&gt;</code> es la forma recomendada</strong> de implementarlo (thread-safe automático).</li>
+                    <li>El double-check locking es el enfoque clásico, pero añade complejidad.</li>
+                    <li>Singleton <strong>no es lo mismo</strong> que una clase estática (el Singleton es un objeto real).</li>
+                    <li>En aplicaciones modernas con DI, <strong>prefiere registrar servicios como singleton</strong> en el contenedor en lugar de implementar el patrón manualmente.</li>
+                </ul>
+
+                <h3>La Paradoja del Singleton</h3>
+                <p>El Singleton es simultáneamente uno de los patrones más simples y más peligrosos:</p>
+                <ul>
+                    <li><strong>Simple</strong> porque su implementación son pocas líneas de código.</li>
+                    <li><strong>Peligroso</strong> porque crea acoplamiento global y dificulta el testing.</li>
+                </ul>
+                <p>La clave está en reconocer cuándo la naturaleza del problema <strong>exige inherentemente una única instancia</strong> (como el Sol en el sistema solar, o el Presidente de un país), versus cuando solo estás siendo flojo y quieres "acceso fácil" a un objeto.</p>
+
+                <h3>Pregunta Final</h3>
+                <p>Antes de implementar un Singleton, pregúntate:</p>
+                <blockquote>
+                    <em>"¿Es este recurso inherentemente único por naturaleza, o solo estoy evitando pasar parámetros?"</em>
+                </blockquote>
+                <p>Si la respuesta es lo segundo, probablemente no necesitas un Singleton. Usa Dependency Injection.</p>
+
+                <h3>Siguientes Pasos</h3>
+                <p>Ahora que dominas el Singleton, el siguiente patrón creacional es el <strong>Factory Method</strong>, donde aprenderás a delegar la creación de objetos a subclases sin perder flexibilidad. Mientras el Singleton controla <em>cuántas instancias</em> existen, el Factory Method controla <em>cómo se crean</em>.</p>
+                <p>Y recuerda: como el Sol en el cielo, un buen Singleton debe brillar solo, constante y sin competencia. ☀️✨</p>
+            </section>
+        
+        </article>
+
+    </main>
+
+    <!-- FOOTER COMPLETO -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-column">
+                <h4>Navegación</h4>
+                <ul class="footer-links">
+                    <li><a href="../index.html">Inicio</a></li>
+                    <li><a href="../sobre-mi.html">Sobre mí</a></li>
+                    <li><a href="../helios-nexus.html">Proyecto Helios Nexus</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Conectar</h4>
+                <div class="social-links">
+                    <a href="https://linkedin.com/in/magolo" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        LinkedIn
+                    </a>
+                </div>
+            </div>
+            <div class="footer-column footer-mission">
+                <h4>La Misión</h4>
+                <p><strong>magolo.net</strong> documenta el camino hacia sistemas autónomos, cloud-native e inteligentes.</p>
+                <p class="mission-tech">De .NET a Kubernetes, de microservicios a agentes IA. Este blog explora arquitecturas modernas mientras construyo <a href="../helios-nexus.html">Helios Nexus</a>, una arquitectura de referencia evolutiva.</p>
+                <div class="tech-radar">
+                    <div class="radar-item">🔵 <strong>Adoptando:</strong> Semantic Kernel, .NET Aspire</div>
+                    <div class="radar-item">🟢 <strong>Experimentando:</strong> Dapr, Temporal</div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p class="copyright">© 2025-2028 Marcelo González</p>
+                <p class="tech-stack">Stack: HTML5 + CSS3 → GitHub Pages</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

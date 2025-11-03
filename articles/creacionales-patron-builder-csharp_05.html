@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MH6TJV68');</script>
+<!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Patrón Builder en C#: Guía de Construcción Paso a Paso | magolo.NET</title>
+    <meta name="description" content="Aprende el Patrón Builder en C# para crear objetos complejos paso a paso. Guía completa con código, diagramas UML, y comparaciones (vs Factory, Abstract Factory).">
+    <meta name="keywords" content="Builder, C#, Patrones de Diseño, Gang of Four, Programación Orientada a Objetos, .NET, Objetos Complejos, Construcción de Objetos">
+    <meta name="author" content="Marcelo González">
+    
+    <meta property="og:title" content="Patrón Builder en C#: Construcción de Objetos Complejos">
+    <meta property="og:description" content="Domina Builder para evitar constructores telescópicos y crear objetos complejos con flexibilidad. Ejemplos con PCs, Sándwiches y Biología.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.magolo.net/articles/creacional-patron-builder-csharp.html">
+    <meta property="og:image" content="https://www.magolo.net/images/patrones/05_01.png">
+
+    <link rel="icon" type="image/svg+xml" href="articles-favicon.svg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Patrón Builder en C#: Guía de Construcción Paso a Paso de Objetos Complejos",
+      "description": "Guía completa del patrón Builder con implementación en C#, ejemplos prácticos y comparativas.",
+      "author": {
+        "@type": "Person",
+        "name": "Marcelo González"
+      },
+      "datePublished": "2025-10-30",
+      "dateModified": "2025-10-30",
+      "programmingLanguage": "C#",
+      "articleSection": "Patrones de Diseño",
+      "keywords": ["Builder", "C#", "Patrones Creacionales", "Objetos Complejos", "Fluent API"]
+    }
+    </script>
+    
+    <link rel="stylesheet" href="style-patrones-article.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MH6TJV68"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+    <header class="article-nav-header">
+        <nav class="article-nav-content">
+            <a href="../index.html" class="back-link">
+                ← Volver al Blog
+            </a>
+            
+            <div class="article-arrows">
+                <a href="creacionales-patron-abstract-factory-csharp_04.html" class="arrow-btn arrow-prev">
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <div class="arrow-text">
+                        <span class="arrow-label">Anterior</span>
+                        <span class="arrow-title">Abstract Factory</span>
+                    </div>
+                </a>
+
+                <a href="creacionales-patron-prototype-csharp_06.html" class="arrow-btn arrow-next"> <div class="arrow-text">
+                        <span class="arrow-label">Siguiente</span>
+                        <span class="arrow-title">Prototype</span>
+                    </div>
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-article">
+        
+        <header>
+            <h1>Patrón Builder en C#: Guía de Construcción Paso a Paso</h1>
+            <div class="article-meta">
+                <span class="reading-time">⏱️ 14 min de lectura</span>
+                <div class="article-tags">
+                    <span class="article-tag">Creacional</span>
+                    <span class="article-tag">C#</span>
+                    <span class="article-tag">.NET</span>
+                </div>
+            </div>
+        </header>
+        
+        <nav class="toc">
+            <h2>Tabla de Contenidos</h2>
+            <ul>
+                <li><a href="#introduccion">Introducción: El Patrón Anti-Constructores</a></li>
+                <li><a href="#naturaleza">1. El Ribosoma: El Constructor de la Vida</a></li>
+                <li><a href="#dia-a-dia">2. El Pedido de tu Sándwich</a></li>
+                <li><a href="#implementacion">3. Implementación en C# (Ensamblador de PCs)</a></li>
+                <li><a href="#comparacion">4. Builder vs. Otros Patrones</a></li>
+                <li><a href="#diagrama">5. Diagrama UML</a></li>
+                <li><a href="#no-usar">⚠️ Cuándo NO Usarlo</a></li>
+                <li><a href="#ejercicio">💪 Ejercicio Práctico</a></li>
+                <li><a href="#conclusion">Conclusión</a></li>
+            </ul>
+        </nav>
+
+        <article>
+            
+            <section id="introduccion">
+                <h2>Introducción: El Patrón Anti-Constructores</h2>
+                <p>¿Alguna vez has visto un constructor así?</p>
+                <pre><code class="language-csharp">var miReporte = new Reporte("Título", true, false, true, "Arial", 12, "Autor", null, "Contenido...");</code></pre>
+                <p>Este es el infame <strong>"Constructor Telescópico"</strong>. Es frágil, ilegible (¿qué significa `false`?) y una pesadilla de mantener. ¿Y si quieres un reporte con `Autor` pero sin `Fuente`? Tienes que pasar `null`, o crear *otro* constructor sobrecargado.</p>
+                <p>El <strong>Patrón Builder</strong> ataca este problema de frente. Separa la construcción de un objeto complejo de su representación final. En lugar de un constructor que lo hace todo de golpe, usas un objeto "constructor" (el Builder) al que le das instrucciones paso a paso.</p>
+                
+                <blockquote>
+                    El Patrón Builder te permite construir objetos complejos paso a paso, usando los mismos pasos de construcción para crear diferentes representaciones del objeto.
+                </blockquote>
+                
+                <p>Es la diferencia entre comprar un PC pre-ensamblado (un constructor) y elegir cada componente tú mismo (un builder).</p>
+            </section>
+
+            <div class="image-container">
+                <img src="../images/patrones/05_01.png" 
+                     alt="Ilustración conceptual del Patrón de Diseño Builder."
+                     title="Diagrama conceptual Builder">
+            </div>
+            <h6>Prompt: Ilustración conceptual que muestra el Patrón Builder, con un 'Director' dando instrucciones a un 'Builder' que ensambla un 'Producto' pieza por pieza.</h6>
+            
+            <section id="naturaleza">
+                <h2>1. El Ribosoma: El Constructor de la Vida</h2>
+                <p>La biología está repleta de patrones de diseño, y el Builder es uno de los más fundamentales. Piensa en la creación de una proteína.</p>
+                <p>Una proteína es un objeto increíblemente complejo, compuesto por una secuencia específica de aminoácidos. No se crea de la nada.</p>
+                <ul>
+                    <li><strong>El Producto:</strong> La <code>Proteína</code> funcional.</li>
+                    <li><strong>El Plan (Director):</strong> El <code>ARN mensajero (ARNm)</code>. Contiene la secuencia exacta de instrucciones (codones).</li>
+                    <li><strong>El Constructor (Builder):</strong> El <code>Ribosoma</code>. Es la máquina que lee las instrucciones.</li>
+                    <li><strong>Los Pasos (<code>BuildPart</code>):</strong> El Ribosoma lee un codón (instrucción) y añade el <code>Aminoácido</code> correspondiente a la cadena.</li>
+                </ul>
+                <p>El Ribosoma (Builder) ensambla la Proteína (Producto) paso a paso, siguiendo las instrucciones del ARNm (Director). El mismo Ribosoma puede construir miles de proteínas diferentes, simplemente siguiendo diferentes planos de ARNm. Esto es exactamente lo que hace el patrón Builder.</p>
+            </section>
+
+            <section id="dia-a-dia">
+                <h2>2. El Pedido de tu Sándwich</h2>
+                <p>La analogía más famosa del patrón Builder es pedir un sándwich en un lugar como Subway. Cuando llegas, no dices "quiero un BMT". En su lugar, inicias un proceso de construcción paso a paso.</p>
+                <p>Tú eres el <strong>Director</strong> y el empleado es el <strong>Builder</strong>.</p>
+                <ol>
+                    <li><strong>Tú:</strong> "Comencemos un sándwich de 15cm." (<code>new SandwichBuilder()</code>)</li>
+                    <li><strong>Tú:</strong> "Pan de orégano y queso, por favor." (<code>builder.SetPan("Orégano")</code>)</li>
+                    <li><strong>Tú:</strong> "De pavo." (<code>builder.SetProteina("Pavo")</code>)</li>
+                    <li><strong>Tú:</strong> "Queso provolone, tostado." (<code>builder.SetQueso("Provolone").Tostar()</code>)</li>
+                    <li><strong>Tú:</strong> "Con lechuga, tomate y cebolla." (<code>builder.AddVegetal("Lechuga").AddVegetal("Tomate")...</code>)</li>
+                    <li><strong>Tú:</strong> "Y un poco de mayonesa." (<code>builder.SetSalsa("Mayonesa")</code>)</li>
+                    <li><strong>Empleado:</strong> "Aquí tienes." (<code>return builder.GetSandwich()</code>)</li>
+                </ol>
+                <p>El resultado es un objeto <code>Sandwich</code> complejo. Usando el mismo empleado (Builder) y los mismos pasos (<code>SetPan</code>, <code>SetProteina</code>), el siguiente cliente (Director) puede construir una representación totalmente diferente (un sándwich de albóndigas en pan blanco sin tostar).</p>
+            </section>
+            
+            <div class="image-container">
+                <img src="../images/patrones/05_02.png" 
+                     alt="Analogía del Patrón Builder usando un pedido de sándwich."
+                     title="Pedido de sándwich como Patrón Builder">
+            </div>
+            <h6>Prompt: Ilustración de una barra de sándwiches, mostrando a un cliente (Director) dando instrucciones paso a paso a un empleado (Builder) que ensambla un sándwich (Producto).</h6>
+
+            <section id="implementacion">
+                <h2>3. Implementación en C# (Ensamblador de PCs)</h2>
+                <p>Vamos a construir el ejemplo de ensamblar una <code>Computadora</code>. Una computadora es un producto complejo con muchas partes opcionales (CPU, RAM, GPU, etc.).</p>
+                
+                <h3 id="producto">3.1 El Producto</h3>
+                <p>El objeto complejo que queremos construir. Nota: sus propiedades son de solo lectura pública; solo el Builder puede asignarlas.</p>
+<pre><code class="language-csharp">/// &lt;summary&gt;
+/// El Producto: Un objeto complejo.
+/// &lt;/summary&gt;
+public class Computadora
+{
+    public string CPU { get; set; }
+    public int RAM { get; set; }
+    public string Almacenamiento { get; set; }
+    public string GPU { get; set; } // Tarjeta gráfica (opcional)
+
+    public void MostrarEspecificaciones()
+    {
+        Console.WriteLine("--- Especificaciones de la PC ---");
+        Console.WriteLine($"CPU: {CPU ?? "No especificada"}");
+        Console.WriteLine($"RAM: {RAM} GB");
+        Console.WriteLine($"Almacenamiento: {Almacenamiento ?? "No especificado"}");
+        Console.WriteLine($"GPU: {GPU ?? "Integrada (N/A)"}");
+        Console.WriteLine("---------------------------------");
+    }
+}</code></pre>
+
+                <h3 id="builder-interface">3.2 La Interfaz del Builder</h3>
+                <p>Define todos los pasos de construcción posibles.</p>
+<pre><code class="language-csharp">/// &lt;summary&gt;
+/// La interfaz Builder.
+/// Define los pasos para construir el producto.
+/// &lt;/summary&gt;
+public interface IComputadoraBuilder
+{
+    void SetCPU(string cpu);
+    void SetRAM(int ram);
+    void SetAlmacenamiento(string almacenamiento);
+    void SetGPU(string gpu);
+    Computadora GetComputadora();
+}</code></pre>
+
+                <h3 id="builder-concreto">3.3 El Builder Concreto</h3>
+                <p>Implementa los pasos de construcción y mantiene una instancia del producto que está construyendo. A menudo, devuelve <code>this</code> para permitir una "interfaz fluida" (chaining).</p>
+<pre><code class="language-csharp">/// &lt;summary&gt;
+/// El Builder Concreto.
+/// Implementa los pasos y mantiene el producto en construcción.
+/// &lt;/summary&gt;
+public class ComputadoraBuilder : IComputadoraBuilder
+{
+    private Computadora _computadora = new Computadora();
+
+    public ComputadoraBuilder()
+    {
+        this.Reset();
+    }
+
+    public void Reset()
+    {
+        this._computadora = new Computadora();
+    }
+
+    // Usamos 'this' para una interfaz fluida (Fluent Interface)
+    public IComputadoraBuilder SetCPU(string cpu)
+    {
+        _computadora.CPU = cpu;
+        return this; // Permite encadenar: builder.SetCPU(...).SetRAM(...)
+    }
+
+    public IComputadoraBuilder SetRAM(int ram)
+    {
+        _computadora.RAM = ram;
+        return this;
+    }
+
+    public IComputadoraBuilder SetAlmacenamiento(string almacenamiento)
+    {
+        _computadora.Almacenamiento = almacenamiento;
+        return this;
+    }
+
+    public IComputadoraBuilder SetGPU(string gpu)
+    {
+        _computadora.GPU = gpu;
+        return this;
+    }
+
+    // El método final que devuelve el producto
+    public Computadora GetComputadora()
+    {
+        Computadora resultado = this._computadora;
+        this.Reset(); // Prepara al builder para el siguiente producto
+        return resultado;
+    }
+    
+    // Hacemos que la interfaz explícita llame a la fluida
+    void IComputadoraBuilder.SetCPU(string cpu) => this.SetCPU(cpu);
+    void IComputadoraBuilder.SetRAM(int ram) => this.SetRAM(ram);
+    void IComputadoraBuilder.SetAlmacenamiento(string almacenamiento) => this.SetAlmacenamiento(almacenamiento);
+    void IComputadoraBuilder.SetGPU(string gpu) => this.SetGPU(gpu);
+}</code></pre>
+
+                <h3 id="director">3.4 El Director (Opcional pero recomendado)</h3>
+                <p>El Director encapsula "recetas" comunes. Sabe *qué* pasos ejecutar y en *qué* orden para construir una representación popular.</p>
+<pre><code class="language-csharp">/// &lt;summary&gt;
+/// El Director: Define el orden de los pasos de construcción.
+/// Es opcional pero útil para encapsular "recetas".
+/// &lt;/summary&gt;
+public class DirectorEnsamblaje
+{
+    public void ConstruirPCGamer(IComputadoraBuilder builder)
+    {
+        builder.SetCPU("Intel Core i9")
+               .SetRAM(32)
+               .SetAlmacenamiento("2TB NVMe SSD")
+               .SetGPU("NVIDIA RTX 4090");
+    }
+
+    public void ConstruirPCOficina(IComputadoraBuilder builder)
+    {
+        builder.SetCPU("Intel Core i5")
+               .SetRAM(16)
+               .SetAlmacenamiento("512GB SSD");
+        // No se establece GPU, por lo que usará la integrada
+    }
+}</code></pre>
+
+                <h3 id="cliente">3.5 El Cliente</h3>
+                <p>El cliente decide qué construir. Puede usar un Director para una receta estándar o usar el Builder manualmente para una personalización completa.</p>
+<pre><code class="language-csharp">public class Program
+{
+    public static void Main(string[] args)
+    {
+        var director = new DirectorEnsamblaje();
+        var builder = new ComputadoraBuilder();
+
+        // 1. Usando el Director para una PC Gamer
+        Console.WriteLine("Construyendo PC Gamer...");
+        director.ConstruirPCGamer(builder);
+        Computadora pcGamer = builder.GetComputadora();
+        pcGamer.MostrarEspecificaciones();
+
+        // 2. Usando el Director para una PC de Oficina
+        Console.WriteLine("\nConstruyendo PC de Oficina...");
+        director.ConstruirPCOficina(builder);
+        Computadora pcOficina = builder.GetComputadora();
+        pcOficina.MostrarEspecificaciones();
+
+        // 3. Usando el Builder manualmente para una PC personalizada
+        Console.WriteLine("\nConstruyendo PC personalizada (Workstation)...");
+        builder.SetCPU("AMD Threadripper")
+               .SetRAM(128)
+               .SetAlmacenamiento("4TB RAID 0 SSD")
+               .SetGPU("NVIDIA Quadro A6000");
+        Computadora pcWorkstation = builder.GetComputadora();
+        pcWorkstation.MostrarEspecificaciones();
+    }
+}</code></pre>
+                
+                <p><strong>Resultado en Consola:</strong></p>
+<pre><code class="language-bash">Construyendo PC Gamer...
+--- Especificaciones de la PC ---
+CPU: Intel Core i9
+RAM: 32 GB
+Almacenamiento: 2TB NVMe SSD
+GPU: NVIDIA RTX 4090
+---------------------------------
+
+Construyendo PC de Oficina...
+--- Especificaciones de la PC ---
+CPU: Intel Core i5
+RAM: 16 GB
+Almacenamiento: 512GB SSD
+GPU: Integrada (N/A)
+---------------------------------
+
+Construyendo PC personalizada (Workstation)...
+--- Especificaciones de la PC ---
+CPU: AMD Threadripper
+RAM: 128 GB
+Almacenamiento: 4TB RAID 0 SSD
+GPU: NVIDIA Quadro A6000
+---------------------------------</code></pre>
+            </section>
+
+            <section id="comparacion">
+                <h2>4. Builder vs. Otros Patrones</h2>
+                <p>Builder se confunde a menudo con los patrones Factory, pero su propósito es muy diferente.</p>
+
+                <h3>Builder vs. Abstract Factory</h3>
+                <ul>
+                    <li><strong>Abstract Factory:</strong> Se enfoca en crear <strong>familias de objetos relacionados</strong> (ej. <code>IButton</code> y <code>ICheckbox</code> de estilo Mac). El cliente obtiene productos distintos.</li>
+                    <li><strong>Builder:</strong> Se enfoca en construir <strong>un único objeto complejo</strong> paso a paso. El cliente obtiene un solo producto al final del proceso.</li>
+                </ul>
+
+                <h3>Builder vs. Factory Method</h3>
+                <ul>
+                    <li><strong>Factory Method:</strong> Crea <strong>un objeto</strong> en un <strong>solo paso</strong>. El patrón delega la decisión de *qué* clase instanciar a las subclases.</li>
+                    <li><strong>Builder:</strong> Crea <strong>un objeto</strong> en <strong>múltiples pasos</strong>. El patrón se enfoca en *cómo* se ensambla el objeto.</li>
+                </ul>
+                
+                <h3>Builder vs. Constructores Telescópicos</h3>
+                <ul>
+                    <li><strong>Constructor:</strong> <code>new Objeto(a, b, c, d, e)</code>. Ilegible, inflexible, y te obliga a pasar `null` para parámetros opcionales.</li>
+                    <li><strong>Builder:</strong> <code>builder.SetA(a).SetC(c).SetE(e).Build()</code>. Legible, flexible, y solo estableces lo que necesitas.</li>
+                </ul>
+            </section>
+
+            <section id="diagrama">
+                <h2>5. Diagrama UML</h2>
+                <p>El diagrama UML formal muestra las cuatro partes clave interactuando.</p>
+                
+                <blockquote>
+                    <strong>Oficialmente, el Patrón Builder:</strong><br><br>
+                    Separa la construcción de un objeto complejo de su representación, de modo que el mismo proceso de construcción pueda crear diferentes representaciones.
+                </blockquote>
+
+                <h3>Los Cuatro Actores del Patrón</h3>
+                <ul>
+                    <li><strong>Product (<code>Computadora</code>):</strong> El objeto complejo que se está construyendo.</li>
+                    <li><strong>Builder (<code>IComputadoraBuilder</code>):</strong> La interfaz que especifica los pasos de construcción.</li>
+                    <li><strong>ConcreteBuilder (<code>ComputadoraBuilder</code>):</strong> Implementa la interfaz Builder, rastrea el producto que está construyendo y proporciona un método para recuperarlo (<code>GetComputadora</code>).</li>
+                    <li><strong>Director (<code>DirectorEnsamblaje</code>):</strong> (Opcional) La clase que conoce la secuencia de pasos para construir una "receta" popular. Trabaja con la interfaz <code>IComputadoraBuilder</code>.</li>
+                </ul>
+            </section>
+
+            <div class="image-container">
+                <img src="../images/patrones/05_03.png" 
+                     alt="Diagrama de clases UML del Patrón Builder."
+                     title="Diagrama UML Builder">
+            </div>
+            <h6>Prompt: Diagrama UML claro del Patrón Builder, mostrando los 4 componentes: Director, Builder (interfaz), ConcreteBuilder y Product.</h6>
+
+            <section id="no-usar" class="info-box warning-box">
+                <h2>⚠️ Cuándo NO Usar el Patrón Builder</h2>
+                <p>El patrón Builder es una solución elegante, pero introduce varias clases e interfaces nuevas. Es un caso clásico de "no uses un cañón para matar una mosca".</p>
+                
+                <h3>Evítalo Si...</h3>
+                <ul>
+                    <li><strong>El objeto es simple:</strong> Si tu clase solo tiene 2 o 3 parámetros en el constructor, todos obligatorios, un constructor normal es mucho más simple y legible.</li>
+                    <li><strong>No hay diferentes representaciones:</strong> Si siempre construyes el objeto de la misma manera, un <strong>Factory Method</strong> o un <strong>Abstract Factory</strong> podrían ser más apropiados.</li>
+                    <li><strong>Los parámetros son inmutables:</strong> Si el objeto es simple y sus valores no cambian, un constructor simple es preferible. (Aunque un Builder es excelente para crear objetos inmutables complejos).</li>
+                </ul>
+                <p><strong>El costo:</strong> Aumenta la verbosidad del código. Creas 3-4 clases/interfaces solo para evitar un constructor. Úsalo solo cuando la complejidad del constructor se vuelve inmanejable.</p>
+            </section>
+            
+            <section id="ejercicio" class="info-box exercise-box">
+                <h2>💪 Ejercicio Práctico: Constructor de Consultas SQL</h2>
+                <p>Tu tarea es crear un <code>QueryBuilder</code> para construir consultas SQL simples. El patrón Builder es perfecto para esto.</p>
+                
+                <h3>Requisitos</h3>
+                <ol>
+                    <li><strong>Producto:</strong> No necesitas una clase `Producto`. El método final <code>Build()</code> puede devolver un <code>string</code>.</li>
+                    <li><strong>Builder:</strong> Crea una interfaz <code>ISqlQueryBuilder</code>.
+                        <ul>
+                            <li><code>Select(string tabla)</code></li>
+                            <li><code>Where(string condicion)</code></li>
+                            <li><code>OrderBy(string columna)</code></li>
+                            <li><code>Build()</code> (devuelve string)</li>
+                        </ul>
+                    </li>
+                    <li><strong>ConcreteBuilder:</strong> Crea <code>MySqlQueryBuilder</code> que implemente la interfaz.</li>
+                    <li><strong>Cliente:</strong> Muestra cómo construir dos consultas diferentes:
+                        <ol>
+                            <li><code>SELECT * FROM Usuarios WHERE Edad > 18</code></li>
+                            <li><code>SELECT * FROM Productos WHERE Categoria = 'Electronica' ORDER BY Precio</code></li>
+                        </ol>
+                    </li>
+                </ol>
+                 <h3>Bonus</h3>
+                <p>Haz que los métodos del builder sean fluidos (devuelvan <code>this</code>) y añade un método <code>Limit(int cantidad)</code>.</p>
+            </section>
+
+            <section id="conclusion">
+                <h2>Conclusión: Construcción Flexible y Legible</h2>
+                <p>El Patrón Builder transforma un proceso de creación monolítico y confuso (el constructor telescópico) en una serie de pasos elegantes, legibles y flexibles.</p>
+                <p>Te da control total sobre la creación del objeto, permitiéndote construir solo las partes que necesitas (como la PC de oficina sin GPU) o usar "recetas" predefinidas (como la PC Gamer) a través de un Director.</p>
+                <p>Desde pedir un sándwich hasta ensamblar una computadora o incluso construir consultas SQL, el patrón Builder es la herramienta fundamental para cuando el <strong>"cómo"</strong> se construye un objeto es tan importante como el <strong>"qué"</strong> se construye.</p>
+            </section>
+        
+        </article>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-column">
+                <h4>Navegación</h4>
+                <ul class="footer-links">
+                    <li><a href="../index.html">Inicio</a></li>
+                    <li><a href="../sobre-mi.html">Sobre mí</a></li>
+                    <li><a href="../helios-nexus.html">Proyecto Helios Nexus</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Conectar</h4>
+                <div class="social-links">
+                    <a href="https://linkedin.com/in/magolo" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227._792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        LinkedIn
+                    </a>
+                </div>
+            </div>
+            <div class="footer-column footer-mission">
+                <h4>La Misión</h4>
+                <p><strong>magolo.net</strong> documenta el camino hacia sistemas autónomos, cloud-native e inteligentes.</p>
+                <p class="mission-tech">De .NET a Kubernetes, de microservicios a agentes IA. Este blog explora arquitecturas modernas mientras construyo <a href="../helios-nexus.html">Helios Nexus</a>, una arquitectura de referencia evolutiva.</p>
+                <div class="tech-radar">
+                    <div class="radar-item">🔵 <strong>Adoptando:</strong> Semantic Kernel, .NET Aspire</div>
+                    <div class="radar-item">🟢 <strong>Experimentando:</strong> Dapr, Temporal</div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p class="copyright">© 2025-2028 Marcelo González</p>
+                <p class="tech-stack">Stack: HTML5 + CSS3 → GitHub Pages</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

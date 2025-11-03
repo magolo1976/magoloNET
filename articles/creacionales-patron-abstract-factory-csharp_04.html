@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MH6TJV68');</script>
+<!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Patrón Abstract Factory en C#: Guía Definitiva | magolo.NET</title>
+    <meta name="description" content="Aprende el Patrón Abstract Factory en C# para crear familias de objetos. Guía completa con código, diagramas UML, comparaciones (vs Factory Method, Builder) y ejercicios.">
+    <meta name="keywords" content="Abstract Factory, C#, Patrones de Diseño, Gang of Four, Programación Orientada a Objetos, .NET, Factory Method, Familias de Objetos">
+    <meta name="author" content="Marcelo González">
+    
+    <meta property="og:title" content="Patrón Abstract Factory en C#: Guía Definitiva">
+    <meta property="og:description" content="Domina Abstract Factory con ejemplos del mundo real: kits de UI, ecosistemas biológicos y mobiliario.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.magolo.net/articles/creacional-patron-abstract-factory-csharp.html">
+    <meta property="og:image" content="https://www.magolo.net/images/patrones/04_01.png">
+
+    <link rel="icon" type="image/svg+xml" href="articles-favicon.svg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Patrón Abstract Factory en C#: Guía Definitiva para Crear Familias de Objetos",
+      "description": "Guía completa del patrón Abstract Factory con implementación en C#, ejemplos prácticos y comparativas.",
+      "author": {
+        "@type": "Person",
+        "name": "Marcelo González"
+      },
+      "datePublished": "2025-10-29",
+      "dateModified": "2025-10-29",
+      "programmingLanguage": "C#",
+      "articleSection": "Patrones de Diseño",
+      "keywords": ["Abstract Factory", "C#", "Patrones Creacionales", "Factory Method", "Builder"]
+    }
+    </script>
+    
+    <link rel="stylesheet" href="style-patrones-article.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MH6TJV68"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+ 
+    <header class="article-nav-header">
+        <nav class="article-nav-content">
+            <a href="../index.html" class="back-link">
+                ← Volver al Blog
+            </a>
+            
+            <div class="article-arrows">
+                <a href="creacionales-patron-factory-method-csharp_02.html" class="arrow-btn arrow-prev">
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <div class="arrow-text">
+                        <span class="arrow-label">Anterior</span>
+                        <span class="arrow-title">Factory Method</span>
+                    </div>
+                </a>
+
+                <a href="creacionales-patron-builder-csharp_05.html" class="arrow-btn arrow-next"> <div class="arrow-text">
+                        <span class="arrow-label">Siguiente</span>
+                        <span class="arrow-title">Builder</span>
+                    </div>
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-article">
+        
+        <header>
+            <h1>Patrón Abstract Factory en C#: Guía Definitiva para Crear Familias de Objetos</h1>
+            <div class="article-meta">
+                <span class="reading-time">⏱️ 15 min de lectura</span>
+                <div class="article-tags">
+                    <span class="article-tag">Creacional</span>
+                    <span class="article-tag">C#</span>
+                    <span class="article-tag">.NET</span>
+                </div>
+            </div>
+        </header>
+        
+        <nav class="toc">
+            <h2>Tabla de Contenidos</h2>
+            <ul>
+                <li><a href="#introduccion">Introducción: La Fábrica de Fábricas</a></li>
+                <li><a href="#naturaleza">1. El Ecosistema como Fábrica Abstracta</a></li>
+                <li><a href="#dia-a-dia">2. El Kit de Muebles Moderno vs. Victoriano</a></li>
+                <li><a href="#implementacion">3. Implementación en C# (GUI Multiplataforma)</a></li>
+                <li><a href="#comparacion">4. Abstract Factory vs. Otros Patrones</a></li>
+                <li><a href="#diagrama">5. Diagrama UML</a></li>
+                <li><a href="#no-usar">⚠️ Cuándo NO Usarlo</a></li>
+                <li><a href="#ejercicio">💪 Ejercicio Práctico</a></li>
+                <li><a href="#conclusion">Conclusión</a></li>
+            </ul>
+        </nav>
+
+        <article>
+            
+            <section id="introduccion">
+                <h2>Introducción: La Fábrica de Fábricas</h2>
+                <p>Si el Patrón Factory Method es un especialista que sabe construir <strong>un</strong> producto, el <strong>Patrón Abstract Factory</strong> es el director de orquesta. No crea un solo objeto, sino una <strong>familia completa de objetos relacionados</strong>, asegurando que todos sean coherentes entre sí.</p>
+                <p>Imagina que estás diseñando una aplicación que debe verse nativa tanto en Windows como en macOS. No solo necesitas un botón; necesitas un botón, una casilla de verificación y una ventana que <strong>todos</strong> sigan el mismo estilo (Windows <strong>o</strong> macOS).</p>
+                <p>Aquí es donde brilla Abstract Factory. Es una "fábrica de fábricas" que te da la fábrica correcta (la de Windows o la de macOS) y tú le pides los componentes. El resultado es un conjunto de objetos que garantizan la <strong>consistencia visual y funcional</strong>.</p>
+                <ul>
+                    <li>Veremos por qué este patrón es clave para la portabilidad y los "temas" (theming).</li>
+                    <li>Implementaremos el ejemplo clásico de GUI en C#.</li>
+                    <li>Lo diferenciaremos de su "primo", el Factory Method.</li>
+                </ul>
+            </section>
+
+            <div class="image-container">
+                <img src="../images/patrones/04_01.png" 
+                     alt="Ilustración conceptual del Patrón de Diseño Abstract Factory."
+                     title="Diagrama conceptual Abstract Factory">
+            </div>
+            <h6>Prompt: Ilustración conceptual que muestra el Patrón Abstract Factory como una "fábrica maestra" que produce diferentes "kits" de productos (Kit A, Kit B).</h6>
+            
+            <section id="naturaleza">
+                <h2>1. El Ecosistema como Fábrica Abstracta</h2>
+                <p>En la naturaleza, un ecosistema es una fábrica abstracta perfecta. Un ecosistema (como una fábrica) no produce solo "un animal" o "una planta", sino un conjunto de seres vivos que están diseñados para <strong>coexistir</strong>.</p>
+                
+                <h3>La Fábrica de Ecosistemas</h3>
+                <p>Imagina una interfaz <code>IEcosistemaFactory</code>. Esta fábrica abstracta define qué se debe crear:</p>
+                <ul>
+                    <li><code>CrearPlanta()</code></li>
+                    <li><code>CrearHerbivoro()</code></li>
+                    <li><code>CrearDepredador()</code></li>
+                </ul>
+
+                <h3>Fábricas Concretas: Desierto y Selva</h3>
+                <p>Ahora tenemos dos implementaciones (fábricas concretas):</p>
+                <ol>
+                    <li><strong><code>FabricaDesierto</code>:</strong>
+                        <ul>
+                            <li>Crea <code>Cactus</code> (Planta)</li>
+                            <li>Crea <code>Liebre</code> (Herbívoro)</li>
+                            <li>Crea <code>Coyote</code> (Depredador)</li>
+                        </ul>
+                    </li>
+                    <li><strong><code>FabricaSelva</code>:</strong>
+                        <ul>
+                            <li>Crea <code>Orquidea</code> (Planta)</li>
+                            <li>Crea <code>Tapir</code> (Herbívoro)</li>
+                            <li>Crea <code>Jaguar</code> (Depredador)</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p>La clave del patrón es la <strong>consistencia</strong>. Si le pides a la <code>FabricaDesierto</code> un conjunto de seres vivos, nunca te dará un Jaguar o una Orquídea. Te da un conjunto de productos (Cactus, Liebre, Coyote) que tienen sentido juntos. Has creado una <strong>familia</strong> de objetos coherente.</p>
+            </section>
+            
+            <div class="image-container">
+                <img src="../images/patrones/04_02.png" 
+                     alt="Analogía del Patrón Abstract Factory usando ecosistemas."
+                     title="Ecosistemas (Desierto vs Selva) como Abstract Factory">
+            </div>
+            <h6>Prompt: Diagrama de analogía que muestra dos fábricas (Desierto, Selva) produciendo familias de productos relacionados (Cactus/Coyote, Orquídea/Jaguar).</h6>
+
+            <section id="dia-a-dia">
+                <h2>2. El Kit de Muebles Moderno vs. Victoriano</h2>
+                <p>Otro ejemplo es comprar un conjunto de muebles en IKEA. No compras una silla victoriana, una mesa de metal moderna y un sofá rústico. Compras un <strong>kit</strong> donde todas las piezas pertenecen a la misma línea de diseño (ej. "HÄSTBÖRK" o "FINNÅRP").</p>
+
+                <p><strong>Fábrica Abstracta (<code>IFabricaMuebles</code>):</strong></p>
+                <ul>
+                    <li><code>CrearSilla()</code></li>
+                    <li><code>CrearMesa()</code></li>
+                    <li><code>CrearSofa()</code></li>
+                </ul>
+
+                <p><strong>Fábricas Concretas (<code>FabricaModerna</code>, <code>FabricaVictoriana</code>):</strong></p>
+                <ul>
+                    <li>La <code>FabricaModerna</code> crea <code>SillaEames</code>, <code>MesaCristal</code> y <code>SofaMinimalista</code>.</li>
+                    <li>La <code>FabricaVictoriana</code> crea <code>SillaLuisXV</code>, <code>MesaCaoba</code> y <code>SofaChesterfield</code>.</li>
+                </ul>
+                <p>Como cliente, simplemente decides qué <strong>estilo</strong> quieres. Le pides al catálogo (la fábrica concreta) una silla, una mesa y un sofá, y recibes un salón perfectamente combinado, sin tener que saber los nombres de los modelos específicos.</p>
+            </section>
+
+            <section id="implementacion">
+                <h2>3. Implementación en C# (GUI Multiplataforma)</h2>
+                <p>Vamos a implementar el ejemplo clásico: una fábrica de componentes de UI que puede generar elementos para Windows o macOS.</p>
+                
+                <h3 id="productos-abstractos">3.1 Los Productos Abstractos (Interfaces)</h3>
+                <p>Primero, definimos los "contratos" para cada producto de la familia. Queremos botones y casillas de verificación.</p>
+<pre><code class="language-csharp">/// &lt;summary&gt;
+/// Producto Abstracto A: Define un botón genérico.
+/// &lt;/summary&gt;
+public interface IButton
+{
+    void Paint();
+}
+
+/// &lt;summary&gt;
+/// Producto Abstracto B: Define una casilla genérica.
+/// &lt;/summary&gt;
+public interface ICheckbox
+{
+    void Paint();
+}</code></pre>
+
+                <h3 id="productos-concretos">3.2 Los Productos Concretos (Implementaciones)</h3>
+                <p>Ahora creamos las variantes de Windows y macOS para cada producto. Observa cómo los productos de una misma familia (ej. Windows) tienen un estilo coherente.</p>
+<pre><code class="language-csharp">// Familia de Productos 1: Windows
+public class WindowsButton : IButton
+{
+    public void Paint()
+    {
+        Console.WriteLine("🪟 Renderizando botón [Estilo Windows 11]");
+    }
+}
+
+public class WindowsCheckbox : ICheckbox
+{
+    public void Paint()
+    {
+        Console.WriteLine("🪟 Renderizando checkbox [Estilo Windows 11]");
+    }
+}
+
+// Familia de Productos 2: macOS
+public class MacButton : IButton
+{
+    public void Paint()
+    {
+        Console.WriteLine("🍏 Renderizando botón (Estilo macOS Aqua)");
+    }
+}
+
+public class MacCheckbox : ICheckbox
+{
+    public void Paint()
+    {
+        Console.WriteLine("🍏 Renderizando checkbox (Estilo macOS Aqua)");
+    }
+}</code></pre>
+
+                <h3 id="fabrica-abstracta">3.3 La Fábrica Abstracta (Interfaz)</h3>
+                <p>Esta es la interfaz clave. Define un método para crear <strong>cada</strong> producto de la familia.</p>
+<pre><code class="language-csharp">/// &lt;summary&gt;
+/// La Fábrica Abstracta.
+/// Define métodos para crear cada producto abstracto.
+/// &lt;/summary&gt;
+public interface IGUIFactory
+{
+    IButton CreateButton();
+    ICheckbox CreateCheckbox();
+}</code></pre>
+
+                <h3 id="fabricas-concretas">3.4 Las Fábricas Concretas (Implementaciones)</h3>
+                <p>Aquí es donde se decide qué familia de productos crear. Cada fábrica implementa la interfaz y devuelve los productos concretos de <strong>su</strong> ecosistema (Windows o macOS).</p>
+<pre><code class="language-csharp">/// &lt;summary&gt;
+/// Fábrica Concreta 1: Produce productos de la familia Windows.
+/// &lt;/summary&gt;
+public class WindowsFactory : IGUIFactory
+{
+    public IButton CreateButton()
+    {
+        return new WindowsButton();
+    }
+
+    public ICheckbox CreateCheckbox()
+    {
+        return new WindowsCheckbox();
+    }
+}
+
+/// &lt;summary&gt;
+/// Fábrica Concreta 2: Produce productos de la familia macOS.
+/// &lt;/summary&gt;
+public class MacFactory : IGUIFactory
+{
+    public IButton CreateButton()
+    {
+        return new MacButton();
+    }
+
+    public ICheckbox CreateCheckbox()
+    {
+        return new MacCheckbox();
+    }
+}</code></pre>
+
+                <h3 id="cliente">3.5 El Cliente (Quien usa la fábrica)</h3>
+                <p>El código cliente solo necesita saber sobre las interfaces (<code>IGUIFactory</code>, <code>IButton</code>). No sabe (ni le importa) si está trabajando con Windows o Mac. Recibe una fábrica y la usa.</p>
+<pre><code class="language-csharp">/// &lt;summary&gt;
+/// El código cliente.
+/// Trabaja con fábricas y productos a través de sus interfaces abstractas.
+/// &lt;/summary&gt;
+public class Application
+{
+    private readonly IButton _button;
+    private readonly ICheckbox _checkbox;
+
+    // El cliente recibe la fábrica (¡Inyección de Dependencias!)
+    // No sabe si es una WindowsFactory o MacFactory.
+    public Application(IGUIFactory factory)
+    {
+        Console.WriteLine("Cliente: Creando UI con la fábrica proporcionada...");
+        _button = factory.CreateButton();
+        _checkbox = factory.CreateCheckbox();
+    }
+
+    public void PaintUI()
+    {
+        _button.Paint();
+        _checkbox.Paint();
+    }
+}
+
+// --- Ejecución en Program.cs ---
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        // Decidimos qué fábrica usar en tiempo de ejecución
+        // (Esto podría venir de un archivo de configuración o detección del SO)
+        
+        string os = "Windows"; // Cambia a "Mac" para probar
+        IGUIFactory factory;
+
+        if (os == "Windows")
+        {
+            factory = new WindowsFactory();
+        }
+        else
+        {
+            factory = new MacFactory();
+        }
+
+        // El cliente (Application) no cambia, solo recibe la fábrica
+        Application app = new Application(factory);
+        app.PaintUI();
+    }
+}</code></pre>
+                
+                <p><strong>Resultado en Consola (si <code>os = "Windows"</code>):</strong></p>
+<pre><code class="language-bash">Cliente: Creando UI con la fábrica proporcionada...
+🪟 Renderizando botón [Estilo Windows 11]
+🪟 Renderizando checkbox [Estilo Windows 11]</code></pre>
+                <p><strong>Resultado en Consola (si <code>os = "Mac"</code>):</strong></p>
+<pre><code class="language-bash">Cliente: Creando UI con la fábrica proporcionada...
+🍏 Renderizando botón (Estilo macOS Aqua)
+🍏 Renderizando checkbox (Estilo macOS Aqua)</code></pre>
+            </section>
+
+            <section id="comparacion">
+                <h2>4. Abstract Factory vs. Otros Patrones</h2>
+                <p>Es muy común confundir Abstract Factory con Factory Method y Builder.</p>
+
+                <h3>Abstract Factory vs. Factory Method</h3>
+                <ul>
+                    <li><strong>Propósito:</strong>
+                        <ul>
+                            <li><strong>Factory Method:</strong> Crea <strong>un</strong> producto. Se basa en la <strong>herencia</strong> (las subclases deciden qué crear).</li>
+                            <li><strong>Abstract Factory:</strong> Crea <strong>familias</strong> de productos. Se basa en la <strong>composición</strong> (se pasa un objeto fábrica al cliente).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Implementación:</strong> Es muy común que una Abstract Factory se implemente <strong>usando</strong> varios Factory Methods (un método por cada producto que crea).</li>
+                </ul>
+
+                <h3>Abstract Factory vs. Builder</h3>
+                <ul>
+                    <li><strong>Propósito:</strong>
+                        <ul>
+                            <li><strong>Builder:</strong> Construye <strong>un objeto complejo</strong> paso a paso (ej. <code>new Pizza().ConQueso().ConPepperoni().Build()</code>).</li>
+                            <li><strong>Abstract Factory:</strong> Crea <strong>múltiples objetos simples</strong> de una sola vez (ej. <code>factory.CrearSilla()</code>, <code>factory.CrearMesa()</code>).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Enfoque:</strong> Builder se enfoca en la <strong>construcción flexible</strong> de un solo objeto. Abstract Factory se enfoca en la <strong>consistencia de familia</strong> de múltiples objetos.</li>
+                </ul>
+            </section>
+
+            <section id="diagrama">
+                <h2>5. Diagrama UML</h2>
+                <p>El diagrama UML formal muestra claramente la separación entre las familias de productos.</p>
+                
+                <blockquote>
+                    <strong>Oficialmente, el Patrón Abstract Factory:</strong><br><br>
+                    Proporciona una interfaz para crear familias de objetos relacionados o dependientes sin especificar sus clases concretas.
+                </blockquote>
+
+                <h3>Los Actores del Patrón</h3>
+                <ul>
+                    <li><strong>AbstractFactory (<code>IGUIFactory</code>):</strong> La interfaz que declara los métodos de creación (<code>CreateButton</code>, <code>CreateCheckbox</code>).</li>
+                    <li><strong>ConcreteFactory (<code>WindowsFactory</code>, <code>MacFactory</code>):</strong> Implementa los métodos para crear una familia de productos concreta.</li>
+                    <li><strong>AbstractProduct (<code>IButton</code>, <code>ICheckbox</code>):</strong> Las interfaces para los productos.</li>
+                    <li><strong>ConcreteProduct (<code>WindowsButton</code>, <code>MacButton</code>, etc.):</strong> Las implementaciones de los productos, agrupadas por familia.</li>
+                    <li><strong>Client (<code>Application</code>):</strong> Utiliza solo las interfaces <code>IGUIFactory</code> e <code>IButton</code>/<code>ICheckbox</code>.</li>
+                </ul>
+            </section>
+
+            <div class="image-container">
+                <img src="../images/patrones/04_03.png" 
+                     alt="Diagrama de clases UML del Patrón Abstract Factory."
+                     title="Diagrama UML Abstract Factory">
+            </div>
+            <h6>Prompt: Diagrama UML claro del Patrón Abstract Factory mostrando AbstractFactory, ConcreteFactory, AbstractProduct (A y B) y ConcreteProducts.</h6>
+
+            <section id="no-usar" class="info-box warning-box">
+                <h2>⚠️ Cuándo NO Usar el Patrón Abstract Factory</h2>
+                <p>Abstract Factory es poderoso, pero introduce mucha complejidad. No lo uses a la ligera.</p>
+                
+                <h3>Evítalo Si...</h3>
+                <ul>
+                    <li><strong>Solo tienes una familia de productos:</strong> Si tu app <strong>solo</strong> va a ser estilo Windows y nunca habrá otra, es un exceso de ingeniería.</li>
+                    <li><strong>Los productos no están relacionados:</strong> Si no importa que el botón sea estilo Mac y la ventana estilo Windows (¡raro!), no necesitas forzar la consistencia.</li>
+                    <li><strong>Solo necesitas crear UN producto:</strong> Si solo creas botones, pero no checkboxes ni ventanas, usa <strong>Factory Method</strong>.</li>
+                </ul>
+
+                <h3>El Gran Inconveniente</h3>
+                <p>El principal problema de Abstract Factory es la <strong>rigidez al añadir nuevos productos</strong>.</p>
+                <p>Si mañana decides que tu familia de UI también necesita un <code>ITextbox</code>:</p>
+                <ol>
+                    <li>Debes añadir <code>CreateTextbox()</code> a la interfaz <code>IGUIFactory</code>.</li>
+                    <li>Esto <strong>rompe todas las fábricas concretas existentes</strong> (<code>WindowsFactory</code>, <code>MacFactory</code>), que ahora deben implementar <code>CreateTextbox()</code>.</li>
+                </ol>
+                <p>Es fácil añadir <strong>nuevas familias</strong> (ej. <code>LinuxFactory</code>), pero difícil añadir <strong>nuevos productos</strong> a todas las familias.</p>
+            </section>
+            
+            <section id="ejercicio" class="info-box exercise-box">
+                <h2>💪 Ejercicio Práctico: Facciones de un Videojuego</h2>
+                <p>Implementa un sistema para crear unidades en un juego de estrategia (RTS). El juego tiene dos facciones: <strong>Terran</strong> y <strong>Zerg</strong>. Cada facción tiene unidades terrestres y aéreas.</p>
+                
+                <h3>Requisitos</h3>
+                <ol>
+                    <li><strong>Productos Abstractos:</strong> Crea interfaces <code>ISoldado</code> (con método <code>Atacar()</code>) y <code>IUnidadAerea</code> (con método <code>Mover()</code>).</li>
+                    <li><strong>Productos Concretos:</strong>
+                        <ul>
+                            <li>Terran: <code>Marine</code> (ISoldado) y <code>Viking</code> (IUnidadAerea).</li>
+                            <li>Zerg: <code>Zergling</code> (ISoldado) y <code>Mutalisk</code> (IUnidadAerea).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Fábrica Abstracta:</strong> Crea <code>IFaccionFactory</code> con métodos <code>CrearSoldado()</code> y <code>CrearUnidadAerea()</code>.</li>
+                    <li><strong>Fábricas Concretas:</strong> Implementa <code>TerranFactory</code> y <code>ZergFactory</code>.</li>
+                    <li><strong>Cliente:</strong> Escribe un código que reciba una <code>IFaccionFactory</code>, cree un pequeño ejército (2 soldados, 1 aéreo) y los haga actuar, sin saber de qué facción son.</li>
+                </ol>
+            </section>
+
+            <section id="conclusion">
+                <h2>Conclusión: El Poder de la Consistencia</h2>
+                <p>El Patrón Abstract Factory es la solución definitiva para un problema clave: <strong>¿Cómo creo objetos que no solo están relacionados por un tipo, sino por un tema o familia?</strong></p>
+                <p>Al desacoplar al cliente de las implementaciones concretas, Abstract Factory te permite cambiar todo el "look and feel" (o el ecosistema, o el conjunto de muebles) de tu aplicación simplemente cambiando la fábrica que inyectas al principio.</p>
+                <p>Es un patrón que requiere planificación, ya que define la "línea de productos" completa desde el principio. Pero cuando se usa correctamente, da como resultado un código cliente increíblemente limpio y sistemas que pueden escalar en <strong>variantes</strong> (familias) con una elegancia que pocos patrones pueden igualar.</p>
+            </section>
+        
+        </article>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-column">
+                <h4>Navegación</h4>
+                <ul class="footer-links">
+                    <li><a href="../index.html">Inicio</a></li>
+                    <li><a href="../sobre-mi.html">Sobre mí</a></li>
+                    <li><a href="../helios-nexus.html">Proyecto Helios Nexus</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Conectar</h4>
+                <div class="social-links">
+                    <a href="https://linkedin.com/in/magolo" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        LinkedIn
+                    </a>
+                    </div>
+            </div>
+            <div class="footer-column footer-mission">
+                <h4>La Misión</h4>
+                <p><strong>magolo.net</strong> documenta el camino hacia sistemas autónomos, cloud-native e inteligentes.</p>
+                <p class="mission-tech">De .NET a Kubernetes, de microservicios a agentes IA. Este blog explora arquitecturas modernas mientras construyo <a href="../helios-nexus.html">Helios Nexus</a>, una arquitectura de referencia evolutiva.</p>
+                <div class="tech-radar">
+                    <div class="radar-item">🔵 <strong>Adoptando:</strong> Semantic Kernel, .NET Aspire</div>
+                    <div class="radar-item">🟢 <strong>Experimentando:</strong> Dapr, Temporal</div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p class="copyright">© 2025-2028 Marcelo González</p>
+                <p class="tech-stack">Stack: HTML5 + CSS3 → GitHub Pages</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

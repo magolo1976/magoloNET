@@ -427,6 +427,11 @@ article pre code {
     font-size: 0.95rem;
 }
 
+article pre code.language-bash {
+    background: #222; 
+    color: #eee;
+}
+
 /* --- Images --- */
 .image-container {
     margin: var(--spacing-xl) 0;

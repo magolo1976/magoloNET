@@ -9,18 +9,34 @@
     <priority>1.0</priority>
   </url>
   
+  <!-- Artículo: Patrón Observer -->
+  <url>
+    <loc>https://www.magolo.net/articles/comportamiento-patron-observer-csharp_01.html</loc>
+    <lastmod>2025-10-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Artículo: Patrón Factory Method -->
   <url>
-    <loc>https://www.magolo.net/articles/creacionales-patron-factory-method-csharp.html</loc>
+    <loc>https://www.magolo.net/articles/creacionales-patron-factory-method-csharp_02.html</loc>
     <lastmod>2025-10-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
+  <!-- Artículo: Patrón Singleton -->
+  <url>
+    <loc>https://www.magolo.net/articles/creacionales-patron-singleton-csharp_03.html</loc>
+    <lastmod>2025-11-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Artículo: Patrón Observer -->
   <url>
-    <loc>https://www.magolo.net/articles/comportamiento-patron-observer-csharp.html</loc>
-    <lastmod>2025-10-28</lastmod>
+    <loc>https://www.magolo.net/articles/creacionales-patron-abstract-factory-csharp_04.html</loc>
+    <lastmod>2025-11-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

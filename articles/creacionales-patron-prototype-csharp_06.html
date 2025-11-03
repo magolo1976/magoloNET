@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Patrón Prototype en C#: Guía para Clonar Objetos | magolo.NET</title>
+    <meta name="description" content="Aprende el Patrón Prototype en C# para optimizar la creación de objetos mediante clonación. Guía con código, diagramas UML y la diferencia clave entre Shallow y Deep Copy.">
+    <meta name="keywords" content="Prototype, C#, Patrones de Diseño, Clonación, ICloneable, Deep Copy, Shallow Copy, .NET, Programación Orientada a Objetos">
+    <meta name="author" content="Marcelo González">
+    
+    <meta property="og:title" content="Patrón Prototype en C#: Clonación Eficiente de Objetos">
+    <meta property="og:description" content="Domina Prototype para evitar la construcción costosa de objetos. Ejemplos con clonación celular, plantillas y la crucial implementación de Deep Copy en C#.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.magolo.net/articles/creacional-patron-prototype-csharp.html">
+    <meta property="og:image" content="https://www.magolo.net/images/patrones/05_01.png">
+
+    <link rel="icon" type="image/svg+xml" href="articles-favicon.svg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Patrón Prototype en C#: Guía para Clonar Objetos Eficientemente",
+      "description": "Guía completa del patrón Prototype en C# explorando la clonación, la optimización y la diferencia vital entre copia superficial y profunda (Shallow vs Deep Copy).",
+      "author": {
+        "@type": "Person",
+        "name": "Marcelo González"
+      },
+      "datePublished": "2025-10-31",
+      "dateModified": "2025-10-31",
+      "programmingLanguage": "C#",
+      "articleSection": "Patrones de Diseño",
+      "keywords": ["Prototype", "C#", "Patrones Creacionales", "Clonación", "Deep Copy", "Shallow Copy"]
+    }
+    </script>
+    
+    <link rel="stylesheet" href="style-patrones-article.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+</head>
+<body>
+
+
+    <header class="article-nav-header">
+        <nav class="article-nav-content">
+            <a href="../index.html" class="back-link">
+                ← Volver al Blog
+            </a>
+            
+            <div class="article-arrows">
+                <a href="creacionales-patron-builder-csharp_05.html" class="arrow-btn arrow-prev">
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <div class="arrow-text">
+                        <span class="arrow-label">Anterior</span>
+                        <span class="arrow-title">Builder</span>
+                    </div>
+                </a>
+
+                <a href="creacionales-patron-singleton-csharp.html" class="arrow-btn arrow-next"> <div class="arrow-text">
+                        <span class="arrow-label">Siguiente</span>
+                        <span class="arrow-title">Singleton</span>
+                    </div>
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-article">
+        
+        <header>
+            <h1>Patrón Prototype en C#: La Guía Definitiva de Clonación de Objetos</h1>
+            <div class="article-meta">
+                <span class="reading-time">⏱️ 16 min de lectura</span>
+                <div class="article-tags">
+                    <span class="article-tag">Creacional</span>
+                    <span class="article-tag">C#</span>
+                    <span class="article-tag">.NET</span>
+                </div>
+            </div>
+        </header>
+        
+        <nav class="toc">
+            <h2>Tabla de Contenidos</h2>
+            <ul>
+                <li><a href="#introduccion">Introducción: El Arte de Copiar</a></li>
+                <li><a href="#naturaleza">1. Mitosis: La Fábrica de la Vida</a></li>
+                <li><a href="#dia-a-dia">2. La Plantilla de Documento</a></li>
+                <li><a href="#implementacion">3. Implementación en C# (Shallow vs. Deep Copy)</a></li>
+                <li><a href="#comparacion">4. Prototype vs. Otros Patrones</a></li>
+                <li><a href="#diagrama">5. Diagrama UML</a></li>
+                <li><a href="#no-usar">⚠️ Cuándo NO Usarlo</a></li>
+                <li><a href="#ejercicio">💪 Ejercicio Práctico</a></li>
+                <li><a href="#conclusion">Conclusión</a></li>
+            </ul>
+        </nav>
+
+        <article>
+            
+            <section id="introduccion">
+                <h2>Introducción: El Arte de Copiar</h2>
+                <p>¿Qué haces si crear un objeto es increíblemente "caro"? Imagina que para instanciar una clase <code>NivelJuego</code>, necesitas leer 500MB de disco, parsear un JSON complejo y conectarte a una base de datos para cargar el estado del jugador. Hacer <code>new NivelJuego()</code> tarda 10 segundos.</p>
+                <p>Ahora, ¿qué pasa si necesitas 5 copias de ese nivel para una simulación? ¿Esperar 50 segundos? Aquí es donde los patrones anteriores no son suficientes. No queremos *construir* un objeto nuevo; queremos *clonar* uno que ya existe.</p>
+                
+                <blockquote>
+                    El <strong>Patrón Prototype</strong> te permite crear nuevos objetos copiando una instancia existente (un "prototipo"), en lugar de crear el objeto desde cero.
+                </blockquote>
+                
+                <p>Es el patrón de "Ctrl+C, Ctrl+V" para la Programación Orientada a Objetos. Se enfoca en la eficiencia cuando la inicialización es costosa.</p>
+            </section>
+
+            <div class="image-container">
+                <img src="../images/patrones/05_01.png" 
+                     alt="Ilustración conceptual del Patrón de Diseño Prototype."
+                     title="Diagrama conceptual Prototype">
+            </div>
+            <h6>Prompt: Ilustración conceptual que muestra un objeto 'prototipo' maestro siendo introducido en una fotocopiadora, de la que salen múltiples clones idénticos.</h6>
+            
+            <section id="naturaleza">
+                <h2>1. Mitosis: La Fábrica de la Vida</h2>
+                <p>La naturaleza es la maestra de la eficiencia, y el patrón Prototype es su herramienta de cabecera. Cuando tu cuerpo necesita crear una nueva célula de piel, no va a un "Constructor de Células" a pedirle que "ensamble una célula nueva desde cero" con lípidos, proteínas y aminoácidos sueltos.</p>
+                <p>Ese proceso sería terriblemente lento e ineficiente. En su lugar, usa el Prototype: la <strong>mitosis</strong>.</p>
+                <ul>
+                    <li><strong>El Prototipo:</strong> Una <code>Célula</code> existente y saludable.</li>
+                    <li><strong>El Método <code>Clone()</code>:</strong> El proceso de mitosis.</li>
+                    <li><strong>El Resultado:</strong> Dos <code>Células</code> hijas idénticas.</li>
+                </ul>
+                <p>El cuerpo simplemente toma una célula existente, duplica su configuración (el ADN) y la divide. Es infinitamente más rápido que construir una nueva desde sus componentes moleculares. La vida se basa en la clonación.</p>
+            </section>
+
+            <section id="dia-a-dia">
+                <h2>2. La Plantilla de Documento</h2>
+                <p>En tu trabajo diario, usas el patrón Prototype constantemente. Cada vez que creas un documento nuevo en Word, Excel o Google Docs, probablemente no empiezas con una hoja en blanco.</p>
+                <p>Usas una <strong>plantilla</strong>.</p>
+                <ul>
+                    <li><strong>El Prototipo:</strong> El archivo "Plantilla_Factura.docx" o "Plantilla_Reporte_Semanal.xlsx". Este objeto ya está "construido" y "configurado" con el logo de la empresa, las fuentes correctas, el pie de página y las fórmulas.</li>
+                    <li><strong>El Método <code>Clone()</code>:</strong> Hacer clic en "Archivo" -> "Nuevo desde plantilla" (o "Guardar como...").</li>
+                    <li><strong>El Resultado:</strong> Un documento nuevo, idéntico al prototipo, listo para que solo añadas los datos nuevos (el cliente, las horas trabajadas).</li>
+                </ul>
+                <p>El "costo de construcción" (diseñar el layout, añadir el logo, configurar las fórmulas) se pagó *una sola vez*. Todas las creaciones futuras de objetos <code>Factura</code> son ahora casi instantáneas gracias a la clonación.</p>
+            </section>
+            
+            <div class="image-container">
+                <img src="../images/patrones/05_02.png" 
+                     alt="Analogía del Patrón Prototype usando plantillas de documentos."
+                     title="Plantillas de documentos como Patrón Prototype">
+            </div>
+            <h6>Prompt: Ilustración de una interfaz de software (como Word o Google Docs) mostrando la opción 'Crear desde plantilla', con una plantilla de 'Factura' siendo copiada.</h6>
+
+            <section id="implementacion">
+                <h2>3. Implementación en C# (Shallow vs. Deep Copy)</h2>
+                <p>Aquí es donde el patrón se vuelve técnico y donde muchos desarrolladores cometen errores. Implementar Prototype en C# es fácil, pero implementarlo *correctamente* requiere entender la diferencia entre <strong>Shallow Copy (Copia Superficial)</strong> y <strong>Deep Copy (Copia Profunda)</strong>.</p>
+                <p>Vamos a modelar un objeto <code>ConfiguracionServidor</code> que es costoso de crear.</p>
+
+                <h3 id="producto-y-referencia">3.1 El Objeto Prototipo y su Referencia</h3>
+                <p>Nuestra configuración tiene datos simples (IP) y un objeto complejo de referencia (<code>OpcionesAvanzadas</code>).</p>
+<pre><code class="language-csharp">/// &lt;summary&gt;
+/// Un objeto de referencia. Esto es lo que causa problemas.
+/// &lt;/summary&gt;
+public class OpcionesAvanzadas
+{
+    public int Timeout { get; set; }
+    public string LogPath { get; set; }
+}
+
+/// &lt;summary&gt;
+/// El Producto/Prototipo. Es "caro" de crear.
+/// &lt;/summary&gt;
+public class ConfiguracionServidor
+{
+    public string IpAddress { get; set; }
+    public OpcionesAvanzadas Opciones { get; set; }
+
+    // Constructor "CARO"
+    public ConfiguracionServidor(string ip)
+    {
+        IpAddress = ip;
+        // Simula una operación costosa (ej. leer de un archivo o DB)
+        Thread.Sleep(2000); // ¡Tarda 2 segundos!
+        Opciones = new OpcionesAvanzadas { Timeout = 120, LogPath = "/var/log/default.log" };
+        Console.WriteLine($"¡CONSTRUCTOR COSTOSO EJECUTADO! Config para {ip} creada.");
+    }
+}</code></pre>
+
+                <h3 id="shallow-copy">3.2 El Error: Shallow Copy con <code>MemberwiseClone</code></h3>
+                <p>C# provee <code>MemberwiseClone()</code>, que es una forma rápida de hacer una copia superficial. Define una interfaz <code>IPrototype</code> para estandarizar.</p>
+<pre><code class="language-csharp">public interface IPrototype&lt;T&gt;
+{
+    T Clone();
+}
+
+public class ConfiguracionServidor : IPrototype&lt;ConfiguracionServidor&gt;
+{
+    // ... (propiedades y constructor de antes) ...
+
+    // Constructor de copia privada para clonación
+    private ConfiguracionServidor(ConfiguracionServidor source)
+    {
+        // ... (lógica de copia) ...
+    }
+
+    /// &lt;summary&gt;
+    /// IMPLEMENTACIÓN 1: SHALLOW COPY (Peligrosa)
+    /// &lt;/summary&gt;
+    public ConfiguracionServidor ShallowClone()
+    {
+        Console.WriteLine("Clonando (Shallow)...");
+        // MemberwiseClone copia los campos.
+        // Copia el valor de 'IpAddress' (string).
+        // Copia la *REFERENCIA* de 'Opciones' (OpcionesAvanzadas).
+        return (ConfiguracionServidor)this.MemberwiseClone();
+    }
+    
+    // Método 'Clone' principal que usaremos (lo haremos Deep)
+    public ConfiguracionServidor Clone()
+    {
+        // Por ahora, lo dejaremos como shallow para ver el error
+        return ShallowClone();
+    }
+}
+
+// --- Cliente (Program.cs) ---
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        Console.WriteLine("--- Creando prototipo original (costoso)... ---");
+        ConfiguracionServidor prototipo = new ConfiguracionServidor("192.168.1.1");
+        
+        Console.WriteLine("\n--- Creando clon 1 (rápido)... ---");
+        ConfiguracionServidor clon1 = prototipo.ShallowClone();
+
+        // Modificamos el clon
+        clon1.IpAddress = "192.168.1.100";
+        clon1.Opciones.Timeout = 9999; // ¡Modificamos el objeto de referencia!
+
+        Console.WriteLine("\n--- Resultados ---");
+        Console.WriteLine($"ORIGINAL: IP={prototipo.IpAddress}, Timeout={prototipo.Opciones.Timeout}");
+        Console.WriteLine($"CLON 1:   IP={clon1.IpAddress}, Timeout={clon1.Opciones.Timeout}");
+    }
+}</code></pre>
+
+                <p><strong>Resultado en Consola (¡EL ERROR!):</strong></p>
+<pre><code class="language-bash">--- Creando prototipo original (costoso)... ---
+¡CONSTRUCTOR COSTOSO EJECUTADO! Config para 192.168.1.1 creada.
+
+--- Creando clon 1 (rápido)... ---
+Clonando (Shallow)...
+
+--- Resultados ---
+ORIGINAL: IP=192.168.1.1, Timeout=9999
+CLON 1:   IP=192.168.1.100, Timeout=9999</code></pre>
+                <p>Como puedes ver, ¡modificar el <code>Timeout</code> del clon <strong>también modificó el prototipo original</strong>! Esto es un bug catastrófico. Ocurre porque ambos objetos apuntan a la *misma instancia* de <code>OpcionesAvanzadas</code> en memoria.</p>
+
+                <h3 id="deep-copy">3.3 La Solución: Deep Copy (Copia Profunda)</h3>
+                <p>Para solucionarlo, debemos implementar una copia profunda. Debemos clonar manualmente *todos* los objetos referenciados.</p>
+<pre><code class="language-csharp">// Primero, hacemos que OpcionesAvanzadas también sea clonable
+public class OpcionesAvanzadas : IPrototype&lt;OpcionesAvanzadas&gt;
+{
+    public int Timeout { get; set; }
+    public string LogPath { get; set; }
+
+    public OpcionesAvanzadas Clone()
+    {
+        // String es inmutable, int es valor. MemberwiseClone es seguro aquí.
+        return (OpcionesAvanzadas)this.MemberwiseClone();
+    }
+}
+
+// Ahora, modificamos ConfiguracionServidor
+public class ConfiguracionServidor : IPrototype&lt;ConfiguracionServidor&gt;
+{
+    // ... (propiedades y constructor de antes) ...
+
+    // ... (ShallowClone de antes) ...
+
+    /// &lt;summary&gt;
+    /// IMPLEMENTACIÓN 2: DEEP COPY (Correcta)
+    /// &lt;/summary&gt;
+    public ConfiguracionServidor DeepClone()
+    {
+        Console.WriteLine("Clonando (Deep)...");
+        // 1. Hacemos una copia superficial de los tipos valor/inmutables
+        ConfiguracionServidor clon = (ConfiguracionServidor)this.MemberwiseClone();
+        
+        // 2. Clonamos manualmente todos los objetos de referencia
+        clon.Opciones = this.Opciones.Clone(); // ¡Esta es la línea clave!
+
+        return clon;
+    }
+
+    // El método Clone público ahora usa la versión Deep
+    public ConfiguracionServidor Clone()
+    {
+        return DeepClone();
+    }
+}
+
+// --- Cliente (Program.cs) - MISMO CÓDIGO DE ANTES ---
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        Console.WriteLine("--- Creando prototipo original (costoso)... ---");
+        ConfiguracionServidor prototipo = new ConfiguracionServidor("192.168.1.1");
+        
+        Console.WriteLine("\n--- Creando clon 1 (rápido)... ---");
+        ConfiguracionServidor clon1 = prototipo.Clone(); // Ahora llama a DeepClone
+
+        // Modificamos el clon
+        clon1.IpAddress = "192.168.1.100";
+        clon1.Opciones.Timeout = 9999; 
+
+        Console.WriteLine("\n--- Resultados ---");
+        Console.WriteLine($"ORIGINAL: IP={prototipo.IpAddress}, Timeout={prototipo.Opciones.Timeout}");
+        Console.WriteLine($"CLON 1:   IP={clon1.IpAddress}, Timeout={clon1.Opciones.Timeout}");
+    }
+}</code></pre>
+
+                <p><strong>Resultado en Consola (¡CORRECTO!):</strong></p>
+<pre><code class="language-bash">--- Creando prototipo original (costoso)... ---
+¡CONSTRUCTOR COSTOSO EJECUTADO! Config para 192.168.1.1 creada.
+
+--- Creando clon 1 (rápido)... ---
+Clonando (Deep)...
+
+--- Resultados ---
+ORIGINAL: IP=192.168.1.1, Timeout=120
+CLON 1:   IP=192.168.1.100, Timeout=9999</code></pre>
+                <p>¡Éxito! Ahora el clon es una entidad totalmente independiente. El prototipo original permanece intacto, que es el objetivo del patrón.</p>
+
+            </section>
+
+            <section id="comparacion">
+                <h2>4. Prototype vs. Otros Patrones</h2>
+                
+                <h3>Prototype vs. Factory Method</h3>
+                <ul>
+                    <li><strong>Factory Method:</strong> Se enfoca en <strong>crear</strong> un objeto (<code>new</code>) pero delega la decisión de *qué* clase concreta instanciar a las subclases.</li>
+                    <li><strong>Prototype:</strong> Se enfoca en <strong>clonar</strong> un objeto existente. No usa <code>new</code> (excepto en la implementación de Deep Copy), sino que copia una instancia.</li>
+                    <li><strong>Combinación:</strong> Puedes tener un Factory Method que, en lugar de crear un objeto, clona un prototipo.</li>
+                </ul>
+
+                <h3>Prototype vs. Builder</h3>
+                <ul>
+                    <li><strong>Builder:</strong> Construye un objeto complejo paso a paso. Es útil cuando necesitas <strong>diferentes configuraciones</strong> de un objeto.</li>
+                    <li><strong>Prototype:</strong> Copia un objeto complejo de golpe. Es útil cuando necesitas <strong>múltiples copias de la misma configuración</strong>.</li>
+                    <li><strong>Combinación:</strong> Puedes usar un Builder para crear tu objeto prototipo original (con la configuración perfecta y costosa) y luego usar Prototype para clonarlo 1000 veces.</li>
+                </ul>
+            </section>
+
+            <section id="diagrama">
+                <h2>5. Diagrama UML</h2>
+                <p>El diagrama UML para Prototype es engañosamente simple, ocultando la complejidad del Deep Copy.</p>
+                
+                <blockquote>
+                    <strong>Oficialmente, el Patrón Prototype:</strong><br><br>
+                    Especifica los tipos de objetos a crear usando una instancia prototípica, y crea nuevos objetos copiando este prototipo.
+                </blockquote>
+
+                <h3>Los Actores del Patrón</h3>
+                <ul>
+                    <li><strong>Prototype (<code>IPrototype</code>):</strong> La interfaz que declara el método de clonación (ej. <code>Clone()</code>).</li>
+                    <li><strong>ConcretePrototype (<code>ConfiguracionServidor</code>):</strong> La clase concreta que implementa el método <code>Clone()</code>. Contiene la lógica para copiarse a sí misma (shallow o deep).</li>
+                    <li><strong>Client (<code>Program</code>):</strong> El cliente obtiene una instancia de un ConcretePrototype y la clona para obtener nuevos objetos, sin saber cómo se clona o se construye.</li>
+                </ul>
+            </section>
+
+            <div class="image-container">
+                <img src="../images/patrones/05_03.png" 
+                     alt="Diagrama de clases UML del Patrón Prototype."
+                     title="Diagrama UML Prototype">
+            </div>
+            <h6>Prompt: Diagrama UML claro del Patrón Prototype, mostrando un Client, una interfaz IPrototype (con método Clone) y una clase ConcretePrototype que la implementa.</h6>
+
+            <section id="no-usar" class="info-box warning-box">
+                <h2>⚠️ Cuándo NO Usar el Patrón Prototype</h2>
+                <p>La clonación no es una bala de plata. A veces, <code>new</code> es simplemente mejor.</p>
+                
+                <h3>Evítalo Si...</h3>
+                <ul>
+                    <li><strong>Los objetos son simples:</strong> Si la clase solo tiene tipos de valor (<code>int</code>, <code>string</code>, <code>bool</code>) y el constructor es barato, usar <code>new</code> es más limpio, más rápido y más legible.</li>
+                    <li><strong>La clase no "posee" sus datos:</strong> Si un objeto contiene referencias a servicios compartidos (ej. un logger, un socket de red, un manejador de base de datos), clonarlo puede ser desastroso. ¿Clonas la referencia (ahora dos objetos usan el mismo socket)? ¿O intentas clonar el socket (imposible)?</li>
+                    <li><strong>La complejidad del Deep Copy es demasiado alta:</strong> Si tu objeto es un grafo gigante de referencias circulares, implementar un <code>DeepClone()</code> correcto puede ser una pesadilla de código recursivo y seguimiento de referencias. En ese punto, es mejor refactorizar o usar un Factory.</li>
+                </ul>
+            </section>
+            
+            <section id="ejercicio" class="info-box exercise-box">
+                <h2>💪 Ejercicio Práctico: Registro de Formas (Shape Registry)</h2>
+                <p>Tu objetivo es crear una caché de "prototipos" para un programa de dibujo. Queremos tener formas base (un círculo rojo, un cuadrado azul) y poder crear copias de ellas rápidamente.</p>
+                
+                <h3>Requisitos</h3>
+                <ol>
+                    <li><strong>Prototipos:</strong> Crea una interfaz <code>IShapePrototype</code> con un método <code>Clone()</code> y <code>Draw()</code>.</li>
+                    <li><strong>Clases Concretas:</strong> Crea <code>Circle</code> y <code>Rectangle</code>. Dales propiedades (ej. <code>Radius</code>, <code>Color</code>, <code>Width</code>, <code>Height</code>). Implementa <code>Clone()</code> (¡Deep Copy si añades un objeto de referencia <code>Position</code>!).</li>
+                    <li><strong>El Registro (Registry):</strong> Crea una clase <code>ShapeRegistry</code>.
+                        <ul>
+                            <li>Debe tener un <code>Dictionary&lt;string, IShapePrototype&gt;</code>.</li>
+                            <li>Un método <code>LoadPrototypes()</code> que crea un <code>Circle</code> y un <code>Rectangle</code> base y los guarda en el diccionario (ej. con claves "BigRedCircle", "BlueSquare").</li>
+                            <li>Un método <code>GetShape(string key)</code> que <strong>devuelve un clon</strong> del prototipo almacenado.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Cliente:</strong> Muestra cómo usar el registro para obtener "BigRedCircle", modificar su radio, y dibujarlo, probando que el prototipo original en el registro no fue modificado.</li>
+                </ol>
+            </section>
+
+            <section id="conclusion">
+                <h2>Conclusión: Copiar es más Rápido que Construir</h2>
+                <p>El Patrón Prototype cambia nuestra mentalidad de "construcción" a "copia". Cuando el costo de <code>new</code> es prohibitivo, la clonación se convierte en una herramienta de optimización esencial.</p>
+                <p>Sin embargo, todo su poder se basa en una implementación correcta. Si te llevas una sola cosa de este artículo, que sea esto: <strong>cuidado con la copia superficial</strong>. Un <code>MemberwiseClone()</code> descuidado es una bomba de relojería que puede corromper el estado de tus prototipos originales.</p>
+                <p>Domina el Deep Copy, y habrás dominado el patrón Prototype.</p>
+            </section>
+        
+        </article>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-column">
+                <h4>Navegación</h4>
+                <ul class="footer-links">
+                    <li><a href="../index.html">Inicio</a></li>
+                    <li><a href="../sobre-mi.html">Sobre mí</a></li>
+                    <li><a href="../helios-nexus.html">Proyecto Helios Nexus</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Conectar</h4>
+                <div class="social-links">
+                    <a href="https://linkedin.com/in/magolo" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227._792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        LinkedIn
+                    </a>
+                </div>
+            </div>
+            <div class="footer-column footer-mission">
+                <h4>La Misión</h4>
+                <p><strong>magolo.net</strong> documenta el camino hacia sistemas autónomos, cloud-native e inteligentes.</p>
+                <p class="mission-tech">De .NET a Kubernetes, de microservicios a agentes IA. Este blog explora arquitecturas modernas mientras construyo <a href="../helios-nexus.html">Helios Nexus</a>, una arquitectura de referencia evolutiva.</p>
+                <div class="tech-radar">
+                    <div class="radar-item">🔵 <strong>Adoptando:</strong> Semantic Kernel, .NET Aspire</div>
+                    <div class="radar-item">🟢 <strong>Experimentando:</strong> Dapr, Temporal</div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p class="copyright">© 2025-2028 Marcelo González</p>
+                <p class="tech-stack">Stack: HTML5 + CSS3 → GitHub Pages</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
