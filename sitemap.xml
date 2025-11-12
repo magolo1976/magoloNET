@@ -4,61 +4,69 @@
   <!-- Página principal -->
   <url>
     <loc>https://www.magolo.net/</loc>
-    <lastmod>2025-11-02</lastmod>
+    <lastmod>2025-11-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   
   <!-- Artículo: Patrón Observer -->
   <url>
-    <loc>https://www.magolo.net/articles/comportamiento-patron-observer-csharp_01.html</loc>
-    <lastmod>2025-10-28</lastmod>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/comportamiento-patron-observer-csharp_01.html</loc>
+    <lastmod>2025-11-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Artículo: Patrón Factory Method -->
   <url>
-    <loc>https://www.magolo.net/articles/creacionales-patron-factory-method-csharp_02.html</loc>
-    <lastmod>2025-10-22</lastmod>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales-patron-factory-method-csharp_02.html</loc>
+    <lastmod>2025-11-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <!-- Artículo: Patrón Singleton -->
   <url>
-    <loc>https://www.magolo.net/articles/creacionales-patron-singleton-csharp_03.html</loc>
-    <lastmod>2025-11-03</lastmod>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales-patron-singleton-csharp_03.html</loc>
+    <lastmod>2025-11-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <!-- Artículo: Patrón Abstract Factory -->
   <url>
-    <loc>https://www.magolo.net/articles/creacionales-patron-abstract-factory-csharp_04.html</loc>
-    <lastmod>2025-11-03</lastmod>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales-patron-abstract-factory-csharp_04.html</loc>
+    <lastmod>2025-11-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Artículo: Patrón Builder -->
   <url>
-    <loc>https://www.magolo.net/articles/creacionales-patron-builder-csharp_05.html</loc>
-    <lastmod>2025-11-04</lastmod>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales-patron-builder-csharp_05.html</loc>
+    <lastmod>2025-11-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Artículo: Patrón Prototype -->
   <url>
-    <loc>https://www.magolo.net/articles/creacionales-patron-prototype-csharp_06.html</loc>
-    <lastmod>2025-11-04</lastmod>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales-patron-prototype-csharp_06.html</loc>
+    <lastmod>2025-11-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Artículo: Patrón Object Pool -->
   <url>
-    <loc>https://www.magolo.net/articles/creacionales-patron-object-pool-csharp_07.html</loc>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales-patron-object-pool-csharp_07.html</loc>
+    <lastmod>2025-11-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Artículo: Patrón Adapter -->
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/estructurales-patron-adapter-csharp_08.html</loc>
     <lastmod>2025-11-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
