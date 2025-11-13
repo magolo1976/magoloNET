@@ -68,7 +68,6 @@ h1 {
 .ticker-group {
     display: flex;
     flex-direction: column;
-    color: #035de4;
 }
 
 .ticker-name {
@@ -77,6 +76,7 @@ h1 {
     color: var(--text-main);
     letter-spacing: -0.005em;
     line-height: 1.1;
+    color: #035de4;
 }
 
 .ticker-label {
