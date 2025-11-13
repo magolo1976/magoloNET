@@ -76,7 +76,6 @@ h1 {
     color: var(--text-main);
     letter-spacing: -0.005em;
     line-height: 1.1;
-    color: #035de4;
 }
 
 .ticker-label {
@@ -98,6 +97,7 @@ h1 {
     color: var(--text-main);
     font-feature-settings: "tnum"; /* Números alineados */
     line-height: 1.1;
+    color: #035de4;
 }
 
 .last-update {
