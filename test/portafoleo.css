@@ -51,14 +51,14 @@ h1 {
 .stock-card {
     background: var(--card-bg);
     border-radius: 8px;
-    padding: 6px 10px; /* mucho menor */
+    padding: 4px 8px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
     transition: transform 0.2s ease;
-    min-height: 40px; /* aprox mitad de 70px */
+    min-height: 20px; /* mitad de 40px */
 }
 
 .stock-card:hover {
