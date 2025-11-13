@@ -82,11 +82,9 @@ async function fetchData() {
             card.innerHTML = `
                 <div class="ticker-group">
                     <div class="ticker-name">${ticker}</div>
-                    <div class="ticker-label">Stock</div>
                 </div>
                 <div class="price-group">
                     <div class="price-value">${displayPrice}</div>
-                    <div class="last-update">${lastDate}</div>
                 </div>
             `;
             container.appendChild(card);
