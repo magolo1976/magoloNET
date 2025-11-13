@@ -41,23 +41,24 @@ h1 {
 /* Contenedor de las tarjetas */
 #stock-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
     width: 100%;
-    max-width: 800px;
+    max-width: 1100px; /* permite 3 columnas cómodamente en desktop */
 }
 
 /* Diseño de la tarjeta */
 .stock-card {
     background: var(--card-bg);
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: 10px;
+    padding: 14px 16px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
     transition: transform 0.2s ease;
+    min-height: 70px; /* más compacto */
 }
 
 .stock-card:hover {
@@ -70,10 +71,10 @@ h1 {
 }
 
 .ticker-name {
-    font-size: 1.05rem; /* reducido desde 1.25rem */
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--text-main);
-    letter-spacing: -0.015em;
+    letter-spacing: -0.01em;
 }
 
 .ticker-label {
@@ -89,8 +90,8 @@ h1 {
 }
 
 .price-value {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.3rem;
+    font-weight: 600;
     color: var(--text-main);
     font-feature-settings: "tnum"; /* Números alineados */
 }
@@ -125,5 +126,12 @@ h1 {
 }
 
 .stock-card {
-    animation: fadeIn 0.4s ease-out forwards;
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Fuerza exactamente 3 columnas en pantallas grandes */
+@media (min-width: 900px) {
+    #stock-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
