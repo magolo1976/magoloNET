@@ -50,15 +50,15 @@ h1 {
 /* Diseño de la tarjeta */
 .stock-card {
     background: var(--card-bg);
-    border-radius: 10px;
-    padding: 14px 16px;
+    border-radius: 8px;
+    padding: 6px 10px; /* mucho menor */
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
     transition: transform 0.2s ease;
-    min-height: 70px; /* más compacto */
+    min-height: 40px; /* aprox mitad de 70px */
 }
 
 .stock-card:hover {
@@ -71,18 +71,20 @@ h1 {
 }
 
 .ticker-name {
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-main);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.005em;
+    line-height: 1.1;
 }
 
 .ticker-label {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     color: var(--text-muted);
     text-transform: uppercase;
     font-weight: 600;
-    margin-top: 4px;
+    margin-top: 2px;
+    line-height: 1;
 }
 
 .price-group {
@@ -90,16 +92,18 @@ h1 {
 }
 
 .price-value {
-    font-size: 1.3rem;
+    font-size: 1.05rem;
     font-weight: 600;
     color: var(--text-main);
     font-feature-settings: "tnum"; /* Números alineados */
+    line-height: 1.1;
 }
 
 .last-update {
-    font-size: 0.75rem;
+    font-size: 0.6rem;
     color: var(--text-muted);
-    margin-top: 4px;
+    margin-top: 2px;
+    line-height: 1;
 }
 
 /* Estados de carga y error */
