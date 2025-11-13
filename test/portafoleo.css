@@ -44,7 +44,7 @@ h1 {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 12px;
     width: 100%;
-    max-width: 1100px; /* permite 3 columnas cómodamente en desktop */
+    max-width: 1400px; /* permite 4 columnas cómodamente en desktop */
 }
 
 /* Diseño de la tarjeta */
@@ -133,9 +133,9 @@ h1 {
     animation: fadeIn 0.3s ease-out forwards;
 }
 
-/* Fuerza exactamente 3 columnas en pantallas grandes */
-@media (min-width: 900px) {
+/* Fuerza exactamente 4 columnas en pantallas grandes */
+@media (min-width: 1024px) {
     #stock-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
     }
 }
