@@ -5,7 +5,7 @@ const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRsnmjygWG6Tx
 const cleanText = (txt) => txt ? txt.replace(/"/g, '').trim() : "";
 const cleanPrice = (txt) => {
     if (!txt) return null;
-    const cleaned = cleanText(txt);
+    const cleaned = cleanText(txt).replace(/,/g, '.'); // Convierte comas a puntos
     if (cleaned === "" || isNaN(parseFloat(cleaned))) {
         return null;
     }
