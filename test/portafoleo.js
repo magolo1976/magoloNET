@@ -60,10 +60,9 @@ async function fetchData() {
             if (row.length <= lastColIndex) continue;
             
             // --- MODIFICADO ---
-            // Asumimos que la penúltima columna es el CAMBIO
-            // y la última es el PRECIO.
-            const rawChange = cleanText(row[lastColIndex - 1]); // Penúltima columna
-            const rawPrice = cleanText(row[lastColIndex]); // Última columna
+            // Leemos el precio ANTERIOR (penúltima) y el NUEVO (última)
+            const rawPreviousPrice = cleanText(row[lastColIndex - 1]); // Penúltima columna
+            const rawNewPrice = cleanText(row[lastColIndex]); // Última columna
             // --- FIN MODIFICADO ---
             
             // --- FILTRO CRÍTICO ---
@@ -74,22 +73,38 @@ async function fetchData() {
             
             activeCount++;
             
-            // Formatear precio
-            let displayPrice = "---";
-            if (rawPrice && !isNaN(parseFloat(rawPrice))) {
-                // Formatear como moneda
-                displayPrice = `$${parseFloat(rawPrice).toFixed(2)}`;
-            } else if (rawPrice === "#N/A") {
-                displayPrice = "N/A";
-            } else if (rawPrice) {
-                // Si es texto (ej. "Error" o "Cargando")
-                displayPrice = rawPrice;
-            }
+            // --- MODIFICADO: Formatear precio ---
+            // Limpiamos la coma del precio nuevo (ej. 150,50 -> 150.50)
+            const cleanNewPrice = rawNewPrice.replace(',', '.');
             
-            // --- NUEVO: Determinar color basado en el cambio ---
+            let displayPrice = "---";
+            if (rawNewPrice && !isNaN(parseFloat(cleanNewPrice))) {
+                // Formatear como moneda
+                displayPrice = `$${parseFloat(cleanNewPrice).toFixed(2)}`;
+            } else if (rawNewPrice === "#N/A") {
+                displayPrice = "N/A";
+            } else if (rawNewPrice) {
+                // Si es texto (ej. "Error" o "Cargando")
+                displayPrice = rawNewPrice;
+            }
+            // --- FIN MODIFICADO ---
+            
+            
+            // --- MODIFICADO: Determinar color basado en el CÁLCULO ---
             let changeClass = ''; // Clase por defecto (azul/neutro)
-            if (rawChange && !isNaN(parseFloat(rawChange))) {
-                const changeValue = parseFloat(rawChange);
+            
+            // Limpiamos comas de ambos valores
+            const cleanPrevious = rawPreviousPrice.replace(',', '.');
+            const cleanNew = rawNewPrice.replace(',', '.');
+            
+            // Convertimos a números
+            const previousPrice = parseFloat(cleanPrevious);
+            const newPrice = parseFloat(cleanNew);
+            
+            // Solo calculamos si AMBOS son números válidos
+            if (!isNaN(previousPrice) && !isNaN(newPrice)) {
+                const changeValue = newPrice - previousPrice;
+                
                 if (changeValue > 0) {
                     changeClass = 'price-positive'; // Verde
                 } else if (changeValue < 0) {
@@ -97,7 +112,7 @@ async function fetchData() {
                 }
                 // Si es 0, se queda con la clase vacía (usará el azul por defecto)
             }
-            // --- FIN NUEVO ---
+            // --- FIN MODIFICADO ---
             
             // Crear tarjeta HTML
             const card = document.createElement('div');
