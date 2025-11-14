@@ -98,11 +98,21 @@ h1 {
 .price-value {
     font-size: 1.05rem;
     font-weight: 600;
-    color: var(--text-main);
     font-feature-settings: "tnum"; /* Números alineados */
     line-height: 1.1;
-    color: #035de4;
+    color: #035de4; /* Color azul por defecto (neutro o sin cambios) */
+    transition: color 0.3s ease; /* Transición suave de color */
 }
+
+/* --- NUEVAS CLASES --- */
+.price-positive {
+    color: #16a34a; /* Verde (ej. green-600) */
+}
+
+.price-negative {
+    color: #dc2626; /* Rojo (ej. red-600) */
+}
+/* --- FIN NUEVAS CLASES --- */
 
 .last-update {
     font-size: 0.6rem;

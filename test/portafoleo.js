@@ -58,7 +58,13 @@ async function fetchData() {
             
             // Asegurarnos de que estamos leyendo la columna correcta
             if (row.length <= lastColIndex) continue;
+            
+            // --- MODIFICADO ---
+            // Asumimos que la penúltima columna es el CAMBIO
+            // y la última es el PRECIO.
+            const rawChange = cleanText(row[lastColIndex - 1]); // Penúltima columna
             const rawPrice = cleanText(row[lastColIndex]); // Última columna
+            // --- FIN MODIFICADO ---
             
             // --- FILTRO CRÍTICO ---
             // Solo mostramos si Estado es "1" y el ticker tiene nombre
@@ -80,6 +86,19 @@ async function fetchData() {
                 displayPrice = rawPrice;
             }
             
+            // --- NUEVO: Determinar color basado en el cambio ---
+            let changeClass = ''; // Clase por defecto (azul/neutro)
+            if (rawChange && !isNaN(parseFloat(rawChange))) {
+                const changeValue = parseFloat(rawChange);
+                if (changeValue > 0) {
+                    changeClass = 'price-positive'; // Verde
+                } else if (changeValue < 0) {
+                    changeClass = 'price-negative'; // Rojo
+                }
+                // Si es 0, se queda con la clase vacía (usará el azul por defecto)
+            }
+            // --- FIN NUEVO ---
+            
             // Crear tarjeta HTML
             const card = document.createElement('div');
             card.className = 'stock-card';
@@ -87,14 +106,16 @@ async function fetchData() {
             card.style.animationDelay = `${activeCount * 0.05}s`;
             
             // Esta estructura HTML coincide con la que espera tu CSS
+            // --- MODIFICADO: Se añade la variable changeClass ---
             card.innerHTML = `
                 <div class="ticker-group">
                     <div class="ticker-name">${ticker}</div>
                 </div>
                 <div class="price-group">
-                    <div class="price-value">${displayPrice}</div>
+                    <div class="price-value ${changeClass}">${displayPrice}</div>
                 </div>
             `;
+            // --- FIN MODIFICADO ---
             container.appendChild(card);
         }
         
