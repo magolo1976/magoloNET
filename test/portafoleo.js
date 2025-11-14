@@ -1,11 +1,13 @@
 // URL DE TU GOOGLE SHEET (PUBLICADA COMO CSV)
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRsnmjygWG6TxoCh01ThLVM5YDD5NOQnMkBgMHxVqc9MF8d2fn1J7LCUyItMoZ-BoGfL5iU0Dw2yLWR/pub?gid=2022586956&single=true&output=csv";
 
-// Función helper para limpiar y parsear precios
+// Función helper para limpiar texto
 const cleanText = (txt) => txt ? txt.replace(/"/g, '').trim() : "";
+
+// Función para parsear precios (convierte comas a puntos)
 const cleanPrice = (txt) => {
     if (!txt) return null;
-    const cleaned = cleanText(txt).replace(/,/g, '.'); // Convierte comas a puntos
+    const cleaned = txt.replace(/"/g, '').trim().replace(/,/g, '.');
     if (cleaned === "" || isNaN(parseFloat(cleaned))) {
         return null;
     }
