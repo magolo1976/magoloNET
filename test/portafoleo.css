@@ -47,19 +47,20 @@ h1 {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 16px;
     width: 100%;
-    max-width: 800px;
+    max-width: 1400px;
 }
 
 .stock-card {
     background: var(--card-bg);
     border-radius: 12px;
-    padding: 20px;
+    padding: 4px 8px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
     transition: transform 0.2s ease;
+    min-height: 20px;
 }
 
 .stock-card:hover {
@@ -132,4 +133,11 @@ h1 {
     /* Animación de entrada */
     opacity: 0;
     animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Fuerza exactamente 4 columnas en pantallas grandes */
+@media (min-width: 1024px) {
+    #stock-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
