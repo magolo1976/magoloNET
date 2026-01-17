@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>El Maquinista - App Completa</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+
+    <style>
+        /* Optimizaciones App Móvil */
+        body {
+            user-select: none;
+            -webkit-user-select: none;
+            overscroll-behavior: none;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .font-handwriting { font-family: 'Pacifico', cursive; }
+
+        /* Animaciones */
+        @keyframes bounce-slight {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        .animate-bounce-slight { animation: bounce-slight 1.5s infinite; }
+
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            animation: fall 3s linear forwards;
+            z-index: 100;
+        }
+
+        /* Utilidades */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        
+        /* Transiciones suaves */
+        .task-content {
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .task-content.open {
+            max-height: 600px;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+
+    <!-- APP CONTAINER -->
+    <div id="app" class="w-full max-w-md mx-auto h-full flex flex-col relative bg-slate-50 shadow-2xl overflow-hidden">
+        <!-- Renderizado JS aquí -->
+    </div>
+
+    <!-- DATA & LOGIC -->
+    <script>
+        // --- BASE DE DATOS COMPLETA (100 DÍAS) ---
+        const ROADMAP = {
+            // MES 1: CIMIENTOS
+            1: { t: "Las Vocales", ctx: "Los vagones azules.", w: "Traza 5 vocales *SAL*", m: "Pon [A][E][I][O][U]. Tren visita.", c: "Escribe vocal favorita *SAL*", guide: [{icon:"{A}", t:"Lija Vocal", d:"Azul (Vagón)"}, {icon:"[A]", t:"Imán Vocal", d:"Azul"}], sos: {title:"Sonidos Vocales", steps:["A: Boca muy abierta", "O: Boca redonda", "I: Sonrisa estirada"]} },
+            2: { t: "Motor M", ctx: "Sonido largo 'Mmmm'.", w: "Lija {M}. 'Mmmm'.", m: "Tren empuja [M] por la vía.", c: "M gigante en *SAL*", guide: [{icon:"{M}", t:"Lija M", d:"Roja (Consonante)"}, {icon:"[M]", t:"Imán M", d:"Roja"}], sos: {title:"Fonema M", steps:["Mmmm: Labios pegados", "Siente la vibración en garganta"]} },
+            3: { t: "Choque MA", ctx: "Unión Consonante+Vocal", w: "Traza M mesa.", m: "[M]...[A] -> ¡MA! (5 veces).", c: "Escribe MA *SAL*", guide: [{icon:"[M]", t:"Imán M", d:"Locomotora Roja"}, {icon:"[A]", t:"Imán A", d:"Vagón Azul"}], sos: {title:"Unión M+A", steps:["Mmmm... (largo)", "...aaaa (abre boca)"]} },
+            4: { t: "Choques ME/MI", ctx: "Mecánica básica.", w: "Repaso M sal.", m: "[M]+[E]=ME. [M]+[I]=MI.", c: "ME y MI *SAL*", guide: [{icon:"[M]", t:"Imán M", d:"Roja"}, {icon:"[E]", t:"Imán E", d:"Azul"}], sos: {title:"Fonemas E / I", steps:["E: Boca media", "I: Dientes juntos (sonrisa)"]} },
+            5: { t: "Serie M", ctx: "Fluidez M.", w: "Vocales rápidas.", m: "[MA][ME][MI][MO][MU] salteadas.", c: "MAMA *SAL*", guide: [{icon:"(tren)", t:"El Tren", d:"Juguete"}], sos: {title:"Repaso M", steps:["Mmm: Siempre labios juntos"]} },
+            6: { t: "Explosión P", ctx: "Golpe seco '¡P!'.", w: "Lija {P}. Pompas.", m: "Golpe [P]+[A]=¡PA!.", c: "P *SAL*", guide: [{icon:"{P}", t:"Lija P", d:"Tocar: Fondo Rojo"}, {icon:"[P]", t:"Imán P", d:"Pizarra: Fondo Blanco"}], sos: {title:"Fonema P", steps:["¡P!: Explota aire", "Sin vocal (no Pe)", "Labios aprietan y sueltan"]} },
+            7: { t: "Choque PA", ctx: "Velocidad P.", w: "Explota pompas.", m: "[P]+[O]=PO. [P]+[E]=PE.", c: "PO *SAL*", guide: [{icon:"[P]", t:"Imán P", d:"Roja"}, {icon:"[A]", t:"Imán A", d:"Azul"}], sos: {title:"Unión P", steps:["Golpe rápido", "No arrastres el sonido"]} },
+            8: { t: "M vs P", ctx: "Discriminación.", w: "Toca {M} y {P}.", m: "Compara [MA] vs [PA].", c: "PAPA *SAL*", guide: [{icon:"[M]", t:"Imán M", d:"Suave"}, {icon:"[P]", t:"Imán P", d:"Fuerte"}], sos: {title:"M vs P", steps:["M: Mmmm (Largo)", "P: ¡P! (Corto/Explosivo)"]} },
+            9: { t: "Serie P", ctx: "Automatización.", w: "Traza P.", m: "[PI][PO][PU] salto de tren.", c: "PU *SAL*", guide: [{icon:"[P]", t:"Imán P", d:"Roja"}], sos: {title:"Silabas P", steps:["Pi, Po, Pu"]} },
+            10: { t: "Lectura Mix", ctx: "Evitar adivinanza.", w: "Juego libre.", m: "[MA][PE][MO][PI] dictado.", c: "MAPA *SAL*", guide: [{icon:"[M]", t:"M"}, {icon:"[P]", t:"P"}], sos: {title:"Mix", steps:["Lee lo que ves", "No adivines"]} },
+            11: { t: "Serpiente S", ctx: "Sonido fricativo.", w: "Lija {S}. Sssss.", m: "Curvas con tren Sssss.", c: "S *SAL*", guide: [{icon:"{S}", t:"Lija S", d:"Roja"}], sos: {title:"Fonema S", steps:["Sssss: Dientes juntos", "Aire sale silbando"]} },
+            12: { t: "Tobogán S", ctx: "Unión visual.", w: "S aire.", m: "Rampa: [S] arriba, [A] abajo.", c: "SA *SAL*", guide: [{icon:"[S]", t:"Imán S", d:"Roja"}], sos: {title:"Unión S", steps:["Sssss... (largo)", "...aaaa (vocal)"]} },
+            13: { t: "Construye S", ctx: "Formación.", w: "Repaso S.", m: "Fabrica [SO]. Fabrica [SE].", c: "OSO *SAL*", guide: [{icon:"[S]", t:"Imán S", d:"Roja"}], sos: {title:"Silabas S", steps:["So, Se"]} },
+            14: { t: "Pseudopalabras", ctx: "Lectura real.", w: "S sal.", m: "Lee: [MA-SA], [PE-SO].", c: "MESA *SAL*", guide: [{icon:"[S]", t:"Imán S", d:"Roja"}, {icon:"[M]", t:"Imán M", d:"Roja"}], sos: {title:"Lectura", steps:["Junta los sonidos"]} },
+            15: { t: "Velocidad S", ctx: "Fluidez.", w: "Sssss.", m: "SA SE SI SO SU rápido.", c: "SUSI *SAL*", guide: [{icon:"[S]", t:"Imán S", d:"Roja"}], sos: {title:"Velocidad", steps:["Más rápido el tren"]} },
+            16: { t: "Locomotora L", ctx: "Solo directa.", w: "Lija {L}. Lllll.", m: "Lengua techo. Lllll.", c: "L *SAL*", guide: [{icon:"{L}", t:"Lija L", d:"Roja"}], sos: {title:"Fonema L", steps:["Lllll: Lengua arriba", "Toca detrás de los dientes"]} },
+            17: { t: "Unión L", ctx: "Larga duración.", w: "L aire.", m: "[L]+[A]=LA. [L]+[E]=LE.", c: "LA *SAL*", guide: [{icon:"[L]", t:"Imán L", d:"Roja"}], sos: {title:"Unión L", steps:["Mantén la lengua arriba Llll...", "...suéltala con la vocal"]} },
+            18: { t: "Palabras L", ctx: "Significado.", w: "L sal.", m: "[MA-LA], [PA-LA].", c: "ALA *SAL*", guide: [{icon:"[L]", t:"Imán L", d:"Roja"}], sos: {title:"Palabras", steps:["Ma...La"]} },
+            19: { t: "Mix General", ctx: "Repaso Mes 1.", w: "Todas letras.", m: "Juega con [M][P][S][L].", c: "LOLA *SAL*", guide: [{icon:"[L]", t:"L"}, {icon:"[S]", t:"S"}, {icon:"[P]", t:"P"}, {icon:"[M]", t:"M"}], sos: {title:"Repaso General", steps:["M: Mmmm", "P: ¡P!", "S: Sssss", "L: Lllll"]} },
+            20: { t: "EXAMEN MES 1", ctx: "Evaluación.", w: "Relax.", m: "Lee: LOMA, PESA, MULA.", c: "¡FIESTA!", guide: [{icon:"🏆", t:"Trofeo", d:"Fin de Mes"}] },
+
+            // MES 2: INVERSAS (CRÍTICO)
+            21: { t: "Semáforo L", ctx: "Inversiones LA/AL.", w: "Puntos Verde/Rojo.", m: "[L][A] Verde=L. [A][L] Verde=A.", c: "EL *SAL*", guide: [{icon:"🚦", t:"Semáforo", d:"Verde=Inicio, Rojo=Fin"}, {icon:"[L]", t:"Imán L", d:"Roja"}, {icon:"[A]", t:"Imán A", d:"Azul"}], sos: {title:"Inversas L", steps:["Verde a la Izquierda", "Si Verde es Vocal: Aaaa-lll"]} },
+            22: { t: "Entreno AL", ctx: "Foco en Vocal-Cons.", w: "Semáforo pizarra.", m: "Arranca en vocal: Aaaa-lll [AL].", c: "AL *SAL*", guide: [{icon:"🚦", t:"Semáforo", d:"Verde=Inicio"}, {icon:"[A]", t:"Imán A", d:"Azul"}, {icon:"[L]", t:"Imán L", d:"Roja"}], sos: {title:"Sonido Inverso", steps:["Empieza con boca abierta (A)", "Termina lengua arriba (L)"]} },
+            23: { t: "Caza Visual", ctx: "Discriminación.", w: "Verde/Rojo.", m: "Rodea los 'AL' en pizarra.", c: "LA *SAL*", guide: [{icon:"🚦", t:"Semáforo", d:"Ayuda Visual"}], sos: {title:"Visual", steps:["Busca el orden A-L"]} },
+            24: { t: "Dictado Color", ctx: "Orden.", w: "Semáforo.", m: "Pon Azul-Rojo. Pon Rojo-Azul.", c: "LE *SAL*", guide: [{icon:"[A]", t:"Azul", d:"Vocal"}, {icon:"[L]", t:"Roja", d:"Consonante"}], sos: {title:"Colores", steps:["Azul primero = Vocal primero"]} },
+            25: { t: "Palabras Inv.", ctx: "Uso real.", w: "Lija {L}.", m: "Construye [EL], [AL-TO].", c: "ALTO *SAL*", guide: [{icon:"[L]", t:"Imán L", d:"Roja"}], sos: {title:"Palabras", steps:["El... (inversa)"]} },
+            26: { t: "Letra N", ctx: "Nasal Nnnn.", w: "Lija {N}.", m: "[N]+[A]=NA. [N]+[O]=NO.", c: "NO *SAL*", guide: [{icon:"{N}", t:"Lija N", d:"Roja"}], sos: {title:"Fonema N", steps:["Nnnn: Lengua plana arriba", "Aire sale por nariz"]} },
+            27: { t: "Inversas N", ctx: "Semáforo N.", w: "Nnnn.", m: "[E]+[N]=EN. [U]+[N]=UN.", c: "EN *SAL*", guide: [{icon:"🚦", t:"Semáforo", d:"Verde=Inicio"}, {icon:"[N]", t:"Imán N", d:"Roja"}], sos: {title:"Inversas N", steps:["Primero vocal: Eeee...", "...luego nariz: nnn"]} },
+            28: { t: "Comparación", ctx: "NA vs AN.", w: "N sal.", m: "Pon par: [NA]-[AN]. Lee.", c: "UNA *SAL*", guide: [{icon:"[N]", t:"Imán N", d:"Roja"}], sos: {title:"Comparar", steps:["Mira el semáforo"]} },
+            29: { t: "El Intruso", ctx: "Atención.", w: "N aire.", m: "Serie: EN EN NE EN. ¿Fallo?", c: "NENE *SAL*", guide: [{icon:"[N]", t:"Imán N", d:"Roja"}], sos: {title:"Atención", steps:["Busca la diferente"]} },
+            30: { t: "Palabras N", ctx: "Lectura.", w: "N sal.", m: "[U-NO], [LU-NA].", c: "LUNA *SAL*", guide: [{icon:"[N]", t:"Imán N", d:"Roja"}], sos: {title:"Lectura", steps:["U...No"]} },
+            31: { t: "Martillo T", ctx: "Dental fuerte.", w: "Lija {T}.", m: "Golpe dientes: [TA][TE].", c: "T *SAL*", guide: [{icon:"{T}", t:"Lija T", d:"Roja"}], sos: {title:"Fonema T", steps:["Ttt: Lengua en dientes", "Escupe aire suave"]} },
+            32: { t: "Construcción", ctx: "Bisílabas.", w: "T sal.", m: "[PA-TO], [MO-TO].", c: "PATO *SAL*" },
+            33: { t: "Trisílabas", ctx: "Memoria.", w: "T aire.", m: "[TO-MA-TE].", c: "TOMATE *SAL*" },
+            34: { t: "Frase T", ctx: "Estructura.", w: "T sal.", m: "[MI] [TI-O].", c: "TIO *SAL*" },
+            35: { t: "Repaso Inv.", ctx: "S inversa.", w: "S sal.", m: "[ES], [AS], [PA-S-TA].", c: "ESTA *SAL*" },
+            36: { t: "Dedo D", ctx: "Dental suave.", w: "Lija {D}.", m: "Vibra: [DA][DE].", c: "D *SAL*", guide: [{icon:"{D}", t:"Lija D", d:"Roja"}], sos: {title:"Fonema D", steps:["Dddd: Dientes y lengua", "Vibra (Zumbido)"]} },
+            37: { t: "T vs D", ctx: "Fuerte vs Suave.", w: "Garganta vibra D.", m: "[TO] vs [DO].", c: "DADO *SAL*", guide: [{icon:"[T]", t:"Imán T", d:"Fuerte"}, {icon:"[D]", t:"Imán D", d:"Suave"}], sos: {title:"T vs D", steps:["T: Aire (Ttt)", "D: Vibración (Ddd)"]} },
+            38: { t: "Construye D", ctx: "Precisión.", w: "D sal.", m: "[DA-DO], [DE-DO].", c: "DEDO *SAL*" },
+            39: { t: "Frase D", ctx: "Lectura.", w: "D aire.", m: "[TU] [DA-DO].", c: "DIA *SAL*" },
+            40: { t: "EXAMEN MES 2", ctx: "Logro.", w: "Relax.", m: "Lee: PATO, DADO, ALTO.", c: "¡BIEN!", guide: [{icon:"🏆", t:"Trofeo", d:"Fin de Mes"}] },
+
+            // MES 3: FRICATIVAS
+            41: { t: "Viento F", ctx: "Labiodental.", w: "Lija {F}. Ffff.", m: "Sopla: [FA][FE].", c: "F *SAL*", guide: [{icon:"{F}", t:"Lija F", d:"Roja"}], sos: {title:"Fonema F", steps:["Ffff: Dientes en labio abajo", "Sopla aire"]} },
+            42: { t: "Palabras F", ctx: "Uso F.", w: "F sal.", m: "[FO-TO], [SO-FA].", c: "FOTO *SAL*" },
+            43: { t: "Construye F", ctx: "Práctica.", w: "F aire.", m: "[FE-O], [FI-LA].", c: "FEO *SAL*" },
+            44: { t: "Inversas F", ctx: "Difícil.", w: "F sal.", m: "Oral: AF, OF.", c: "FIN *SAL*" },
+            45: { t: "Mix F", ctx: "Fluidez.", w: "F sal.", m: "Lectura rápida F.", c: "CAFE *SAL*" },
+            46: { t: "Gemelos B/V", ctx: "Suenan igual.", w: "Lijas {B}/{V}.", m: "[BA]=[VA]. Sonido igual.", c: "BEBE *SAL*", guide: [{icon:"{B}", t:"Lija B", d:"Roja"}, {icon:"{V}", t:"Lija V", d:"Roja"}], sos: {title:"Fonema B/V", steps:["Sonido: Bbbb (Explosivo suave)", "B y V suenan IGUAL"]} },
+            47: { t: "Familia B/V", ctx: "Práctica.", w: "B/V sal.", m: "Mezcla sílabas B y V.", c: "VIVA *SAL*" },
+            48: { t: "Palabras B", ctx: "Lectura.", w: "B sal.", m: "[BO-TA], [LO-BO].", c: "BOTA *SAL*" },
+            49: { t: "Palabras V", ctx: "Lectura.", w: "V sal.", m: "[U-VA], [A-VI-ON].", c: "UVA *SAL*" },
+            50: { t: "Bingo B/V", ctx: "Oído.", w: "Sal.", m: "Dicta BOTA, dicta PAVA.", c: "VELA *SAL*" },
+            51: { t: "Risa J", ctx: "Fuerte garganta.", w: "Lija {J}. Jjjj.", m: "[JA][JO][JU].", c: "JAJA *SAL*", guide: [{icon:"{J}", t:"Lija J", d:"Roja"}], sos: {title:"Fonema J", steps:["Jjjj: Rasca la garganta", "Como roncar suave"]} },
+            52: { t: "La Risa", ctx: "Divertido.", w: "J sal.", m: "Escribe [JAJAJA].", c: "JOJO *SAL*" },
+            53: { t: "Palabras J", ctx: "Lectura.", w: "J aire.", m: "[O-JO], [CA-JA].", c: "OJO *SAL*" },
+            54: { t: "Construye J", ctx: "Práctica.", w: "J sal.", m: "[PA-JA], [JU-GO].", c: "JUGO *SAL*" },
+            55: { t: "Frase J", ctx: "Oración.", w: "J sal.", m: "[EL] [O-JO] [RO-JO].", c: "ROJO *SAL*" },
+            56: { t: "G Suave", ctx: "Garganta suave.", w: "Lija {G}. Gggg.", m: "Solo [GA][GO][GU].", c: "GATO *SAL*", guide: [{icon:"{G}", t:"Lija G", d:"Roja"}], sos: {title:"Fonema G", steps:["Gggg: Garganta suave", "Solo con A, O, U"]} },
+            57: { t: "Palabras G", ctx: "Uso G.", w: "G sal.", m: "[GA-TO], [A-GUA].", c: "GOTA *SAL*" },
+            58: { t: "Gue Gui", ctx: "U muda.", w: "G sal.", m: "La U no suena: [GU][E].", c: "GUISO *SAL*", guide: [{icon:"[G]", t:"Imán G", d:"Roja"}, {icon:"[U]", t:"Imán U", d:"Muda"}], sos: {title:"Gue / Gui", steps:["La U es muda", "No se lee"]} },
+            59: { t: "G vs J", ctx: "Suave vs Fuerte.", w: "G/J sal.", m: "[GA-TO] vs [JE-FE].", c: "G *SAL*" },
+            60: { t: "EXAMEN MES 3", ctx: "Logro.", w: "Relax.", m: "GATO, JOYA, FOTO.", c: "¡TREN!", guide: [{icon:"🏆", t:"Logro", d:"Mes 3"}] },
+
+            // MES 4: SONIDOS COMPLEJOS
+            61: { t: "Sonido K", ctx: "C fuerte.", w: "Lija {C}.", m: "[CA][CO][CU].", c: "CASA *SAL*", guide: [{icon:"{C}", t:"Lija C", d:"Roja"}], sos: {title:"Fonema K (C)", steps:["Kkkk: Seco atrás", "Solo con A, O, U"]} },
+            62: { t: "Que Qui", ctx: "Queso.", w: "Q sal.", m: "U muda: [QU][E].", c: "QUESO *SAL*", guide: [{icon:"[Q]", t:"Imán Q", d:"Roja"}, {icon:"[U]", t:"Imán U", d:"Muda"}], sos: {title:"Que / Qui", steps:["La U es muda", "Siempre con E, I"]} },
+            63: { t: "Mix K", ctx: "Práctica.", w: "C/Q sal.", m: "[CA-MA], [PI-CO].", c: "CAMA *SAL*" },
+            64: { t: "C vs Q", ctx: "Ortografía visual.", w: "Sal.", m: "[CA-SA] vs [QUE-SO].", c: "COCO *SAL*" },
+            65: { t: "Frase K", ctx: "Oración.", w: "Sal.", m: "[EL] [PA-QUE-TE].", c: "K *SAL*" },
+            66: { t: "Letra Z", ctx: "Zapato.", w: "Lija {Z}.", m: "[ZA][ZO][ZU].", c: "Z *SAL*", guide: [{icon:"{Z}", t:"Lija Z", d:"Roja"}], sos: {title:"Fonema Z", steps:["Zzzz: Lengua entre dientes", "Sopla aire"]} },
+            67: { t: "Ce Ci", ctx: "Sonido Z.", w: "C sal.", m: "[CE], [CI]. Suena Z.", c: "CINE *SAL*", sos: {title:"Ce / Ci", steps:["La C suena como Z", "Con E, I"]} },
+            68: { t: "Mix Z", ctx: "Variación.", w: "Z/C sal.", m: "[ZA-PA-TO], [CO-CI-NA].", c: "AZUL *SAL*" },
+            69: { t: "Ca vs Ce", ctx: "Diferenciación.", w: "Sal.", m: "Fuerte [CA] vs Suave [CE].", c: "CENA *SAL*" },
+            70: { t: "Palabras Z", ctx: "Lectura.", w: "Z sal.", m: "[TA-ZA], [PO-ZO].", c: "TAZA *SAL*" },
+            71: { t: "R Inicial", ctx: "Fuerte.", w: "Lija {R}.", m: "[RA][RE][RI] fuerte.", c: "REY *SAL*", guide: [{icon:"{R}", t:"Lija R", d:"Roja"}], sos: {title:"R Fuerte", steps:["Rrrrr: Vibra fuerte", "Al principio de palabra"]} },
+            72: { t: "R Media", ctx: "Suave.", w: "R sal.", m: "[PE-RA], [LO-RO].", c: "PERA *SAL*", sos: {title:"R Suave", steps:["R suave: 1 toque", "En medio de vocales"]} },
+            73: { t: "RR Doble", ctx: "Fuerte media.", w: "RR sal.", m: "[PE-RRO], [TO-RRE].", c: "PERRO *SAL*", sos: {title:"RR Doble", steps:["Doble R = Fuerte", "Entre vocales"]} },
+            74: { t: "R Inversa", ctx: "Vocal antes.", w: "Semáforo.", m: "[AR], [ER], [MA-R].", c: "MAR *SAL*" },
+            75: { t: "Mix R", ctx: "Complejidad.", w: "R sal.", m: "[CO-RRER], [DOR-MIR].", c: "AMOR *SAL*" },
+            76: { t: "Letra CH", ctx: "Che.", w: "C+H sal.", m: "[CHA][CHE]. [LE-CHE].", c: "CHE *SAL*", sos: {title:"Fonema CH", steps:["Chhh: Estornudo", "C + H juntas"]} },
+            77: { t: "Letra Ñ", ctx: "Ñu.", w: "Lija {Ñ}.", m: "[NI-ÑO], [PI-ÑA].", c: "NIÑO *SAL*", sos: {title:"Fonema Ñ", steps:["Ññññ: Nasal", "Como N pero arrugada"]} },
+            78: { t: "Letra LL", ctx: "Lla.", w: "L+L sal.", m: "[PO-LLO], [SI-LLA].", c: "POLLO *SAL*", sos: {title:"Fonema LL", steps:["Lll: Casi como Y", "Doble L"]} },
+            79: { t: "Letra Y", ctx: "Ye.", w: "Lija {Y}.", m: "[YA-TE], [PA-YA-SO].", c: "YATE *SAL*" },
+            80: { t: "EXAMEN MES 4", ctx: "Logro.", w: "Relax.", m: "EL NIÑO COME POLLO.", c: "¡AVE!", guide: [{icon:"🏆", t:"Logro", d:"Mes 4"}] },
+
+            // MES 5: MAESTRÍA (SINFONES Y PAPEL)
+            81: { t: "Letra H", ctx: "Muda.", w: "Lija {H}.", m: "[HO-LA], [HI-LO]. No suena.", c: "HOLA *SAL*", guide: [{icon:"{H}", t:"Lija H", d:"Roja"}], sos: {title:"Letra H", steps:["Es muda", "No tiene sonido"]} },
+            82: { t: "Letra X", ctx: "Examen.", w: "Lija {X}.", m: "[TA-XI], [EX-TRA].", c: "TAXI *SAL*", guide: [{icon:"{X}", t:"Lija X", d:"Roja"}], sos: {title:"Fonema X", steps:["Ks: K + S", "Ta-k-s-i"]} },
+            83: { t: "K y W", ctx: "Extranjeras.", w: "K/W sal.", m: "[KI-WI], [KA-RA-TE].", c: "KIWI *SAL*" },
+            84: { t: "Repaso", ctx: "Todo el alfabeto.", w: "Todas.", m: "Juego libre letras.", c: "ABC *SAL*" },
+            85: { t: "Nombre", ctx: "Identidad.", w: "Sal.", m: "Nombre y Apellidos.", c: "YO *SAL*" },
+            86: { t: "Sinfón L", ctx: "Trabadas.", w: "P+L sal.", m: "P+L+A = [PLA].", c: "PLA *SAL*", guide: [{icon:"[P]", t:"P"}, {icon:"[L]", t:"L"}], sos: {title:"Sinfón L", steps:["P...L...A", "Júntalo rápido"]} },
+            87: { t: "PLA BLA", ctx: "Práctica.", w: "Sal.", m: "[PLA-TO], [BLAN-CO].", c: "PLATO *SAL*" },
+            88: { t: "CLA FLA", ctx: "Práctica.", w: "Sal.", m: "[CLA-VO], [FLA-N].", c: "FLOR *SAL*" },
+            89: { t: "GLA", ctx: "Práctica.", w: "Sal.", m: "[GLO-BO], [I-GLU].", c: "GLOBO *SAL*" },
+            90: { t: "Frase L", ctx: "Lectura.", w: "Sal.", m: "[EL] [PLA-TO] [BLAN-CO].", c: "LEO *SAL*" },
+            91: { t: "Sinfón R", ctx: "Trabadas R.", w: "T+R sal.", m: "T+R+A = [TRA].", c: "TRA *SAL*", guide: [{icon:"[T]", t:"T"}, {icon:"[R]", t:"R"}], sos: {title:"Sinfón R", steps:["T...R...A", "Motor vibrando"]} },
+            92: { t: "TRA PRA", ctx: "Práctica.", w: "Sal.", m: "[TREN], [PRE-CIO].", c: "TREN *SAL*" },
+            93: { t: "BRA CRA", ctx: "Práctica.", w: "Sal.", m: "[BRA-ZO], [CRE-MA].", c: "BRAZO *SAL*" },
+            94: { t: "GRA FRA", ctx: "Práctica.", w: "Sal.", m: "[GRAN-DE], [FRE-SA].", c: "GRAN *SAL*" },
+            95: { t: "Frase R", ctx: "Lectura.", w: "Sal.", m: "[EL] [TREN] [GRAN-DE].", c: "FIN *SAL*" },
+            96: { t: "Papel I", ctx: "Escritura real.", w: "Rotu.", m: "Copia: MI MAMA.", c: "MAMA *SAL*", guide: [{icon:"✏️", t:"Rotu", d:"Papel"}] },
+            97: { t: "Dictado", ctx: "Oído.", w: "Rotu.", m: "Escribe: LA MOTO.", c: "MOTO *SAL*" },
+            98: { t: "Mensaje", ctx: "Funcional.", w: "Rotu.", m: "Nota para Mamá.", c: "AMOR *SAL*" },
+            99: { t: "Carta Final", ctx: "Preparación.", w: "Rotu.", m: "Carta Graduación.", c: "FIN *SAL*" },
+            100: { t: "GRADUACIÓN", ctx: "¡FIN DEL VIAJE!", w: "Fiesta.", m: "DIPLOMA DE HONOR.", c: "¡MAGLEV!", guide: [{icon:"🏆", t:"Campeón", d:"100 Días"}], sos: {title:"¡Felicidades!", steps:["Lo has logrado"]} }
+        };
+
+        const TRAIN_EVOLUTION = {
+            0: { name: "Tranvía Tímido", speed: "30 km/h", desc: "Inicio del viaje. Lento pero seguro.", theme: "from-slate-600 to-slate-800" },
+            1: { name: "Forja de Vapor", speed: "100 km/h", desc: "¡Potencia bruta! El motor M y P empujan fuerte.", theme: "from-blue-700 to-slate-800" },
+            2: { name: "Rugido Diésel", speed: "150 km/h", desc: "Fuerza moderna. Nada detiene a la T y la D.", theme: "from-amber-600 to-orange-800" },
+            3: { name: "Rayo Eléctrico", speed: "250 km/h", desc: "Silencioso y ágil. Fricativas y Guturales.", theme: "from-teal-600 to-emerald-800" },
+            4: { name: "Alta Velocidad", speed: "350 km/h", desc: "Aerodinámica pura. Reglas complejas dominadas.", theme: "from-indigo-600 to-purple-900" },
+            5: { name: "Levitación Maglev", speed: "600 km/h", desc: "Tecnología legendaria. ¡Maquinista Maestro!", theme: "from-fuchsia-600 to-rose-900" }
+        };
+
+        // --- ESTADO ---
+        let state = {
+            day: parseInt(localStorage.getItem('maquinista_day')) || 1,
+            tasks: [false, false, false],
+            expanded: null,
+            timer: 600,
+            timerActive: false,
+            timerInterval: null,
+            showSOS: false,
+            showGuide: false,
+            showPostcard: null,
+            diplomaName: ""
+        };
+
+        // --- HELPERS ---
+        function getTrainLevel(day) {
+            if (day > 100) return 5; if (day > 80) return 4; if (day > 60) return 3; if (day > 40) return 2; if (day > 20) return 1; return 0;
+        }
+
+        function isVowel(char) {
+            return "AEIOUÁÉÍÓÚ".includes(char.toUpperCase());
+        }
+
+        function getDayData(day) {
+            const lesson = ROADMAP[day] || { t: `Día ${day}`, ctx: "Práctica.", w: "Sal.", m: "Juego libre.", c: "Sal." };
+            if (!lesson.guide) lesson.guide = [{icon:"[?]", t:"Materiales", d:"Según ejercicio"}];
+            if (!lesson.sos) lesson.sos = { title: "Ayuda", steps: ["Respira", "Repasa lo anterior"] };
+            return lesson;
+        }
+
+        // --- RENDERIZADORES ---
+        function renderTrainSVG(level, className) {
+            const styles = `class="${className}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"`;
+            const svgs = [
+                `<svg viewBox="0 0 100 60" ${styles}><rect x="20" y="15" width="60" height="35" rx="4"/><rect x="25" y="20" width="15" height="15"/><rect x="45" y="20" width="10" height="15"/><rect x="60" y="20" width="15" height="15"/><circle cx="35" cy="50" r="4"/><circle cx="65" cy="50" r="4"/><path d="M50 15 L50 5 L35 5 M50 5 L65 5"/><path d="M10 55 L90 55" stroke-width="1" stroke-dasharray="4 2"/></svg>`,
+                `<svg viewBox="0 0 100 60" ${styles}><path d="M20 40 L20 20 A 10 10 0 0 1 40 20 L70 20 L70 40 Z"/><rect x="70" y="15" width="20" height="25"/><path d="M30 20 L30 10 L25 5 M30 10 L35 5"/><path d="M25 5 Q 20 0, 30 -5 Q 40 0, 35 5" stroke-opacity="0.5"/><circle cx="35" cy="45" r="8"/><circle cx="55" cy="45" r="8"/><circle cx="80" cy="45" r="5"/><path d="M20 40 L10 45"/></svg>`,
+                `<svg viewBox="0 0 100 60" ${styles}><path d="M15 40 L15 15 L85 15 L85 40 Z"/><rect x="15" y="15" width="20" height="15"/><line x1="35" y1="15" x2="35" y2="40"/><line x1="45" y1="20" x2="45" y2="35" stroke-opacity="0.5"/><line x1="55" y1="20" x2="55" y2="35" stroke-opacity="0.5"/><line x1="65" y1="20" x2="65" y2="35" stroke-opacity="0.5"/><circle cx="25" cy="45" r="5"/><circle cx="75" cy="45" r="5"/><path d="M15 45 L85 45" stroke-width="4" stroke-opacity="0.2"/></svg>`,
+                `<svg viewBox="0 0 100 60" ${styles}><path d="M10 40 L20 15 L90 15 L90 40 Z"/><path d="M20 15 L35 15 L35 30 L16 30 Z"/><path d="M70 15 L60 5 L50 10 L40 5"/><path d="M50 25 L60 25 L55 35 L65 35" stroke-width="1"/><circle cx="30" cy="45" r="5"/><circle cx="70" cy="45" r="5"/></svg>`,
+                `<svg viewBox="0 0 100 60" ${styles}><path d="M5 40 Q 10 15, 40 15 L95 15 L95 40 Z"/><path d="M25 15 Q 30 25, 45 25 L45 15 Z" fill="currentColor" fill-opacity="0.1"/><line x1="40" y1="30" x2="90" y2="30" stroke-width="1"/><path d="M20 40 L90 40 L90 45 L25 45 Z"/></svg>`,
+                `<svg viewBox="0 0 100 60" ${styles}><path d="M5 35 Q 10 10, 50 10 L95 10 L95 35 Q 50 35, 5 35 Z"/><path d="M30 15 L90 15 L90 20 L35 20 Z" fill="currentColor" fill-opacity="0.2"/><path d="M10 45 L90 45" stroke-dasharray="2 2" stroke-opacity="0.5"/><path d="M10 50 L90 50" stroke-width="1" stroke-opacity="0.2"/><circle cx="20" cy="25" r="2"/><line x1="40" y1="25" x2="80" y2="25" stroke-width="0.5"/></svg>`
+            ];
+            return svgs[level] || "";
+        }
+
+        function renderRichText(text) {
+            if (!text) return '';
+            const parts = text.split(/(\{.*?\}|\[.*?\]|\(tren\)|\*.*?\*|🚦)/g);
+            return parts.map(part => {
+                if (part.startsWith('{') && part.endsWith('}')) {
+                    const char = part.slice(1, -1);
+                    const color = isVowel(char) ? 'bg-blue-600 border-blue-600' : 'bg-red-600 border-red-600';
+                    return `<span class="inline-flex items-center justify-center w-8 h-8 mx-1 text-white font-black rounded-md border-2 ${color} shadow-sm align-middle select-none text-base">${char}</span>`;
+                }
+                if (part.startsWith('[') && part.endsWith(']')) {
+                    const char = part.slice(1, -1);
+                    const color = isVowel(char) ? 'text-blue-600 border-blue-600' : 'text-red-600 border-red-600';
+                    return `<span class="inline-flex items-center justify-center w-auto px-2 h-8 mx-1 bg-white font-black rounded-md border-2 ${color} shadow-sm align-middle select-none text-base">${char}</span>`;
+                }
+                if (part === '(tren)') return `<i data-lucide="train-front" class="inline mx-1 text-slate-800 align-middle"></i>`;
+                if (part === '🚦') return `<span class="text-2xl align-middle">🚦</span>`;
+                if (part.startsWith('*') && part.endsWith('*')) return `<strong class="font-black text-slate-900">${part.slice(1, -1)}</strong>`;
+                return part;
+            }).join('');
+        }
+
+        // --- APP LOGIC ---
+        function renderApp() {
+            const app = document.getElementById('app');
+            const trainLevel = getTrainLevel(state.day);
+            const train = TRAIN_EVOLUTION[trainLevel];
+            const data = getDayData(state.day);
+            const isComplete = state.tasks.every(Boolean);
+            const dayInWeek = (state.day - 1) % 5; 
+            const weekNum = Math.ceil(state.day / 5);
+            const monthNum = Math.ceil(state.day / 20);
+
+            // DIPLOMA VIEW
+            if (state.day > 100) {
+                app.innerHTML = `
+                    <div class="h-full bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+                        <div id="confetti-layer" class="absolute inset-0 pointer-events-none z-0"></div>
+                        <div class="bg-white p-8 rounded-[40px] shadow-2xl max-w-lg w-full text-center relative z-10 border-[8px] border-yellow-400">
+                            <div class="absolute -top-12 left-1/2 -translate-x-1/2 bg-yellow-400 p-4 rounded-full border-4 border-white shadow-lg text-white">
+                                <i data-lucide="trophy" width="64" height="64"></i>
+                            </div>
+                            <h1 class="text-4xl font-black text-slate-800 mt-12 mb-2 uppercase tracking-widest font-handwriting">Diploma</h1>
+                            <div class="my-8">
+                                <h2 class="text-3xl font-black text-blue-600 uppercase mb-2">MAQUINISTA EXPERTO</h2>
+                                <p class="text-slate-400 text-sm">Nivel Maglev Desbloqueado</p>
+                            </div>
+                            <div class="mb-8">
+                                <p class="text-slate-500 italic mb-2">Concedido a:</p>
+                                <input type="text" placeholder="Escribe tu nombre" class="text-center text-3xl font-bold text-slate-800 border-b-4 border-slate-300 w-full focus:outline-none p-2 bg-transparent" oninput="updateName(this.value)" value="${state.diplomaName}">
+                            </div>
+                            <div class="flex gap-4 justify-center">
+                                <button onclick="resetApp()" class="bg-slate-100 text-slate-500 px-6 py-3 rounded-xl font-bold">Reiniciar</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
+                startConfetti();
+                return;
+            }
+
+            // MAIN VIEW
+            let starsHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const filled = i < dayInWeek || (i === dayInWeek && isComplete);
+                const color = filled ? 'text-yellow-400 fill-yellow-400 animate-bounce-slight' : 'text-white/20';
+                starsHTML += `<i data-lucide="star" width="18" height="18" class="${color} transition-all duration-500"></i>`;
+            }
+
+            let themeClass = "from-slate-600 to-slate-800";
+            if(monthNum === 1) themeClass = "from-blue-600 to-blue-800";
+            if(monthNum === 2) themeClass = "from-indigo-600 to-indigo-800";
+            if(monthNum === 3) themeClass = "from-teal-600 to-teal-800";
+            if(monthNum === 4) themeClass = "from-orange-600 to-orange-800";
+            if(monthNum === 5) themeClass = "from-fuchsia-600 to-purple-800";
+
+            // SKIP BUTTON
+            const skipBtn = `<button onclick="skipDay()" class="absolute top-4 right-4 text-white/30 hover:text-white z-50 p-2"><i data-lucide="chevrons-right" width="20"></i></button>`;
+
+            const headerHTML = `
+                <div class="bg-gradient-to-br ${themeClass} p-6 text-white rounded-b-[40px] shadow-xl relative z-10 transition-all duration-1000 shrink-0">
+                    ${skipBtn}
+                    <div class="absolute right-[-10px] top-[10px] opacity-20 rotate-[-5deg] scale-150 pointer-events-none">
+                        ${renderTrainSVG(trainLevel, "w-64 h-40 text-white")}
+                    </div>
+                    <div class="relative z-20">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-white/30 backdrop-blur-sm flex items-center gap-2">
+                                <i data-lucide="trophy" width="12" height="12" class="text-yellow-300"></i> Nivel ${trainLevel}
+                            </span>
+                            <span class="font-mono text-xs font-bold text-white/80 bg-black/20 px-2 py-1 rounded">${train.speed}</span>
+                        </div>
+                        <div class="flex flex-col items-center mt-2 mb-4">
+                            <div class="w-24 h-24 mb-4 relative flex items-center justify-center">
+                                <div class="absolute inset-0 bg-white/10 rounded-full animate-pulse blur-xl"></div>
+                                ${renderTrainSVG(trainLevel, "w-full h-full text-white drop-shadow-lg relative z-10")}
+                            </div>
+                            <h2 class="text-xl font-bold text-white/90 uppercase tracking-widest text-center leading-none mb-1">${train.name}</h2>
+                            <h1 class="text-5xl font-black italic tracking-tighter drop-shadow-md">DÍA ${state.day}</h1>
+                        </div>
+                        <div class="flex justify-center gap-2 mt-4 bg-black/10 p-2 rounded-2xl w-fit mx-auto backdrop-blur-md">
+                            ${starsHTML}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const contextHTML = `
+                <div class="px-6 -mt-6 relative z-30 flex justify-between items-stretch gap-3 shrink-0">
+                    <div class="flex-1 bg-white rounded-2xl shadow-lg border-2 border-slate-50 overflow-hidden">
+                        <div class="bg-yellow-50/90 p-3 h-full backdrop-blur-sm">
+                            <div class="flex gap-2 items-center mb-1 text-yellow-700">
+                                <i data-lucide="lightbulb" width="16" height="16"></i>
+                                <h3 class="font-bold text-xs uppercase">Hoy Entrenamos:</h3>
+                            </div>
+                            <p class="text-slate-800 text-sm font-medium leading-tight">${data.ctx}</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleGuide()" class="w-14 bg-white rounded-2xl shadow-lg border-2 border-slate-50 flex flex-col items-center justify-center text-blue-500 active:scale-95 transition-transform hover:bg-blue-50">
+                        <i data-lucide="help-circle" width="24" height="24"></i>
+                        <span class="text-[10px] font-bold mt-1">Guía</span>
+                    </button>
+                </div>
+            `;
+
+            let tasksHTML = '<div class="flex-1 p-6 flex flex-col gap-3 mt-1 overflow-y-auto no-scrollbar pb-32">';
+            tasksHTML += renderTaskItem(0, "1. Entrante", data.w.includes("Lija") ? "Letra Lija (3 min)" : "Bandeja Sal (3 min)", data.w, state.tasks[0], state.expanded === 0);
+            tasksHTML += renderTaskItem(1, "2. Misión", "Imanes + Tren (10 min)", data.m, state.tasks[1], state.expanded === 1, true);
+            tasksHTML += renderTaskItem(2, "3. Postre", "Sellado en Sal (2 min)", data.c, state.tasks[2], state.expanded === 2);
+            tasksHTML += '</div>';
+
+            const footerHTML = `
+                <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-slate-200 safe-area-bottom z-40 max-w-md mx-auto">
+                    ${!isComplete ? `
+                        <div class="flex gap-3">
+                            <button onclick="toggleSOS()" class="flex-1 py-3 bg-red-50 text-red-500 rounded-xl font-bold border-2 border-red-100 flex items-center justify-center gap-2 active:bg-red-100 transition-all">
+                                <i data-lucide="alert-circle" width="20" height="20"></i> SOS
+                            </button>
+                            <button disabled class="flex-[2] py-3 bg-slate-100 text-slate-400 rounded-xl font-bold flex items-center justify-center gap-2 cursor-not-allowed border-2 border-slate-100">
+                                <i data-lucide="lock" width="20" height="20"></i> Siguiente Día
+                            </button>
+                        </div>
+                    ` : `
+                        <button onclick="nextDay()" class="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-black text-xl shadow-lg shadow-green-200 flex items-center justify-center gap-2 animate-bounce-slight active:scale-95 transition-all">
+                            <i data-lucide="play" width="24" height="24" fill="currentColor"></i> ¡AVANZAR!
+                        </button>
+                    `}
+                </div>
+            `;
+
+            // MODALES
+            let modalHTML = '';
+            if (state.showSOS) {
+                const steps = data.sos.steps.map((s, i) => `<div class="flex gap-3"><span class="bg-red-200 text-red-800 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0">${i+1}</span><p>${s}</p></div>`).join('');
+                modalHTML = renderModal("AYUDA SONIDOS", "alert-circle", "text-red-500", `
+                    <h3 class="text-lg font-bold text-slate-700 mb-4">${data.sos.title}</h3>
+                    <div class="bg-red-50 p-5 rounded-2xl space-y-4 text-slate-700 font-medium border border-red-100">${steps}</div>
+                `, "toggleSOS");
+            }
+            if (state.showGuide) {
+                const items = data.guide.map(g => `
+                    <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div class="scale-125">${renderRichText(g.icon)}</div>
+                        <div><h4 class="font-bold text-slate-800">${g.t}</h4><p class="text-xs text-slate-500">${g.d}</p></div>
+                    </div>
+                `).join('');
+                modalHTML = renderModal("GUÍA DEL DÍA", "help-circle", "text-blue-500", `
+                    <div class="grid grid-cols-1 gap-3">${items}
+                        <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-400 text-center">Símbolos: [A] Imán | {A} Lija | 🔴 Consonante | 🔵 Vocal</div>
+                    </div>
+                `, "toggleGuide");
+            }
+            if (state.showPostcard) {
+                const lvl = state.showPostcard;
+                const trn = TRAIN_EVOLUTION[lvl];
+                modalHTML = `
+                    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-[fade-in_0.3s_ease-out]">
+                        <div class="bg-white rounded-[40px] p-8 w-full max-w-sm text-center relative overflow-hidden shadow-2xl border-4 border-yellow-400">
+                            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 via-yellow-400 to-red-500"></div>
+                            <div class="mb-6 relative"><div class="absolute inset-0 bg-yellow-100 rounded-full blur-2xl opacity-50"></div>
+                                <div class="w-48 h-32 mx-auto text-slate-800 drop-shadow-xl relative z-10">${renderTrainSVG(lvl, "w-full h-full text-slate-800")}</div>
+                            </div>
+                            <h2 class="text-yellow-500 font-black text-xs tracking-[0.3em] uppercase mb-2">¡NUEVO TREN!</h2>
+                            <h1 class="text-3xl font-black text-slate-900 leading-tight mb-4">${trn.name}</h1>
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-6 text-left">
+                                <h3 class="font-bold text-slate-700 text-sm mb-1">Especificaciones:</h3>
+                                <p class="text-slate-500 text-sm leading-relaxed">${trn.desc}</p>
+                                <div class="mt-3 flex items-center gap-2 text-blue-600 font-bold bg-blue-50 px-3 py-1 rounded-lg w-fit text-xs">
+                                    <i data-lucide="zap" width="14" height="14"></i> Velocidad: ${trn.speed}
+                                </div>
+                            </div>
+                            <button onclick="closePostcard()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-xl active:scale-95 transition-transform">¡A RODAR!</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            app.innerHTML = headerHTML + contextHTML + tasksHTML + footerHTML + modalHTML + `<div id="confetti-layer" class="absolute inset-0 pointer-events-none z-50 overflow-hidden"></div>`;
+            
+            // Re-hidratar
+            lucide.createIcons();
+        }
+
+        function renderTaskItem(index, title, sub, content, completed, expanded, hasTimer = false) {
+            const highlight = index === 1;
+            const borderClass = completed ? 'border-slate-100' : (highlight ? 'border-blue-200' : 'border-slate-200');
+            const bgClass = completed ? 'bg-slate-50 opacity-60' : (highlight ? 'bg-white shadow-md' : 'bg-white');
+            const checkClass = completed ? 'bg-green-500 border-green-500 text-white scale-110 shadow-sm' : 'bg-white border-slate-200 text-transparent';
+            
+            let timerHTML = '';
+            if (hasTimer && expanded) {
+                const mins = Math.floor(state.timer / 60);
+                const secs = state.timer % 60;
+                const timeStr = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                const pct = (state.timer / 600) * 100;
+                const btnIcon = state.timerActive ? 'pause' : 'play';
+                const btnText = state.timerActive ? 'Pausa' : 'Go';
+                const btnColor = state.timerActive ? 'bg-yellow-100 text-yellow-700' : 'bg-blue-100 text-blue-700';
+
+                timerHTML = `
+                    <div class="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                        <div class="flex justify-between mb-2 font-bold text-slate-600">
+                            <div class="flex gap-2 items-center"><i data-lucide="clock" width="18"></i> Tiempo</div>
+                            <div class="font-mono text-xl text-slate-800">${timeStr}</div>
+                        </div>
+                        <div class="h-3 bg-slate-200 rounded-full mb-3 overflow-hidden">
+                            <div class="h-full bg-blue-500 transition-all duration-1000 ease-linear" style="width: ${pct}%"></div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="toggleTimer()" class="flex-1 py-2 rounded-lg font-bold flex justify-center items-center gap-2 ${btnColor}">
+                                <i data-lucide="${btnIcon}" width="16"></i> ${btnText}
+                            </button>
+                            <button onclick="resetTimer()" class="px-3 bg-slate-200 rounded-lg flex items-center justify-center text-slate-600">
+                                <i data-lucide="rotate-ccw" width="16"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="rounded-2xl transition-all duration-300 border-2 overflow-hidden shrink-0 ${bgClass} ${borderClass}">
+                    <div class="flex items-center p-4 gap-4">
+                        <div onclick="toggleExpand(${index})" class="flex-1 text-left cursor-pointer select-none">
+                            <h3 class="font-bold text-lg ${completed ? 'text-slate-400 line-through' : 'text-slate-800'}">${title}</h3>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mt-1">${sub}</p>
+                        </div>
+                        <button onclick="toggleTask(${index})" class="w-14 h-14 rounded-xl border-2 flex items-center justify-center transition-all shrink-0 ${checkClass}">
+                            <i data-lucide="check" width="32" height="32" stroke-width="4"></i>
+                        </button>
+                    </div>
+                    <div class="task-content ${expanded ? 'open' : ''} bg-slate-50">
+                        <div class="p-5 text-slate-700 leading-relaxed text-lg border-t border-slate-100">
+                            ${renderRichText(content)}
+                            ${timerHTML}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderModal(title, icon, color, content, closeFn) {
+            return `
+                <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-[fade-in_0.2s_ease-out]">
+                    <div class="bg-white rounded-[30px] p-6 w-full max-w-sm shadow-2xl relative border-4 border-slate-100">
+                        <button onclick="${closeFn}()" class="absolute top-4 right-4 text-slate-400 p-2 bg-slate-100 rounded-full hover:bg-slate-200"><i data-lucide="x" width="20"></i></button>
+                        <div class="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
+                            <i data-lucide="${icon}" width="28" height="28" class="${color}"></i>
+                            <h2 class="text-xl font-black text-slate-800 uppercase tracking-tight">${title}</h2>
+                        </div>
+                        ${content}
+                        <button onclick="${closeFn}()" class="w-full mt-6 bg-slate-800 text-white py-4 rounded-2xl font-bold hover:bg-slate-900 shadow-lg">Entendido</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- ACCIONES ---
+        window.toggleTask = (index) => {
+            state.tasks[index] = !state.tasks[index];
+            if (state.tasks[index]) state.expanded = null;
+            saveState();
+            renderApp();
+            if (state.tasks.every(Boolean)) startConfetti();
+        };
+
+        window.toggleExpand = (index) => {
+            state.expanded = state.expanded === index ? null : index;
+            renderApp();
+        };
+
+        window.toggleSOS = () => { state.showSOS = !state.showSOS; renderApp(); };
+        window.toggleGuide = () => { state.showGuide = !state.showGuide; renderApp(); };
+        
+        window.nextDay = () => {
+            advanceDayLogic();
+        };
+
+        window.skipDay = () => {
+            if(confirm("¿Saltar este día (Debug)?")) {
+                advanceDayLogic();
+            }
+        };
+
+        function advanceDayLogic() {
+            const prevLevel = getTrainLevel(state.day);
+            state.day++;
+            state.tasks = [false, false, false];
+            state.expanded = null;
+            state.timer = 600;
+            state.timerActive = false;
+            
+            const newLevel = getTrainLevel(state.day);
+            if (newLevel > prevLevel && newLevel > 0) {
+                state.showPostcard = newLevel;
+            }
+
+            saveState();
+            renderApp();
+        }
+
+        window.closePostcard = () => {
+            state.showPostcard = null;
+            renderApp();
+        }
+
+        window.toggleTimer = () => {
+            state.timerActive = !state.timerActive;
+            if (state.timerActive) {
+                state.timerInterval = setInterval(() => {
+                    if (state.timer > 0) {
+                        state.timer--;
+                        const display = document.querySelector('.font-mono.text-xl');
+                        const progressBar = document.querySelector('.h-3 > div');
+                        if(display) {
+                            const m = Math.floor(state.timer / 60);
+                            const s = state.timer % 60;
+                            display.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+                        }
+                        if(progressBar) {
+                            const pct = (state.timer / 600) * 100;
+                            progressBar.style.width = `${pct}%`;
+                        }
+                    } else {
+                        state.timerActive = false;
+                        clearInterval(state.timerInterval);
+                        renderApp();
+                    }
+                }, 1000);
+            } else {
+                clearInterval(state.timerInterval);
+            }
+            renderApp();
+        };
+
+        window.resetTimer = () => {
+            state.timerActive = false;
+            state.timer = 600;
+            clearInterval(state.timerInterval);
+            renderApp();
+        };
+
+        window.updateName = (val) => {
+            state.diplomaName = val;
+        };
+
+        window.resetApp = () => {
+            if(confirm("¿Empezar de cero?")) {
+                state.day = 1;
+                state.tasks = [false, false, false];
+                saveState();
+                renderApp();
+            }
+        };
+
+        function startConfetti() {
+            const container = document.getElementById('confetti-layer') || document.getElementById('app');
+            if(!container) return;
+            const colors = ['#ef4444', '#22c55e', '#3b82f6', '#eab308'];
+            for(let i=0; i<40; i++) {
+                const el = document.createElement('div');
+                el.className = 'confetti';
+                el.style.left = Math.random() * 100 + '%';
+                el.style.animationDelay = Math.random() * 2 + 's';
+                el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                container.appendChild(el);
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('maquinista_day', state.day);
+        }
+
+        // --- INICIALIZACIÓN ---
+        renderApp();
+
+    </script>
+</body>
+</html>
