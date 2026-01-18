@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BKI Portfolio - Datos</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .status {
+            flex: 1;
+            text-align: right;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .status.loading {
+            color: #667eea;
+        }
+
+        .status.success {
+            color: #28a745;
+        }
+
+        .status.error {
+            color: #dc3545;
+        }
+
+        .content {
+            padding: 30px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #495057;
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        tbody tr:nth-child(even):hover {
+            background: #e9ecef;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state svg {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .empty-state p {
+            font-size: 1.1em;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            text-align: center;
+        }
+
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            text-align: center;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 500px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .chart-wrapper {
+                height: 350px;
+            }
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .controls {
+                justify-content: center;
+            }
+
+            .status {
+                width: 100%;
+                text-align: center;
+                margin-top: 10px;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 BKI Portfolio Data</h1>
+            <p>Visualización de datos del Portfoleo</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="loadData()">🔄 Recargar Datos</button>
+            <button class="btn" onclick="exportToCSV()">💾 Exportar CSV</button>
+            <div class="status" id="status">Presiona "Recargar Datos" para comenzar</div>
+        </div>
+
+        <div class="content">
+            <div class="stats" id="stats" style="display: none;"></div>
+            
+            <div class="chart-container" id="chartContainer" style="display: none;">
+                <h3>📈 Cambio Porcentual por Acción</h3>
+                <div class="chart-wrapper">
+                    <canvas id="portfolioChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container" id="chartContainerCumulative" style="display: none;">
+                <h3>💹 Cambio Porcentual Acumulado del Portfolio</h3>
+                <div class="chart-wrapper">
+                    <canvas id="portfolioChartCumulative"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container" id="chartContainerAggregate" style="display: none;">
+                <h3>📊 Cambio Porcentual Agregado del Portfolio</h3>
+                <div class="chart-wrapper">
+                    <canvas id="portfolioChartAggregate"></canvas>
+                </div>
+            </div>
+            
+            <div id="dataContainer">
+                <div class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <h3>No hay datos cargados</h3>
+                    <p>Haz clic en "Recargar Datos" para cargar la información</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRsnmjygWG6TxoCh01ThLVM5YDD5NOQnMkBgMHxVqc9MF8d2fn1J7LCUyItMoZ-BoGfL5iU0Dw2yLWR/pub?gid=2022586956&single=true&output=csv';
+        let currentData = [];
+
+        function updateStatus(message, type = '') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = 'status ' + type;
+        }
+
+        function showLoader() {
+            updateStatus('', 'loading');
+            const statusEl = document.getElementById('status');
+            statusEl.innerHTML = '<div class="loader"></div>Cargando datos...';
+        }
+
+        async function loadData() {
+            showLoader();
+            
+            try {
+                const response = await fetch(CSV_URL);
+                const text = await response.text();
+                
+                // Parsear CSV
+                const parsedData = parseCSV(text);
+                
+                if (parsedData.data.length > 0) {
+                    currentData = parsedData.data;
+                    displayData(currentData, parsedData.headers);
+                    displayStats(currentData);
+                    createChart(currentData, parsedData.headers);
+                    createCumulativeChart(currentData, parsedData.headers);
+                    createAggregateChart(currentData, parsedData.headers);
+                    updateStatus(`✅ ${currentData.length} filas cargadas correctamente`, 'success');
+                } else {
+                    throw new Error('No se encontraron datos en la hoja');
+                }
+            } catch (error) {
+                console.error('Error al cargar datos:', error);
+                updateStatus(`❌ Error: ${error.message}`, 'error');
+                
+                const isCorsError = error.message.includes('fetch') || error.message.includes('CORS') || error.message.includes('Failed to fetch');
+                
+                document.getElementById('dataContainer').innerHTML = `
+                    <div class="empty-state">
+                        <h3>⚠️ Error al cargar datos</h3>
+                        <p style="font-size: 1.1em; color: #dc3545; margin-bottom: 15px;">${error.message}</p>
+                        ${isCorsError ? `
+                            <div style="text-align: left; max-width: 600px; margin: 20px auto; padding: 20px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                                <h4 style="color: #856404; margin-bottom: 10px;">🔒 Restricción de seguridad del navegador (CORS)</h4>
+                                <p style="color: #856404; margin-bottom: 15px;">
+                                    No puedes abrir este archivo directamente desde el disco (file://). 
+                                    Necesitas usar un servidor web local.
+                                </p>
+                                <h5 style="color: #856404; margin-bottom: 8px;">✅ Solución rápida con VS Code:</h5>
+                                <ol style="color: #856404; line-height: 1.8; margin-left: 20px;">
+                                    <li>Instala la extensión <strong>"Live Server"</strong> de Ritwick Dey</li>
+                                    <li>Click derecho en <code>bki_portfoleo.html</code></li>
+                                    <li>Selecciona <strong>"Open with Live Server"</strong></li>
+                                </ol>
+                                <h5 style="color: #856404; margin: 15px 0 8px 0;">🐍 O usa Python (desde la terminal en la carpeta del archivo):</h5>
+                                <code style="display: block; background: #856404; color: white; padding: 10px; border-radius: 5px; margin-top: 8px;">
+                                    python -m http.server 8000
+                                </code>
+                                <p style="color: #856404; margin-top: 8px; font-size: 0.9em;">
+                                    Luego abre: <strong>http://localhost:8000/bki_portfoleo.html</strong>
+                                </p>
+                            </div>
+                        ` : `
+                            <p style="margin-top: 10px; font-size: 0.9em; color: #6c757d;">
+                                Verifica que la hoja de cálculo esté publicada:<br>
+                                <strong>Archivo → Publicar en la web → Publicar</strong>
+                            </p>
+                        `}
+                    </div>
+                `;
+            }
+        }
+
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n').filter(line => line.trim() !== '');
+            
+            if (lines.length === 0) {
+                return { headers: [], data: [] };
+            }
+
+            // Primera línea son los headers
+            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+            const data = [];
+
+            // Procesar cada fila de datos
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',');
+                const rowData = {};
+                
+                headers.forEach((header, index) => {
+                    let value = values[index] || '';
+                    // Limpiar comillas si existen
+                    value = value.trim().replace(/^"|"$/g, '');
+                    
+                    // Intentar convertir a número si es posible
+                    if (value !== '' && !isNaN(value)) {
+                        value = parseFloat(value);
+                    }
+                    
+                    rowData[header] = value;
+                });
+                
+                data.push(rowData);
+            }
+            
+            return { headers, data };
+        }
+
+        function displayData(data, headers) {
+            if (data.length === 0) {
+                document.getElementById('dataContainer').innerHTML = `
+                    <div class="empty-state">
+                        <h3>📭 Sin datos</h3>
+                        <p>La hoja "Datos" está vacía</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<table><thead><tr>';
+            headers.forEach(header => {
+                html += `<th>${header}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            data.forEach(row => {
+                html += '<tr>';
+                headers.forEach(header => {
+                    let value = row[header];
+                    
+                    // Formatear números
+                    if (typeof value === 'number') {
+                        value = value.toLocaleString('es-ES', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 2
+                        });
+                    }
+                    
+                    html += `<td>${value !== undefined && value !== null ? value : ''}</td>`;
+                });
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            document.getElementById('dataContainer').innerHTML = html;
+        }
+
+        function displayStats(data) {
+            if (data.length === 0) {
+                document.getElementById('stats').style.display = 'none';
+                return;
+            }
+
+            const statsContainer = document.getElementById('stats');
+            statsContainer.style.display = 'grid';
+            
+            const numRows = data.length;
+            const numCols = Object.keys(data[0]).length;
+            const lastUpdate = new Date().toLocaleString('es-ES');
+
+            statsContainer.innerHTML = `
+                <div class="stat-card">
+                    <div class="value">${numRows}</div>
+                    <div class="label">Nº Acciones</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">${numCols}</div>
+                    <div class="label">Días</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">${lastUpdate.split(',')[1]}</div>
+                    <div class="label">Última actualización</div>
+                </div>
+            `;
+        }
+
+        let portfolioChart = null;
+        let portfolioChartCumulative = null;
+        let portfolioChartAggregate = null;
+
+        function createChart(data, headers) {
+            if (data.length === 0) {
+                document.getElementById('chartContainer').style.display = 'none';
+                return;
+            }
+
+            // Mostrar el contenedor del gráfico
+            document.getElementById('chartContainer').style.display = 'block';
+
+            // Las primeras dos columnas no son fechas, extraer desde la tercera
+            const dateColumns = headers.slice(2);
+            
+            // Generar colores distintos para cada acción
+            const colors = [
+                '#667eea', '#764ba2', '#f093fb', '#4facfe',
+                '#43e97b', '#fa709a', '#fee140', '#30cfd0',
+                '#a8edea', '#fed6e3', '#c471f5', '#12c2e9',
+                '#f64f59', '#c471ed', '#2af598', '#009efd',
+                '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24'
+            ];
+
+            // Preparar datasets (una línea por acción)
+            const datasets = data.map((row, index) => {
+                const actionName = row[headers[0]] || `Acción ${index + 1}`;
+                
+                // Extraer valores para esta acción desde las columnas de fecha
+                const rawValues = dateColumns.map(dateCol => {
+                    const value = row[dateCol];
+                    // Si es vacío, null o undefined, retornar null para que Chart.js no dibuje
+                    if (value === '' || value === null || value === undefined) {
+                        return null;
+                    }
+                    return typeof value === 'number' ? value : parseFloat(value);
+                });
+
+                // Contar cuántos valores no nulos tiene esta acción
+                const nonNullCount = rawValues.filter(v => v !== null).length;
+                
+                // Si solo tiene un valor, retornar 0 para evitar mostrar valor absoluto
+                if (nonNullCount <= 1) {
+                    const zeroData = rawValues.map(v => v !== null ? 0 : null);
+                    return {
+                        label: actionName,
+                        data: zeroData,
+                        borderColor: colors[index % colors.length],
+                        backgroundColor: colors[index % colors.length] + '20',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        fill: false,
+                        spanGaps: false
+                    };
+                }
+
+                // Encontrar el primer valor no nulo (valor inicial de referencia)
+                let firstValue = null;
+                for (let i = 0; i < rawValues.length; i++) {
+                    if (rawValues[i] !== null) {
+                        firstValue = rawValues[i];
+                        break;
+                    }
+                }
+
+                // Si el primer valor es 0, evitar división por cero
+                if (firstValue === 0) {
+                    firstValue = 0.0001; // Valor muy pequeño para evitar división por cero
+                }
+
+                // Calcular cambio porcentual respecto al primer valor
+                const percentageChanges = rawValues.map((value, i) => {
+                    if (value === null) return null;
+                    
+                    // Cambio porcentual = ((precio_actual - precio_inicial) / precio_inicial) * 100
+                    return ((value - firstValue) / firstValue) * 100;
+                });
+
+                return {
+                    label: actionName,
+                    data: percentageChanges,
+                    borderColor: colors[index % colors.length],
+                    backgroundColor: colors[index % colors.length] + '20',
+                    borderWidth: 2,
+                    tension: 0, // Líneas rectas para evitar extensión visual
+                    pointRadius: 0, // Sin puntos
+                    pointHoverRadius: 4, // Punto al hacer hover
+                    fill: false,
+                    spanGaps: false, // No conectar cuando hay gaps
+                    segment: {
+                        borderColor: ctx => ctx.p0.parsed.y === null || ctx.p1.parsed.y === null ? 'transparent' : undefined
+                    }
+                };
+            });
+
+            // Destruir gráfico anterior si existe
+            if (portfolioChart) {
+                portfolioChart.destroy();
+            }
+
+            // Crear el gráfico
+            const ctx = document.getElementById('portfolioChart').getContext('2d');
+            portfolioChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dateColumns,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                boxWidth: 15,
+                                padding: 10,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toLocaleString('es-ES', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }) + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Fecha',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Cambio Porcentual (%)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString('es-ES', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }) + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createCumulativeChart(data, headers) {
+            if (data.length === 0) {
+                document.getElementById('chartContainerCumulative').style.display = 'none';
+                return;
+            }
+
+            // Mostrar el contenedor del gráfico acumulativo
+            document.getElementById('chartContainerCumulative').style.display = 'block';
+
+            // Las primeras dos columnas no son fechas, extraer desde la tercera
+            const dateColumns = headers.slice(2);
+            
+            // Calcular las diferencias porcentuales para cada acción
+            const allPercentageChanges = data.map((row, index) => {
+                const actionName = row[headers[0]] || `Acción ${index + 1}`;
+                
+                // Extraer valores para esta acción desde las columnas de fecha
+                const rawValues = dateColumns.map(dateCol => {
+                    const value = row[dateCol];
+                    if (value === '' || value === null || value === undefined) {
+                        return null;
+                    }
+                    return typeof value === 'number' ? value : parseFloat(value);
+                });
+
+                // Contar cuántos valores no nulos tiene esta acción
+                const nonNullCount = rawValues.filter(v => v !== null).length;
+                
+                // Si solo tiene un valor, retornar array de ceros
+                if (nonNullCount <= 1) {
+                    return rawValues.map(v => v !== null ? 0 : null);
+                }
+
+                // Encontrar el primer valor no nulo (valor inicial)
+                let firstValue = null;
+                for (let i = 0; i < rawValues.length; i++) {
+                    if (rawValues[i] !== null) {
+                        firstValue = rawValues[i];
+                        break;
+                    }
+                }
+
+                if (firstValue === 0) firstValue = 0.0001;
+
+                // Calcular cambio porcentual respecto al día anterior
+                const percentageChanges = rawValues.map((value, i) => {
+                    if (value === null) return null;
+                    
+                    // Buscar el valor anterior no nulo
+                    let prevValue = null;
+                    for (let j = i - 1; j >= 0; j--) {
+                        if (rawValues[j] !== null) {
+                            prevValue = rawValues[j];
+                            break;
+                        }
+                    }
+                    
+                    // Si no hay valor anterior, retornar 0
+                    if (prevValue === null) {
+                        return 0;
+                    }
+                    
+                    if (prevValue === 0) prevValue = 0.0001;
+                    
+                    // Retornar cambio porcentual: ((actual - anterior) / anterior) * 100
+                    return ((value - prevValue) / prevValue) * 100;
+                });
+
+                return percentageChanges;
+            });
+
+            // Sumar todos los cambios porcentuales por columna (día)
+            const aggregatedData = dateColumns.map((dateCol, colIndex) => {
+                let sum = 0;
+                let hasValues = false;
+                
+                allPercentageChanges.forEach(actionChanges => {
+                    const value = actionChanges[colIndex];
+                    if (value !== null && !isNaN(value)) {
+                        sum += value;
+                        hasValues = true;
+                    }
+                });
+                
+                return hasValues ? sum : null;
+            });
+
+            // Calcular suma acumulativa: cada punto incluye la suma de todos los anteriores
+            const cumulativeData = [];
+            let runningTotal = 0;
+            
+            aggregatedData.forEach((value, index) => {
+                if (value !== null) {
+                    runningTotal += value;
+                    cumulativeData.push(runningTotal);
+                } else {
+                    cumulativeData.push(null);
+                }
+            });
+
+            // Destruir gráfico anterior si existe
+            if (portfolioChartCumulative) {
+                portfolioChartCumulative.destroy();
+            }
+
+            // Crear el gráfico acumulativo
+            const ctx = document.getElementById('portfolioChartCumulative').getContext('2d');
+            portfolioChartCumulative = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dateColumns,
+                    datasets: [{
+                        label: 'Diferencia Acumulada del Portfolio',
+                        data: cumulativeData,
+                        borderColor: '#43e97b',
+                        backgroundColor: 'rgba(67, 233, 123, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        fill: true,
+                        spanGaps: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 13,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toLocaleString('es-ES', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }) + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Fecha',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Cambio Porcentual Acumulado (Σ%)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString('es-ES', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }) + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createAggregateChart(data, headers) {
+            if (data.length === 0) {
+                document.getElementById('chartContainerAggregate').style.display = 'none';
+                return;
+            }
+
+            // Mostrar el contenedor del gráfico agregado
+            document.getElementById('chartContainerAggregate').style.display = 'block';
+
+            // Las primeras dos columnas no son fechas, extraer desde la tercera
+            const dateColumns = headers.slice(2);
+            
+            // Calcular las diferencias porcentuales para cada acción
+            const allPercentageChanges = data.map((row, index) => {
+                const actionName = row[headers[0]] || `Acción ${index + 1}`;
+                
+                // Extraer valores para esta acción desde las columnas de fecha
+                const rawValues = dateColumns.map(dateCol => {
+                    const value = row[dateCol];
+                    if (value === '' || value === null || value === undefined) {
+                        return null;
+                    }
+                    return typeof value === 'number' ? value : parseFloat(value);
+                });
+
+                // Contar cuántos valores no nulos tiene esta acción
+                const nonNullCount = rawValues.filter(v => v !== null).length;
+                
+                // Si solo tiene un valor, retornar array de ceros
+                if (nonNullCount <= 1) {
+                    return rawValues.map(v => v !== null ? 0 : null);
+                }
+
+                // Calcular cambio porcentual respecto al día anterior
+                const percentageChanges = rawValues.map((value, i) => {
+                    if (value === null) return null;
+                    
+                    // Buscar el valor anterior no nulo
+                    let prevValue = null;
+                    for (let j = i - 1; j >= 0; j--) {
+                        if (rawValues[j] !== null) {
+                            prevValue = rawValues[j];
+                            break;
+                        }
+                    }
+                    
+                    // Si no hay valor anterior, retornar 0
+                    if (prevValue === null) {
+                        return 0;
+                    }
+                    
+                    if (prevValue === 0) prevValue = 0.0001;
+                    
+                    // Retornar cambio porcentual: ((actual - anterior) / anterior) * 100
+                    return ((value - prevValue) / prevValue) * 100;
+                });
+
+                return percentageChanges;
+            });
+
+            // Sumar todos los cambios porcentuales por columna (día)
+            const aggregatedData = dateColumns.map((dateCol, colIndex) => {
+                let sum = 0;
+                let hasValues = false;
+                
+                allPercentageChanges.forEach(actionChanges => {
+                    const value = actionChanges[colIndex];
+                    if (value !== null && !isNaN(value)) {
+                        sum += value;
+                        hasValues = true;
+                    }
+                });
+                
+                return hasValues ? sum : null;
+            });
+
+            // Destruir gráfico anterior si existe
+            if (portfolioChartAggregate) {
+                portfolioChartAggregate.destroy();
+            }
+
+            // Crear el gráfico agregado
+            const ctx = document.getElementById('portfolioChartAggregate').getContext('2d');
+            portfolioChartAggregate = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dateColumns,
+                    datasets: [{
+                        label: 'Cambio Porcentual Total del Portfolio',
+                        data: aggregatedData,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        fill: true,
+                        spanGaps: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 13,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toLocaleString('es-ES', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }) + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Fecha',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Cambio Porcentual Agregado (Σ%)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString('es-ES', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }) + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function exportToCSV() {
+            if (currentData.length === 0) {
+                alert('No hay datos para exportar. Carga los datos primero.');
+                return;
+            }
+
+            const headers = Object.keys(currentData[0]);
+            let csv = headers.join(',') + '\n';
+
+            currentData.forEach(row => {
+                const values = headers.map(header => {
+                    let value = row[header];
+                    if (value === null || value === undefined) value = '';
+                    value = String(value).replace(/"/g, '""');
+                    if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+                        value = `"${value}"`;
+                    }
+                    return value;
+                });
+                csv += values.join(',') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `bki_portfolio_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            updateStatus('✅ CSV exportado correctamente', 'success');
+        }
+
+        // Cargar datos automáticamente al abrir la página
+        window.addEventListener('load', () => {
+            loadData();
+        });
+    </script>
+</body>
+</html>
