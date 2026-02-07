@@ -175,4 +175,54 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Patrones Arquitectónicos -->
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/arquitectonicos/arquitectonicos-patron-mvc-csharp_25.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/arquitectonicos/arquitectonicos-patron-mvp-csharp_26.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/arquitectonicos/arquitectonicos-patron-mvvm-csharp_27.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/arquitectonicos/arquitectonicos-patron-layered-architecture-csharp_28.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/arquitectonicos/arquitectonicos-patron-microservices-csharp_29.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/arquitectonicos/arquitectonicos-patron-event-driven-csharp_30.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/arquitectonicos/arquitectonicos-patron-repository-csharp_31.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/arquitectonicos/arquitectonicos-patron-clean-architecture-csharp_32.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
 </urlset>
