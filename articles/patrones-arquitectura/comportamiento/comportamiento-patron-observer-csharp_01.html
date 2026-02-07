@@ -22,11 +22,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <meta property="og:title" content="Patrón Observer en C#: Guía Completa">
     <meta property="og:description" content="Domina el Observer con ejemplos del mundo real: naturaleza, YouTube, SignalR y sistemas distribuidos.">
     <meta property="og:type" content="article">
-    <meta property="og:url" content="https://www.magolo.net/articles/patrones-arquitectura/comportamiento-patron-observer-csharp_01.html">
-    <meta property="og:image" content="https://www.magolo.net/images/patrones-arquitectura/01_01.png">
+    <meta property="og:url" content="https://www.magolo.net/articles/patrones-arquitectura/comportamiento/comportamiento-patron-observer-csharp_01.html">
+    <meta property="og:image" content="https://www.magolo.net/images/patrones-arquitectura/comportamiento/01_01.png">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="articles-favicon.svg">
+    <link rel="icon" type="image/svg+xml" href="../articles-favicon.svg">
 
     <!-- Schema.org -->
     <script type="application/ld+json">
@@ -48,7 +48,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     </script>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="style-patrones-article.css">
+    <link rel="stylesheet" href="../style-patrones-article.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
 </head>
 <body>
@@ -61,7 +61,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- Article Navigation Header -->
     <header class="article-nav-header">
         <nav class="article-nav-content">
-            <a href="../../index.html" class="back-link">
+            <a href="../../../index.html" class="back-link">
                 ← Volver al Blog
             </a>
             
@@ -74,15 +74,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </svg>
                     <div class="arrow-text">
                         <span class="arrow-label">Anterior</span>
-                        <span class="arrow-title">Memento</span>
+                        <span class="arrow-title">—</span>
                     </div>
                 </a>
 
                 <!-- Artículo Siguiente -->
-                <a href="#" class="arrow-btn arrow-next disabled">
+                <a href="../creacionales/creacionales-patron-factory-method-csharp_02.html" class="arrow-btn arrow-next">
                     <div class="arrow-text">
                         <span class="arrow-label">Siguiente</span>
-                        <span class="arrow-title">State</span>
+                        <span class="arrow-title">Factory Method</span>
                     </div>
                     <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -141,7 +141,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </section>
             
             <div class="image-container">
-                <img src="../../images/patrones-arquitectura/01_01.png" 
+                <img src="../../../images/patrones-arquitectura/comportamiento/01_01.png" 
                 alt="Amanecer en un bosque, simbolizando un cambio de estado y el Patrón Observer."
                 title="Prompt: Cinematic sunrise in forest, warm golden light, high-detail.">
             </div>
@@ -163,7 +163,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </ul>
                 <p>Aquí está la clave: el Sol no sabe quiénes son, ni cuántos hay, ni qué hacen. El Sol está <strong>desacoplado</strong> de los Observadores. Solo avisa, y ellos deciden cómo reaccionar.</p>
                 <div class="image-container">
-                    <img src="../../images/patrones-arquitectura/01_02.png" 
+                    <img src="../../../images/patrones-arquitectura/comportamiento/01_02.png" 
                     alt="Gallo cantando al amanecer, un ejemplo natural de un 'Observador' reaccionando a un 'Sujeto' (el sol)."
                     title="Prompt: A rooster crowing energetically, golden sunrise light from the side.">
                 </div>
@@ -183,7 +183,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </ul>
                 <p>Cuando el Youtuber sube un vídeo (un <em>cambio de estado</em>), la plataforma notifica a todos sus Observadores (te envía una notificación push).</p>
                 <div class="image-container">
-                    <img src="../../images/patrones-arquitectura/01_03.png" 
+                    <img src="../../../images/patrones-arquitectura/comportamiento/01_03.png" 
                     alt="Botón de suscripción y campana de YouTube, un ejemplo real del Patrón Observer en aplicaciones."
                     title="Prompt: Flat UI animation, YouTube subscribe button and bell icon shaking.">
                 </div>
@@ -355,7 +355,7 @@ public class Program
                 </ol>
                 <p>Imagina una app de inventario. Cuando Eneko actualiza el stock en la base de datos, el servidor (Sujeto) notifica al Hub, y el Hub de SignalR <em>empuja</em> el nuevo stock a la pantalla de Lola (Observador) al instante.</p>
                 <div class="image-container">
-                    <img src="../../images/patrones-arquitectura/01_04.png" 
+                    <img src="../../../images/patrones-arquitectura/comportamiento/01_04.png" 
                     alt="Diagrama de SignalR implementando el Patrón Observer en .NET para notificar a múltiples clientes desde un servidor."
                     title="Prompt: Glowing data packets from server node to multiple laptops, tech aesthetic.">
                 </div>
@@ -366,7 +366,7 @@ public class Program
                 <h2>5. Diagrama UML y Definición Formal</h2>
                 <p>Así es como se ve el patrón en un diagrama de clases UML formal:</p>
                 <div class="image-container">
-                    <img src="../../images/patrones-arquitectura/01_05.png" 
+                    <img src="../../../images/patrones-arquitectura/comportamiento/01_05.png" 
                     alt="Diagrama de clases UML del Patrón Observer, mostrando la relación entre las interfaces ISujeto e IObservador."
                     title="Prompt: Clean UML class diagram of Observer pattern, minimalist, vector style.">
                 </div>
@@ -428,9 +428,9 @@ public class Program
             <div class="footer-column">
                 <h4>Navegación</h4>
                 <ul class="footer-links">
-                    <li><a href="../../index.html">Inicio</a></li>
-                    <li><a href="../../sobre-mi.html">Sobre mí</a></li>
-                    <li><a href="../../helios-nexus.html">Proyecto Helios Nexus</a></li>
+                    <li><a href="../../../index.html">Inicio</a></li>
+                    <li><a href="../../../sobre-mi.html">Sobre mí</a></li>
+                    <li><a href="../../../helios-nexus.html">Proyecto Helios Nexus</a></li>
                 </ul>
             </div>
 
@@ -470,7 +470,7 @@ public class Program
             <div class="footer-column footer-mission">
                 <h4>La Misión</h4>
                 <p><strong>magolo.net</strong> documenta el camino hacia sistemas autónomos, cloud-native e inteligentes.</p>
-                <p class="mission-tech">De .NET a Kubernetes, de microservicios a agentes IA. Este blog explora arquitecturas modernas mientras construyo <a href="../helios-nexus.html">Helios Nexus</a>, una arquitectura de referencia evolutiva.</p>
+                <p class="mission-tech">De .NET a Kubernetes, de microservicios a agentes IA. Este blog explora arquitecturas modernas mientras construyo <a href="../../../helios-nexus.html">Helios Nexus</a>, una arquitectura de referencia evolutiva.</p>
                 
                 <!-- Tech Radar Mini -->
                 <div class="tech-radar">

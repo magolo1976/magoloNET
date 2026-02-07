@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MH6TJV68');</script>
+<!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Patrón Adapter en C#: Guía Completa con Ejemplos | magolo.NET</title>
+    <meta name="description" content="Aprende el Patrón Adapter en C# desde cero: ejemplos naturales, integración con APIs legacy, código paso a paso y diagramas UML.">
+    <meta name="keywords" content="Adapter Pattern, C#, Patrones de Diseño, Gang of Four, Programación Orientada a Objetos, .NET">
+    <meta name="author" content="Marcelo González">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Patrón Adapter en C#: Guía Completa">
+    <meta property="og:description" content="Domina el Adapter para integrar sistemas incompatibles: naturaleza, mundo real y código C# completo.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.magolo.net/articles/patrones-arquitectura/estructurales/estructurales-patron-adapter-csharp_08.html">
+    <meta property="og:image" content="https://www.magolo.net/images/patrones-arquitectura/estructurales/08_01.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../articles-favicon.svg">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Patrón Adapter en C#: Guía Completa con Ejemplos",
+        "description": "Guía completa del patrón Adapter con implementación en C#, ejemplos prácticos y aplicaciones reales.",
+        "author": {
+            "@type": "Person",
+            "name": "Marcelo González"
+        },
+        "datePublished": "2025-11-04",
+        "dateModified": "2025-11-04",
+        "programmingLanguage": "C#",
+        "articleSection": "Patrones de Diseño",
+        "keywords": ["Adapter", "C#", "Patrones de Diseño", "Estructurales"]
+    }
+    </script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../style-patrones-article.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MH6TJV68"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+ 
+    <!-- Article Navigation Header -->
+    <header class="article-nav-header">
+        <nav class="article-nav-content">
+            <a href="../../../index.html" class="back-link">
+                ← Volver al Blog
+            </a>
+            
+            <!-- Flechas de navegación entre artículos -->
+            <div class="article-arrows">
+                <!-- Artículo Anterior -->
+                <a href="../creacionales/creacionales-patron-object-pool-csharp_07.html" class="arrow-btn arrow-prev">
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <div class="arrow-text">
+                        <span class="arrow-label">Anterior</span>
+                        <span class="arrow-title">Object Pool</span>
+                    </div>
+                </a>
+
+                <!-- Artículo Siguiente -->
+                <a href="estructurales-patron-bridge-csharp_09.html" class="arrow-btn arrow-next">
+                    <div class="arrow-text">
+                        <span class="arrow-label">Siguiente</span>
+                        <span class="arrow-title">Bridge</span>
+                    </div>
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Article Content -->
+    <main class="main-article">
+        
+        <!-- Article Header -->
+        <header>
+            <h1>Patrón Adapter en C#: Guía Completa con Ejemplos</h1>
+            <div class="article-meta">
+                <span class="reading-time">⏱️ 14 min de lectura</span>
+                <div class="article-tags">
+                    <span class="article-tag">Estructural</span>
+                    <span class="article-tag">C#</span>
+                    <span class="article-tag">.NET</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Table of Contents -->
+        <nav class="toc">
+            <h2>Tabla de Contenidos</h2>
+            <ul>
+                <li><a href="#intro">Introducción: Traductor entre mundos</a></li>
+                <li><a href="#natural">1. La Naturaleza: El Pico del Colibrí</a></li>
+                <li><a href="#mundo-real">2. Mundo Real: Enchufes y Adaptadores</a></li>
+                <li><a href="#implementacion">3. Implementación en C#: Código Paso a Paso</a></li>
+                <li><a href="#diferencias">4. Adapter vs Facade vs Bridge</a></li>
+                <li><a href="#diagrama">5. Diagrama UML y Definición Formal</a></li>
+                <li><a href="#no-usar">⚠️ Cuándo NO Usar el Patrón Adapter</a></li>
+                <li><a href="#ejercicio">💪 Ejercicio para Practicar</a></li>
+                <li><a href="#conclusion">Conclusión: Compatibilidad sin dolor</a></li>
+            </ul>
+        </nav>
+
+        <!-- Article Body -->
+        <article>
+            
+            <section id="intro">
+                <h2>Introducción: Traductor entre mundos</h2>
+                <p>El Patrón Adapter es como un traductor simultáneo: permite que dos sistemas que hablan idiomas distintos puedan comunicarse sin que ninguno cambie su forma de hablar.</p>
+                <p>En software, esto ocurre cuando quieres usar una librería antigua o un servicio externo con una interfaz incompatible. En vez de reescribirlo todo, creas un <strong>adaptador</strong> que traduce llamadas de un formato a otro.</p>
+                <p>Este patrón es uno de los más prácticos porque aparece en integraciones reales: APIs legacy, SDKs de terceros, dispositivos externos, etc.</p>
+            </section>
+            
+            <div class="image-container">
+                <img src="../../../images/patrones-arquitectura/estructurales/08_01.png" 
+                alt="Conexión entre dos interfaces incompatibles mediante un adaptador, simbolizando el Patrón Adapter."
+                title="Prompt: Two mismatched plugs connected by a sleek adapter, minimal studio lighting, high-detail product style.">
+            </div>
+            <h6>Prompt: Two mismatched plugs connected by a sleek adapter, minimal studio lighting, high-detail product style.</h6>
+
+            <section id="natural">
+                <h2>1. La Naturaleza: El Pico del Colibrí</h2>
+                <p>El colibrí tiene un pico largo y fino diseñado para acceder a néctar en flores profundas. La flor, por su parte, tiene una forma específica que “espera” ese tipo de pico.</p>
+                <p>En este escenario, el colibrí funciona como un <strong>adaptador biológico</strong> entre la flor y la necesidad de alimento. Si otro pájaro con pico corto quisiera acceder al néctar, necesitaría un “adaptador” (otra estrategia) o no podría alimentarse.</p>
+                <p>La clave: <strong>ni la flor ni el colibrí cambian su forma</strong>. El “adaptador” ya está en el diseño del pico.</p>
+
+                <div class="image-container">
+                    <img src="../../../images/patrones-arquitectura/estructurales/08_02.png" 
+                    alt="Colibrí alimentándose de una flor profunda, analogía natural del Patrón Adapter."
+                    title="Prompt: Hummingbird feeding from deep tubular flower, soft sunlight, nature documentary style.">
+                </div>
+                <h6>Prompt: Hummingbird feeding from deep tubular flower, soft sunlight, nature documentary style.</h6>
+            </section>
+
+            <section id="mundo-real">
+                <h2>2. Mundo Real: Enchufes y Adaptadores</h2>
+                <p>Viajas a otro país y descubres que tu cargador no encaja en el enchufe. El problema no es tu cargador, ni el enchufe: <strong>la interfaz es incompatible</strong>.</p>
+                <p>La solución es un adaptador físico que convierte el formato del cargador al formato del enchufe. Ese adaptador no cambia el cargador ni el enchufe, solo actúa como traductor.</p>
+
+                <div class="image-container">
+                    <img src="../../../images/patrones-arquitectura/estructurales/08_03.png" 
+                    alt="Adaptador de enchufe internacional conectando dispositivos de distintos estándares."
+                    title="Prompt: Travel plug adapter connecting US charger to EU socket, clean white background, product photography.">
+                </div>
+                <h6>Prompt: Travel plug adapter connecting US charger to EU socket, clean white background, product photography.</h6>
+            </section>
+
+            <section id="implementacion">
+                <h2>3. Implementación en C#: Código Paso a Paso</h2>
+                <p>Imaginemos que tenemos un sistema moderno que espera una interfaz <code>IPago</code>, pero queremos usar una librería legacy que trabaja con <code>PagoLegacy</code>.</p>
+
+                <h3>3.1 La interfaz esperada (Target)</h3>
+<pre><code class="language-csharp">public interface IPago
+{
+    void Pagar(decimal monto);
+}</code></pre>
+
+                <h3>3.2 La clase legacy (Adaptee)</h3>
+<pre><code class="language-csharp">// Librería antigua que NO podemos modificar
+public class PagoLegacy
+{
+    public void EjecutarPago(double cantidad)
+    {
+        Console.WriteLine($"[Legacy] Pago ejecutado por {cantidad}€");
+    }
+}</code></pre>
+
+                <h3>3.3 El Adaptador</h3>
+<pre><code class="language-csharp">// Adaptador que convierte IPago en PagoLegacy
+public class PagoAdapter : IPago
+{
+    private readonly PagoLegacy _legacy;
+
+    public PagoAdapter(PagoLegacy legacy)
+    {
+        _legacy = legacy;
+    }
+
+    public void Pagar(decimal monto)
+    {
+        // Adaptamos decimal a double y delegamos
+        _legacy.EjecutarPago((double)monto);
+    }
+}</code></pre>
+
+                <h3>3.4 Uso en el sistema moderno</h3>
+<pre><code class="language-csharp">public class Checkout
+{
+    private readonly IPago _pago;
+
+    public Checkout(IPago pago)
+    {
+        _pago = pago;
+    }
+
+    public void ProcesarCompra(decimal total)
+    {
+        Console.WriteLine($"Procesando compra por {total}€...");
+        _pago.Pagar(total);
+    }
+}
+
+// Uso
+var legacy = new PagoLegacy();
+var adapter = new PagoAdapter(legacy);
+var checkout = new Checkout(adapter);
+
+checkout.ProcesarCompra(99.99m);</code></pre>
+
+                <p><strong>Resultado:</strong> El sistema moderno usa su interfaz <code>IPago</code> sin saber que internamente se está usando una librería antigua.</p>
+            </section>
+
+            <section id="diferencias">
+                <h2>4. Adapter vs Facade vs Bridge</h2>
+                <ul>
+                    <li><strong>Adapter:</strong> Traduce una interfaz a otra para hacer sistemas compatibles.</li>
+                    <li><strong>Facade:</strong> Simplifica un conjunto de subsistemas complejos con una interfaz más simple.</li>
+                    <li><strong>Bridge:</strong> Separa abstracción de implementación desde el diseño.</li>
+                </ul>
+                <p>Si tu problema es compatibilidad, usa Adapter. Si tu problema es complejidad, usa Facade. Si tu problema es explosión combinatoria de jerarquías, usa Bridge.</p>
+
+                <div class="image-container">
+                    <img src="../../../images/patrones-arquitectura/estructurales/08_04.png" 
+                    alt="Comparativa visual entre Adapter, Facade y Bridge."
+                    title="Prompt: Three-panel infographic comparing Adapter, Facade, Bridge; clean vector UI, neutral colors.">
+                </div>
+                <h6>Prompt: Three-panel infographic comparing Adapter, Facade, Bridge; clean vector UI, neutral colors.</h6>
+            </section>
+
+            <section id="diagrama">
+                <h2>5. Diagrama UML y Definición Formal</h2>
+                <div class="image-container">
+                    <img src="../../../images/patrones-arquitectura/estructurales/08_05.png" 
+                    alt="Diagrama UML del Patrón Adapter con Target, Adapter y Adaptee."
+                    title="Prompt: UML class diagram of Adapter pattern, minimalist, black and blue vector style.">
+                </div>
+                <h6>Prompt: UML class diagram of Adapter pattern, minimalist, black and blue vector style.</h6>
+                <blockquote>
+                    Es un <strong>patrón estructural</strong> que convierte la interfaz de una clase en otra que el cliente espera. Permite que clases incompatibles trabajen juntas.
+                </blockquote>
+            </section>
+
+            <section id="no-usar" class="info-box warning-box">
+                <h2>⚠️ Cuándo NO Usar el Patrón Adapter</h2>
+                <ul>
+                    <li>Si puedes cambiar directamente la clase original, no necesitas adapter.</li>
+                    <li>Si solo tienes una pequeña diferencia, quizá sea mejor usar una función simple.</li>
+                    <li>Si la adaptación es demasiado compleja, puede esconder problemas de diseño.</li>
+                </ul>
+            </section>
+            
+            <section id="ejercicio" class="info-box exercise-box">
+                <h2>💪 Ejercicio para Practicar</h2>
+                <p>Implementa un adaptador para un sistema de envío:</p>
+                <ol>
+                    <li>Crea una interfaz <code>IEnvio</code> con <code>Enviar(string destino)</code>.</li>
+                    <li>Simula una clase legacy <code>CorreoAntiguo</code> con método <code>EnviarPaquete(string direccion)</code>.</li>
+                    <li>Crea un <code>CorreoAdapter</code> que implemente <code>IEnvio</code> y traduzca la llamada.</li>
+                </ol>
+            </section>
+
+            <section id="conclusion">
+                <h2>Conclusión: Compatibilidad sin dolor</h2>
+                <p>Adapter es el patrón que hace posible integrar lo viejo con lo nuevo sin romper nada. Es una forma elegante de mantener compatibilidad y evitar reescribir sistemas completos.</p>
+                <p>Cuando veas una API legacy, no pienses en reemplazarla de inmediato: piensa en adaptarla.</p>
+            </section>
+        
+        </article>
+
+    </main>
+
+    <!-- FOOTER COMPLETO -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-column">
+                <h4>Navegación</h4>
+                <ul class="footer-links">
+                    <li><a href="../../../index.html">Inicio</a></li>
+                    <li><a href="../../../sobre-mi.html">Sobre mí</a></li>
+                    <li><a href="../../../helios-nexus.html">Proyecto Helios Nexus</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Conectar</h4>
+                <div class="social-links">
+                    <a href="https://linkedin.com/in/magolo" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        LinkedIn
+                    </a>
+                </div>
+            </div>
+            <div class="footer-column footer-mission">
+                <h4>La Misión</h4>
+                <p><strong>magolo.net</strong> documenta el camino hacia sistemas autónomos, cloud-native e inteligentes.</p>
+                <p class="mission-tech">De .NET a Kubernetes, de microservicios a agentes IA. Este blog explora arquitecturas modernas mientras construyo <a href="../../../helios-nexus.html">Helios Nexus</a>, una arquitectura de referencia evolutiva.</p>
+                <div class="tech-radar">
+                    <div class="radar-item">🔵 <strong>Adoptando:</strong> Semantic Kernel, .NET Aspire</div>
+                    <div class="radar-item">🟢 <strong>Experimentando:</strong> Dapr, Temporal</div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p class="copyright">© 2025-2028 Marcelo González</p>
+                <p class="tech-stack">Stack: HTML5 + CSS3 → GitHub Pages</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

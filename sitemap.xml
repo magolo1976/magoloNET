@@ -1,73 +1,176 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  
+
   <!-- Página principal -->
   <url>
     <loc>https://www.magolo.net/</loc>
-    <lastmod>2025-11-12</lastmod>
+    <lastmod>2026-02-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
-  
-  <!-- Artículo: Patrón Observer -->
+
+  <!-- Páginas base -->
   <url>
-    <loc>https://www.magolo.net/articles/patrones-arquitectura/comportamiento-patron-observer-csharp_01.html</loc>
-    <lastmod>2025-11-12</lastmod>
+    <loc>https://www.magolo.net/sobre-mi.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/helios-nexus.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Patrones de Comportamiento -->
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/comportamiento/comportamiento-patron-observer-csharp_01.html</loc>
+    <lastmod>2026-02-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Artículo: Patrón Factory Method -->
+  <!-- Patrones Creacionales -->
   <url>
-    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales-patron-factory-method-csharp_02.html</loc>
-    <lastmod>2025-11-12</lastmod>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales/creacionales-patron-factory-method-csharp_02.html</loc>
+    <lastmod>2026-02-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  
-  <!-- Artículo: Patrón Singleton -->
   <url>
-    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales-patron-singleton-csharp_03.html</loc>
-    <lastmod>2025-11-12</lastmod>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales/creacionales-patron-singleton-csharp_03.html</loc>
+    <lastmod>2026-02-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  <!-- Artículo: Patrón Abstract Factory -->
   <url>
-    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales-patron-abstract-factory-csharp_04.html</loc>
-    <lastmod>2025-11-12</lastmod>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales/creacionales-patron-abstract-factory-csharp_04.html</loc>
+    <lastmod>2026-02-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-
-  <!-- Artículo: Patrón Builder -->
   <url>
-    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales-patron-builder-csharp_05.html</loc>
-    <lastmod>2025-11-12</lastmod>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales/creacionales-patron-builder-csharp_05.html</loc>
+    <lastmod>2026-02-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-
-  <!-- Artículo: Patrón Prototype -->
   <url>
-    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales-patron-prototype-csharp_06.html</loc>
-    <lastmod>2025-11-12</lastmod>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales/creacionales-patron-prototype-csharp_06.html</loc>
+    <lastmod>2026-02-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-
-  <!-- Artículo: Patrón Object Pool -->
   <url>
-    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales-patron-object-pool-csharp_07.html</loc>
-    <lastmod>2025-11-12</lastmod>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/creacionales/creacionales-patron-object-pool-csharp_07.html</loc>
+    <lastmod>2026-02-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Artículo: Patrón Adapter -->
+  <!-- Patrones Estructurales -->
   <url>
-    <loc>https://www.magolo.net/articles/patrones-arquitectura/estructurales-patron-adapter-csharp_08.html</loc>
-    <lastmod>2025-11-04</lastmod>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/estructurales/estructurales-patron-adapter-csharp_08.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/estructurales/estructurales-patron-bridge-csharp_09.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/estructurales/estructurales-patron-composite-csharp_10.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/estructurales/estructurales-patron-decorator-csharp_11.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/estructurales/estructurales-patron-facade-csharp_12.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/estructurales/estructurales-patron-flyweight-csharp_13.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/estructurales/estructurales-patron-proxy-csharp_14.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Patrones de Comportamiento (continuación) -->
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/comportamiento/comportamiento-patron-chain-of-responsibility-csharp_15.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/comportamiento/comportamiento-patron-command-csharp_16.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/comportamiento/comportamiento-patron-interpreter-csharp_17.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/comportamiento/comportamiento-patron-iterator-csharp_18.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/comportamiento/comportamiento-patron-mediator-csharp_19.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/comportamiento/comportamiento-patron-memento-csharp_20.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/comportamiento/comportamiento-patron-state-csharp_21.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/comportamiento/comportamiento-patron-strategy-csharp_22.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/comportamiento/comportamiento-patron-template-method-csharp_23.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.magolo.net/articles/patrones-arquitectura/comportamiento/comportamiento-patron-visitor-csharp_24.html</loc>
+    <lastmod>2026-02-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

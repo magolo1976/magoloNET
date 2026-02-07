@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MH6TJV68');</script>
+<!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Patrón Template Method en C#: Guía Completa | magolo.NET</title>
+    <meta name="description" content="Aprende el Patrón Template Method en C#: define un esqueleto de algoritmo y deja pasos a subclases. Ejemplos y UML.">
+    <meta name="keywords" content="Template Method Pattern, C#, Patrones de Diseño, Gang of Four, Programación Orientada a Objetos, .NET">
+    <meta name="author" content="Marcelo González">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Patrón Template Method en C#: Guía Completa">
+    <meta property="og:description" content="Estandariza procesos dejando pasos personalizables con Template Method.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.magolo.net/articles/patrones-arquitectura/comportamiento/comportamiento-patron-template-method-csharp_23.html">
+    <meta property="og:image" content="https://www.magolo.net/images/patrones-arquitectura/comportamiento/23_01.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../articles-favicon.svg">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Patrón Template Method en C#: Guía Completa",
+        "description": "Guía completa del patrón Template Method con implementación en C#.",
+        "author": {"@type": "Person","name": "Marcelo González"},
+        "datePublished": "2025-11-19",
+        "dateModified": "2025-11-19",
+        "programmingLanguage": "C#",
+        "articleSection": "Patrones de Diseño",
+        "keywords": ["Template Method", "C#", "Patrones de Diseño", "Comportamiento"]
+    }
+    </script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../style-patrones-article.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MH6TJV68"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+ 
+    <header class="article-nav-header">
+        <nav class="article-nav-content">
+            <a href="../../../index.html" class="back-link">← Volver al Blog</a>
+            <div class="article-arrows">
+                <a href="comportamiento-patron-strategy-csharp_22.html" class="arrow-btn arrow-prev">
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    <div class="arrow-text"><span class="arrow-label">Anterior</span><span class="arrow-title">Strategy</span></div>
+                </a>
+                <a href="comportamiento-patron-visitor-csharp_24.html" class="arrow-btn arrow-next">
+                    <div class="arrow-text"><span class="arrow-label">Siguiente</span><span class="arrow-title">Visitor</span></div>
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-article">
+        <header>
+            <h1>Patrón Template Method en C#: Guía Completa</h1>
+            <div class="article-meta">
+                <span class="reading-time">⏱️ 11 min de lectura</span>
+                <div class="article-tags"><span class="article-tag">Comportamiento</span><span class="article-tag">C#</span><span class="article-tag">.NET</span></div>
+            </div>
+        </header>
+
+        <nav class="toc">
+            <h2>Tabla de Contenidos</h2>
+            <ul>
+                <li><a href="#intro">Introducción: Receta fija</a></li>
+                <li><a href="#natural">1. Naturaleza: Ciclos repetibles</a></li>
+                <li><a href="#mundo-real">2. Mundo Real: Recetas de cocina</a></li>
+                <li><a href="#implementacion">3. Implementación en C#: Código Paso a Paso</a></li>
+                <li><a href="#diferencias">4. Template Method vs Strategy</a></li>
+                <li><a href="#diagrama">5. Diagrama UML</a></li>
+                <li><a href="#no-usar">⚠️ Cuándo NO Usar Template Method</a></li>
+                <li><a href="#ejercicio">💪 Ejercicio</a></li>
+                <li><a href="#conclusion">Conclusión</a></li>
+            </ul>
+        </nav>
+
+        <article>
+            <section id="intro"><h2>Introducción: Receta fija</h2><p>Template Method define el esqueleto de un algoritmo y deja algunos pasos a las subclases. El flujo general se mantiene constante.</p><p>Esto garantiza consistencia en procesos repetibles, con flexibilidad en los detalles.</p></section>
+            <div class="image-container"><img src="../../../images/patrones-arquitectura/comportamiento/23_01.png" alt="Receta" title="Prompt: Recipe card with steps, minimal clean design." /></div>
+            <h6>Prompt: Recipe card with steps, minimal clean design.</h6>
+
+            <section id="natural"><h2>1. Naturaleza: Ciclos repetibles</h2><p>Los ciclos del día siempre siguen el mismo patrón, aunque cambien detalles.</p><p>El orden es fijo (amanecer, día, atardecer, noche), pero las condiciones específicas varían, igual que en un template.</p><div class="image-container"><img src="../../../images/patrones-arquitectura/comportamiento/23_02.png" alt="Ciclo" title="Prompt: Day-night cycle illustration, soft gradient style." /></div><h6>Prompt: Day-night cycle illustration, soft gradient style.</h6></section>
+
+            <section id="mundo-real"><h2>2. Mundo Real: Recetas de cocina</h2><p>La receta define pasos fijos, pero ingredientes o tiempos pueden variar.</p><p>El chef respeta la estructura, pero personaliza detalles: exactamente lo que hacen las subclases en Template Method.</p><div class="image-container"><img src="../../../images/patrones-arquitectura/comportamiento/23_03.png" alt="Cocina" title="Prompt: Minimal kitchen scene with recipe book, warm light." /></div><h6>Prompt: Minimal kitchen scene with recipe book, warm light.</h6></section>
+
+            <section id="implementacion">
+                <h2>3. Implementación en C#: Código Paso a Paso</h2>
+<pre><code class="language-csharp">public abstract class Bebida
+{
+    public void Preparar()
+    {
+        HervirAgua();
+        AgregarIngrediente();
+        Servir();
+    }
+
+    protected void HervirAgua() => Console.WriteLine("Hervir agua");
+    protected void Servir() => Console.WriteLine("Servir");
+    protected abstract void AgregarIngrediente();
+}
+
+public class Te : Bebida
+{
+    protected override void AgregarIngrediente() => Console.WriteLine("Agregar té");
+}</code></pre>
+            </section>
+
+            <section id="diferencias"><h2>4. Template Method vs Strategy</h2><p>Template Method fija el flujo. Strategy intercambia algoritmos completos.</p><p>Si necesitas un esqueleto común con pasos variables, Template Method es ideal; si el algoritmo completo cambia, usa Strategy.</p></section>
+
+            <section id="diagrama"><h2>5. Diagrama UML</h2><div class="image-container"><img src="../../../images/patrones-arquitectura/comportamiento/23_04.png" alt="UML Template Method" title="Prompt: UML diagram of Template Method pattern, clean vector layout." /></div><h6>Prompt: UML diagram of Template Method pattern, clean vector layout.</h6><div class="image-container"><img src="../../../images/patrones-arquitectura/comportamiento/23_05.png" alt="Flujo de pasos" title="Prompt: Step-by-step flow diagram, minimal infographic style." /></div><h6>Prompt: Step-by-step flow diagram, minimal infographic style.</h6></section>
+
+            <section id="no-usar" class="info-box warning-box"><h2>⚠️ Cuándo NO Usar Template Method</h2><ul><li>Si el flujo cambia demasiado o no hay pasos fijos.</li><li>Si cada caso requiere un algoritmo totalmente distinto.</li></ul></section>
+
+            <section id="ejercicio" class="info-box exercise-box"><h2>💪 Ejercicio</h2><p>Crea una clase abstracta para exportar reportes con pasos comunes y variantes CSV/JSON.</p></section>
+
+            <section id="conclusion"><h2>Conclusión</h2><p>Template Method garantiza consistencia con flexibilidad controlada. Es útil para procesos repetibles con variantes bien delimitadas.</p></section>
+        </article>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-column"><h4>Navegación</h4><ul class="footer-links"><li><a href="../../../index.html">Inicio</a></li><li><a href="../../../sobre-mi.html">Sobre mí</a></li><li><a href="../../../helios-nexus.html">Proyecto Helios Nexus</a></li></ul></div>
+            <div class="footer-column"><h4>Conectar</h4><div class="social-links"><a href="https://linkedin.com/in/magolo" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a></div></div>
+            <div class="footer-column footer-mission"><h4>La Misión</h4><p><strong>magolo.net</strong> documenta el camino hacia sistemas autónomos, cloud-native e inteligentes.</p><p class="mission-tech">De .NET a Kubernetes, de microservicios a agentes IA. Este blog explora arquitecturas modernas mientras construyo <a href="../../../helios-nexus.html">Helios Nexus</a>, una arquitectura de referencia evolutiva.</p><div class="tech-radar"><div class="radar-item">🔵 <strong>Adoptando:</strong> Semantic Kernel, .NET Aspire</div><div class="radar-item">🟢 <strong>Experimentando:</strong> Dapr, Temporal</div></div></div>
+        </div>
+        <div class="footer-bottom"><div class="footer-bottom-content"><p class="copyright">© 2025-2028 Marcelo González</p><p class="tech-stack">Stack: HTML5 + CSS3 → GitHub Pages</p></div></div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
