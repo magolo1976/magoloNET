@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MH6TJV68');</script>
+<!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Actor Model en C#: Guía Completa | magolo.NET</title>
+    <meta name="description" content="Actor Model en C#: concurrencia basada en actores y mensajes sin locks.">
+    <meta name="keywords" content="Actor Model, C#, Concurrencia, .NET">
+    <meta name="author" content="Marcelo González">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Actor Model en C#: Guía Completa">
+    <meta property="og:description" content="Aislamiento y mensajes para concurrencia segura." />
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.magolo.net/articles/patrones-arquitectura/concurrencia/concurrencia-patron-actor-model-csharp_70.html">
+    <meta property="og:image" content="https://www.magolo.net/images/patrones-arquitectura/concurrencia/70_01.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../articles-favicon.svg">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Actor Model en C#: Guía Completa",
+        "description": "Guía completa del patrón Actor Model con implementación en C#.",
+        "author": {"@type": "Person","name": "Marcelo González"},
+        "datePublished": "2026-02-23",
+        "dateModified": "2026-02-23",
+        "programmingLanguage": "C#",
+        "articleSection": "Concurrencia",
+        "keywords": ["Actor Model", "C#", "Concurrencia", "Mensajería"]
+    }
+    </script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../style-patrones-article.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MH6TJV68"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+ 
+    <header class="article-nav-header">
+        <nav class="article-nav-content">
+            <a href="../../../index.html" class="back-link">← Volver al Blog</a>
+            <div class="article-arrows">
+                <a href="concurrencia-patron-double-checked-locking-csharp_69.html" class="arrow-btn arrow-prev">
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    <div class="arrow-text"><span class="arrow-label">Anterior</span><span class="arrow-title">Double-Checked Locking</span></div>
+                </a>
+                <a href="concurrencia-patron-thread-pool-csharp_71.html" class="arrow-btn arrow-next">
+                    <div class="arrow-text"><span class="arrow-label">Siguiente</span><span class="arrow-title">Thread Pool</span></div>
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-article">
+        <header>
+            <h1>Actor Model en C#: Guía Completa</h1>
+            <div class="article-meta">
+                <span class="reading-time">⏱️ 16 min de lectura</span>
+                <div class="article-tags"><span class="article-tag">Concurrencia</span><span class="article-tag">C#</span><span class="article-tag">.NET</span></div>
+            </div>
+        </header>
+
+        <nav class="toc">
+            <h2>Tabla de Contenidos</h2>
+            <ul>
+                <li><a href="#intro">Introducción: actores y mensajes</a></li>
+                <li><a href="#natural">1. Naturaleza: colmena</a></li>
+                <li><a href="#mundo-real">2. Mundo Real: trading</a></li>
+                <li><a href="#implementacion">3. Implementación en C#: Código Paso a Paso</a></li>
+                <li><a href="#diferencias">4. Actor Model vs Locks</a></li>
+                <li><a href="#diagrama">5. Diagrama UML</a></li>
+                <li><a href="#no-usar">⚠️ Cuándo NO Usar Actor Model</a></li>
+                <li><a href="#ejercicio">💪 Ejercicio</a></li>
+                <li><a href="#conclusion">Conclusión</a></li>
+            </ul>
+        </nav>
+
+        <article>
+            <section id="intro"><h2>Introducción: actores y mensajes</h2><p>El Actor Model es un paradigma de concurrencia donde la unidad fundamental es el "actor": una entidad aislada que procesa mensajes de forma secuencial. Cada actor tiene su propio estado privado, su propia cola de mensajes, y procesa un mensaje a la vez. Actores se comunican solo mediante mensajes asincroniscous. No hay estado compartido, no hay locks, no hay sincronización explícita. Este cambio paradigmático simplifica enormemente la programación concurrente.</p><p>La necesidad del patrón surge de los problemas con locks. Múltiples threads accediendo estado compartido requieren locks para evitar race conditions. Locks introducen deadlocks, livelocks, contención. El Actor Model evita todo esto al eliminar estado compartido. Cada actor es como un objeto con su propio thread. No necesita compartir estado con otros actores; solo intercambia mensajes.</p><p>El modelo encaja naturalmente con sistemas distribuidos. Un actor en una máquina puede enviar un mensaje a otro actor en otra máquina. El sistema no cambia conceptualmente. Esta propiedad hace Actor Model ideal para microservicios, sistemas distribuidos, y aplicaciones altamente concurrentes donde locks serían cuellos de botella.</p><p>En C#, el modelo se implementa típicamente con frameworks como Akka.NET u Orleans. Estos frameworks proporcionan infraestructura para crear actores, manejar colas de mensajes, escalabilidad distribuida, y recuperación de fallos. Sin el framework, implementar Actor Model manualmente sería tedioso.</p><p>El paradigma es revolucionario porque cambia cómo pensamos sobre concurrencia. En lugar de "múltiples threads accediendo estado compartido, cuidado con los locks", es "actores aislados intercambiando mensajes, sin locks". Esta diferencia es profunda.</p></section>
+            <div class="image-container"><img src="../../../images/patrones-arquitectura/concurrencia/70_01.png" alt="Actor Model" title="Prompt: actors exchanging messages, minimal style." /></div>
+            <h6>Prompt: actors exchanging messages, minimal style.</h6>
+
+            <section id="natural"><h2>1. Naturaleza: colmena</h2><p>Una colmena de abejas es un ejemplo perfecto de Actor Model. Cada abeja es autónoma, tiene su propia tarea (recolectar néctar, construir celdas, defender). Las abejas se comunican mediante danzas y feromonas, no mediante estado compartido. No hay una "abeja coordinadora central". Las abejas simplemente intercambian información mediante signales. El resultado es una estructura altamente eficiente que maneja miles de abejas sin locks o coordinación centralizada. Si una abeja se daña, el colmenar continúa. Si hay más flores, simplemente más abejas van (escalabilidad automática). En software, actores son como abejas. Cada actor hace su tarea, se comunica mediante mensajes, continúa. No hay sincronización centralizada. El sistema escala agregando más actores. Si un actor falla, otros continúan. Los sistemas basados en actores que funcionan bien tienden a tener la robustez y la escalabilidad de una colmena. La analogía también muestra que el modelo es natural. No es una construcción teórica artificial; ocurre en la naturaleza. Las colonias de insectos, las parvadas de pájaros, los bancos de peces, todos usan "actor model" sin locks. Son colmenas distribuidas que funcionan correctamente sin punto central de sincronización.</p><div class="image-container"><img src="../../../images/patrones-arquitectura/concurrencia/70_02.png" alt="Colmena" title="Prompt: bees communicating, soft illustration." /></div><h6>Prompt: bees communicating, soft illustration.</h6></section>
+
+            <section id="mundo-real"><h2>2. Mundo Real: sistemas de eventos distribuidos</h2><p>Imagina un exchange de criptomonedas procesando órdenes de compra/venta. Millones de usuarios simultáneamente. Con locks, cada operación sincronizaría un libro de órdenes global, causando contención masiva. Con actors, cada par de monedas (BTC/USD, ETH/USD) es un actor. Recibe órdenes como mensajes. Mantiene su propio libro de órdenes (estado privado). Cuando hay match, notifica a los actores de los usuarios. Los actores de usuarios actualizan sus portfolios. No hay sincronización global. Miles de pares funcionan en paralelo. Si BTC/USD está congestionado, ETH/USD continúa sin problemas. El sistema escala automáticamente.</p><p>Otro ejemplo: procesamiento de eventos en tiempo real. Una plataforma de análisis recibe millones de eventos (clics, vistas, compras). Con locks, un contador global de eventos tendría contención extrema. Con actors, cada tipo de evento es un actor. Recibe eventos, actualiza agregaciones locales, comunica resultados. Los actores se pueden distribuir en múltiples servidores. Cada servidor maneja un subset de eventos. Escalabilidad lineal. Si necesitas procesar más eventos, agregas más servidores con más actores.</p><p>Los sistemas de recomendación también se benefician. Cada usuario es un actor que rastrea su historial de interacciones. Cada producto es un actor que rastrea quién lo vio, le dio like, lo compró. Los actores se comunican para generar recomendaciones personalizadas. Un usuario ve un producto, el actor del producto recibe el evento. Los actores de productos similares se notifican. Recomendaciones generadas sin cálculos centralizados.</p><p>Las plataformas de chat masivo (Slack, Discord) usan conceptos similares. Cada sala de chat es potencialmente un actor. Cada usuario es un actor. Los actores se comunican para sincronizar mensajes. Sin servidor central conociendo todo el estado. Distribuido, escalable, resiliente.</p><p>El punto común: cuando necesitas procesar muchos eventos/mensajes concurrentemente, escalar sin contención central, y mantener aislamiento entre unidades de trabajo, Actor Model encaja perfectamente. Es la arquitectura de elección para sistemas de alta concurrencia, alta disponibilidad, altamente distribuidos.</p><div class="image-container"><img src="../../../images/patrones-arquitectura/concurrencia/70_03.png" alt="Trading" title="Prompt: trading actors handling messages, flat infographic." /></div><h6>Prompt: trading actors handling messages, flat infographic.</h6></section>
+
+            <section id="implementacion">
+                <h2>3. Implementación en C#: Código Paso a Paso</h2>
+<p>En C#, implementar Actor Model requiere un framework. Akka.NET es la opción más popular. Proporciona infraestructura completa: creación de actores, colas de mensajes, supervisión, escalabilidad distribuida. Orleans de Microsoft es otra opción, más orientada a grains virtuales. Aquí mostramos Akka.NET.</p>
+<pre><code class="language-csharp">// Definir un actor
+public class OrderActor : ReceiveActor
+{
+    private List&lt;Order&gt; _orders = new();
+    
+    public OrderActor()
+    {
+        Receive&lt;PlaceOrder&gt;(msg => HandlePlaceOrder(msg));
+        Receive&lt;GetOrders&gt;(msg => HandleGetOrders(msg));
+    }
+    
+    private void HandlePlaceOrder(PlaceOrder msg)
+    {
+        _orders.Add(new Order { Id = msg.Id, Price = msg.Price });
+        Sender.Tell(new OrderPlaced { OrderId = msg.Id });
+    }
+    
+    private void HandleGetOrders(GetOrders msg)
+    {
+        Sender.Tell(_orders.AsReadOnly());
+    }
+}
+
+// Usar el actor
+var system = ActorSystem.Create("trading");
+var actor = system.ActorOf(Props.Create&lt;OrderActor&gt;(), "orders");
+
+// Enviar mensajes
+actor.Tell(new PlaceOrder { Id = 1, Price = 100m });
+var orders = actor.Ask&lt;IReadOnlyList&lt;Order&gt;&gt;(new GetOrders()).Result;</code></pre>
+<p>El código es simple. El actor recibe mensajes, procesa uno a la vez (secuencial internamente), responde al remitente. El framework maneja threading, colas, distribución. El desarrollador solo define qué mensajes acepta y cómo responde. El framework garantiza que una sola activación del actor procesa un mensaje a la vez. Si múltiples threads envían mensajes, el framework los encola. El actor los procesa secuencialmente. Race conditions imposibles. Deadlocks imposibles. Solo el actor accede su estado privado (_orders). Otros actores nunca ven _orders directamente; solo reciben respuestas a través de mensajes.</p>
+<p>La supervisión es automática. Si un actor falla, su supervisor (otro actor) es notificado. Puede reiniciar el actor, detenerlo, escalar el error. Las políticas de supervisión son configurables. Esto proporciona recuperación de fallos automática sin try/catch en cada mensaje.</p>
+<p>La distribución es transparente. Si reemplazas `ActorSystem.Create` con un sistema remoto, los mismos actores se ejecutan en múltiples máquinas. Los mensajes se serializan y envían por red. El código del actor no cambia. Esta propiedad es revolucionaria para sistemas distribuidos.</p>
+            </section>
+
+            <section id="diferencias"><h2>4. Actor Model vs Locks: diferencias paradigmáticas</h2><p>Con locks, el diseño es: múltiples threads, estado compartido, sincronización explícita. Un contador compartido con Interlocked.Increment() o lock(obj). Múltiples threads pueden acceder simultáneamente (con sincronización). El modelo mental es "proteger el estado compartido". Los problemas: contención (threads esperando locks), deadlocks (A espera B, B espera A), livelocks (threads corriendo sin progreso), race conditions (olvidar un lock). El debugging es difícil porque el comportamiento es no-determinístico.</p><p>Con Actor Model, el diseño es: actores aislados, estado privado, mensajes asincrónicicos. Un contador privado del actor, solo accesible por ese actor. Otros actores envían mensajes "incrementa". El actor actualiza su contador internamente (sin sincronización). No hay contención porque no hay estado compartido. No hay deadlocks porque no hay locks. Los mensajes se procesan secuencialmente por actor (garantizado). El modelo mental es "actores independientes intercambiando información". El debugging es determinístico: dado un mismo conjunto de mensajes, el resultado es siempre igual. No hay race conditions por definición.</p><p>La diferencia es profunda. Locks son de bajo nivel: sincronización explícita en el código. Actores son de alto nivel: aislamiento y mensajes, la concurrencia es emergente. Con locks, manejar 10000 threads es caótico (contención severa). Con actores, 10000 actores es normal (colas locales, sin contención global). La escalabilidad es diferente.</p><p>Complejidad de mantenimiento: con locks, cambiar lógica es riesgoso. Agregar un nuevo lock, olvidarse de uno, cambiar orden de acquisition, deadlock. Con actores, agregar un nuevo tipo de mensaje es localizando al actor que lo maneja. Bajo acoplamiento. El cambio es confinado. Con locks, el estado compartido crea acoplamiento tácito entre threads.</p><p>Distribución: con locks, agregar otro servidor es imposible (locks locales a un proceso). Con actors, distribuir es transparente (mensajes se envían entre máquinas). Esta diferencia es crucial para sistemas cloud-native. Los microservicios usan implícitamente Actor Model: cada servicio es como un "actor distribuido" que recibe HTTP requests (mensajes) y responde.</p><p>Costo: con locks, bajo costo de latencia (sincronización rápida). Con actores, latencia agregada por colas de mensajes. Actor Model es menos adecuado para sistemas con latencia de microsegundos (HFT - trading de alta frecuencia). Es excelente para sistemas de alta concurrencia, alta disponibilidad, alta escalabilidad.</p></section>
+
+            <section id="diagrama"><h2>5. Diagrama UML</h2><p>El diagrama UML del Actor Model muestra entidades clave: Actor (clase base), MailBox (cola de mensajes), Message (tipo base de mensajes), ActorSystem (sistema que crea/gestiona actores). Las relaciones: Un ActorSystem crea múltiples Actors. Cada Actor tiene una MailBox. Cada Actor procesa Messages. Un Actor puede enviar mensajes a otros Actors. Las flechas muestran dependencias. ActorSystem depende de Actor. Actor depende de MailBox y Message. El patrón es simple estructuralmente pero poderoso operacionalmente.</p><div class="image-container"><img src="../../../images/patrones-arquitectura/concurrencia/70_04.png" alt="UML Actor" title="Prompt: UML actor model, clean vector." /></div><h6>Prompt: UML actor model, clean vector.</h6><p>El diagrama de flujo muestra el proceso: Un cliente envía un mensaje al ActorSystem. ActorSystem enruta el mensaje al MailBox del actor correspondiente. El MailBox encola el mensaje. El Actor (cuando está disponible) desencola el mensaje, lo procesa, genera una respuesta. La respuesta se envía de vuelta al remitente o a otro actor. Este ciclo es continuo. Un ActorSystem típico ejecuta múltiples actores concurrentemente, cada uno procesando su cola de mensajes independientemente. El sistema entero es resiliente, escalable, distribuible.</p><div class="image-container"><img src="../../../images/patrones-arquitectura/concurrencia/70_05.png" alt="Flow Actor" title="Prompt: actor message flow diagram, minimal infographic." /></div><h6>Prompt: actor message flow diagram, minimal infographic.</h6></section>
+
+            <section id="no-usar" class="info-box warning-box"><h2>⚠️ Cuándo NO Usar Actor Model</h2><ul><li><strong>Sistemas con latencia crítica de microsegundos:</strong> Actor Model introduce latencia por colas de mensajes. Si necesitas sub-milisegundos, usa locks o sin concurrencia. HFT (high-frequency trading) es un ejemplo donde Actor Model no encaja.</li><li><strong>Equipo sin experiencia en programación reactiva:</strong> Pensar en actores y mensajes es un cambio paradigmático. Si el equipo está acostumbrado a locks y threads, la curva de aprendizaje es pronunciada. La productividad inicial será baja.</li><li><strong>Cálculos intensivos locales:</strong> Si tu aplicación es principalmente computacional sin I/O o comunicación (cálculos numéricos pesados), actores no agregan valor. Los locks y threads tradicionales son suficientes.</li><li><strong>Pequentos sistemas sin concurrencia significativa:</strong> Si tu aplicación es mono-threaded o baja concurrencia, la complejidad de Actor Model no se justifica.</li><li><strong>Necesidad de memoria compartida eficiente:</strong> Actores tienen estado privado. Si necesitas compartir enormes estructuras de datos (p.ej., matrices numéricas gigantes), los actores podrían no ser óptimos. Cada actor tendría copias.</li></ul></section>
+
+            <section id="ejercicio" class="info-box exercise-box"><h2>💪 Ejercicio</h2><p><strong>Diseña un sistema de procesamiento de pedidos concurrente usando Actor Model.</strong></p><p>Especificaciones: (1) Un actor OrderProcessor que recibe pedidos de múltiples clientes. (2) Cada cliente tiene un actor ClientActor que envía pedidos y recibe confirmaciones. (3) Cuando OrderProcessor recibe un pedido, valida si hay stock. (4) Si hay stock, envía un mensaje a InventoryActor para decrementar. (5) InventoryActor responde con confirmación o fallo. (6) OrderProcessor notifica al ClientActor con resultado. (7) El sistema debe manejar 1000 clientes simultáneos enviando órdenes aleatorias.</p><p>Paso 1: Define los tipos de mensajes (PlaceOrder, OrderConfirmed, CheckStock, StockUpdated, etc.).</p><p>Paso 2: Implementa OrderProcessor que reciba PlaceOrder, valide stock, comunique con InventoryActor.</p><p>Paso 3: Implementa InventoryActor que mantenga un contador de stock, responda a queries, decremente on updates.</p><p>Paso 4: Implementa ClientActor que simule enviar órdenes cada 100ms y imprima respuestas.</p><p>Paso 5: En el Main, crea un ActorSystem, 1000 ClientActors, 1 OrderProcessor, 1 InventoryActor. Ejecuta durante 10 segundos. Mide cuántos pedidos se procesaron sin errores.</p><p>Bonificación: Implementa un StatsActor que recolecte métricas de los otros actores (pedidos procesados, pedidos fallidos, latencia promedio). Demuestra que el sistema escala sin contención central.</p></section>
+
+            <section id="conclusion"><h2>Conclusión</h2><p>Actor Model es un cambio paradigmático en concurrencia. Actores aislados, mensajes asincroniscous, cero locks. Elimina contención, deadlocks, race conditions por diseño. Escala a miles de actores sin degradación. Distribuible transparentemente. Los frameworks como Akka.NET proporcionan infraestructura lista. El costo es la curva de aprendizaje: pensar en actores, no threads. Pensar en mensajes, no estado compartido.</p><p>Es la arquitectura de elección para sistemas altamente concurrentes: exchanges, plataformas de chat, sistemas de análisis, recomendadores. No es para todos los casos (latencia crítica, cálculos puros, pequeños sistemas). Pero cuando encaja, encaja perfectamente. Los próximos 10 años de software serán cada vez más concurrentes, distribuidos, escalables. Actor Model es una herramienta central para esa realidad.</p></section>
+        </article>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-column"><h4>Navegación</h4><ul class="footer-links"><li><a href="../../../index.html">Inicio</a></li><li><a href="../../../sobre-mi.html">Sobre mí</a></li><li><a href="../../../helios-nexus.html">Proyecto Helios Nexus</a></li></ul></div>
+            <div class="footer-column"><h4>Conectar</h4><div class="social-links"><a href="https://linkedin.com/in/magolo" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a></div></div>
+            <div class="footer-column footer-mission"><h4>La Misión</h4><p><strong>magolo.net</strong> documenta el camino hacia sistemas autónomos, cloud-native e inteligentes.</p><p class="mission-tech">De .NET a Kubernetes, de microservicios a agentes IA. Este blog explora arquitecturas modernas mientras construyo <a href="../../../helios-nexus.html">Helios Nexus</a>, una arquitectura de referencia evolutiva.</p><div class="tech-radar"><div class="radar-item">🔵 <strong>Adoptando:</strong> Semantic Kernel, .NET Aspire</div><div class="radar-item">🟢 <strong>Experimentando:</strong> Dapr, Temporal</div></div></div>
+        </div>
+        <div class="footer-bottom"><div class="footer-bottom-content"><p class="copyright">© 2025-2028 Marcelo González</p><p class="tech-stack">Stack: HTML5 + CSS3 → GitHub Pages</p></div></div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

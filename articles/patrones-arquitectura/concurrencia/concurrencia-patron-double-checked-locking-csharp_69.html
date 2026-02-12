@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MH6TJV68');</script>
+<!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Double-Checked Locking en C#: Guía Completa | magolo.NET</title>
+    <meta name="description" content="Double-Checked Locking en C#: inicialización segura con menor costo de bloqueo.">
+    <meta name="keywords" content="Double-Checked Locking, C#, Concurrencia">
+    <meta name="author" content="Marcelo González">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Double-Checked Locking en C#: Guía Completa">
+    <meta property="og:description" content="Sincronización eficiente para inicialización perezosa." />
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.magolo.net/articles/patrones-arquitectura/concurrencia/concurrencia-patron-double-checked-locking-csharp_69.html">
+    <meta property="og:image" content="https://www.magolo.net/images/patrones-arquitectura/concurrencia/69_01.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../articles-favicon.svg">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Double-Checked Locking en C#: Guía Completa",
+        "description": "Guía completa del patrón Double-Checked Locking con implementación en C#.",
+        "author": {"@type": "Person","name": "Marcelo González"},
+        "datePublished": "2026-02-22",
+        "dateModified": "2026-02-22",
+        "programmingLanguage": "C#",
+        "articleSection": "Concurrencia",
+        "keywords": ["Double-Checked Locking", "C#", "Concurrencia", "Lazy"]
+    }
+    </script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../style-patrones-article.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MH6TJV68"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+ 
+    <header class="article-nav-header">
+        <nav class="article-nav-content">
+            <a href="../../../index.html" class="back-link">← Volver al Blog</a>
+            <div class="article-arrows">
+                <a href="concurrencia-patron-pessimistic-locking-csharp_68.html" class="arrow-btn arrow-prev">
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    <div class="arrow-text"><span class="arrow-label">Anterior</span><span class="arrow-title">Pessimistic Locking</span></div>
+                </a>
+                <a href="concurrencia-patron-actor-model-csharp_70.html" class="arrow-btn arrow-next">
+                    <div class="arrow-text"><span class="arrow-label">Siguiente</span><span class="arrow-title">Actor Model</span></div>
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-article">
+        <header>
+            <h1>Double-Checked Locking en C#: Guía Completa</h1>
+            <div class="article-meta">
+                <span class="reading-time">⏱️ 12 min de lectura</span>
+                <div class="article-tags"><span class="article-tag">Concurrencia</span><span class="article-tag">C#</span><span class="article-tag">.NET</span></div>
+            </div>
+        </header>
+
+        <nav class="toc">
+            <h2>Tabla de Contenidos</h2>
+            <ul>
+                <li><a href="#intro">Introducción: bloquear lo mínimo</a></li>
+                <li><a href="#natural">1. Naturaleza: doble verificación</a></li>
+                <li><a href="#mundo-real">2. Mundo Real: singleton seguro</a></li>
+                <li><a href="#implementacion">3. Implementación en C#: Código Paso a Paso</a></li>
+                <li><a href="#diferencias">4. DCL vs Lazy&lt;T&gt;</a></li>
+                <li><a href="#diagrama">5. Diagrama UML</a></li>
+                <li><a href="#no-usar">⚠️ Cuándo NO Usar DCL</a></li>
+                <li><a href="#ejercicio">💪 Ejercicio</a></li>
+                <li><a href="#conclusion">Conclusión</a></li>
+            </ul>
+        </nav>
+
+        <article>
+            <section id="intro"><h2>Introducción: bloquear lo mínimo</h2><p>Double-Checked Locking (DCL) es una optimización para sincronización: bloquea solo cuando es necesario. El problema clásico: inicialización perezosa (lazy initialization) de un recurso costoso. Ejemplo: una conexión a base de datos que solo queremos crear si es necesario. Si la creamos en el constructor, costo innecesario. Si usamos inicialización perezosa normal (if (_resource == null) _resource = ...), race condition: dos threads ven null simultáneamente, ambos crean una instancia (desperdicio).</p><p>La solución típica: lock en cada acceso. if (_resource == null) => lock => if (_resource == null) => crear. Pero esto es ineficiente: la mayoría del tiempo, _resource no es null, el lock es innecesario. DCL optimiza esto: verificas sin lock primero. Si está inicializado, retornas (rápido). Si no, entonces lockeas y verificas nuevamente (double-check). Esto reduce contención dramáticamente.</p><p>La magia del patrón está en la "doble verificación". Primera verificación sin lock (rápido pero podría ser stale). Segunda verificación con lock (correcto pero caro). Si la primera pasa, ahorras el lock. Si falla, pagas el lock solo una vez (durante inicialización). Después, la primera verificación siempre pasa, sin locks.</p><p>En C#, la necesidad de DCL ha disminuido con Lazy&lt;T&gt;. Pero el patrón sigue siendo importante para entender concurrencia. Y sigue usándose en lenguajes sin Lazy incorporado (Java, C++). En .NET, es principalmente educacional. Pero si necesitas control fino, DCL es útil.</p><p>El patrón es delicado. Requiere entender memory barriers y volatility. Implementarlo incorrectamente causa bugs sutiles. El compilador podría optimizar el código de formas inesperadas. En C# moderno, Lazy&lt;T&gt; maneja todo automáticamente. Pero aprender DCL te enseña sobre memoria compartida, locks, y optimización de concurrencia.</p></section>
+            <div class="image-container"><img src="../../../images/patrones-arquitectura/concurrencia/69_01.png" alt="DCL" title="Prompt: double check marks with lock, minimal style." /></div>
+            <h6>Prompt: double check marks with lock, minimal style.</h6>
+
+            <section id="natural"><h2>1. Naturaleza: doble verificación</h2><p>Imagina una casa con una cerradura cara (lock). Cuando entras a menudo, abrir y cerrar la cerradura cada vez es tedioso. Pero si entras pocas veces, quieres asegurarte de que está cerrada. DCL es como esto: verificas si la puerta está cerrada mirando (sin tocar la cerradura). Si parece cerrada, entras sin cerrarla más. Solo si ves que está abierta, entonces la cierras (operación cara). Verificación rápida primero, acción cara solo si necesario.</p><p>Otro ejemplo: camarero en un restaurante. Si la mesa está llena, no necesita reservarla (sin lock). Verifica primero (rápido). Si está vacía, entonces la marca como reservada (operación de lock). La mayoría del tiempo, las mesas están ocupadas, verificar es suficiente. Solo ocasionalmente ocurre una reserva (lock needed). DCL es eficiente porque evita locks la mayoría del tiempo.</p><p>En programación concurrente, este patrón es natural para optimización. Primero verifica la condición (barato). Si es como esperas, continúa. Si no, paga el costo de sincronización. Es una heurística pragmática: la mayoría de los accesos son de lectura (la condición ya es verdadera), los locks se pagan raramente (durante inicialización). DCL capitaliza esta asimetría.</p><div class="image-container"><img src="../../../images/patrones-arquitectura/concurrencia/69_02.png" alt="Doble verificación" title="Prompt: person checking door twice, soft illustration." /></div><h6>Prompt: person checking door twice, soft illustration.</h6></section>
+
+            <section id="mundo-real"><h2>2. Mundo Real: singleton thread-safe con bajo overhead</h2><p>Una base de datos singleton. Conectarse es costoso (inicialización, handshake). Quieres una sola instancia compartida. Pero inicializarla siempre es desperdicio. Inicializarla perezosamente es lógico (cuando se necesite). Sin DCL, cada acceso loguea: lock => verificar => unlock. Con 1000 threads accediendo constantemente, contención severa. Con DCL, la mayoría de accesos (lectura después de inicialización) son sin lock. Solo la primer inicialización paga el lock.</p><p>Otro ejemplo: configuración de aplicación. Al iniciar, lees configuration.json. Es costoso (I/O del filesystem). Quieres leerlo una sola vez, cachearlo. Múltiples threads podrían querer leerlo simultáneamente en el startup. Sin DCL, todos compiten en locks durante startup. Con DCL, verifican si está cacheado (sin lock), si no, primero que llega loguea y lo carga. Los demás esperan brevemente (segunda verificación dentro del lock).</p><p>Conexión a API remota es otro caso. Una conexión HTTP/gRPC es un recurso costoso. Quieres reconectar solo si falla. Al principio, no hay conexión. Múltiples threads podrían iniciar simultáneamente. Sin DCL, todos tratan de conectar (desperdicio). Con DCL, solo uno conecta, los demás esperan y usan la conexión creada.</p><p>En sistemas de cache, DCL es común. Cache hit = verificación sin lock (rápido). Cache miss = lock y populate. Con millones de hits y pocos misses, DCL es dominante. Sin DCL, cada hit pagaría lock, devastating para rendimiento.</p><p>Casos de uso reales: singletons, lazy resources, cache initialization, configuración lazy. En todos, evitas locks la mayoría del tiempo (acceso a recurso ya inicializado) y pagas solo durante inicialización (raro).</p><div class="image-container"><img src="../../../images/patrones-arquitectura/concurrencia/69_03.png" alt="Singleton" title="Prompt: singleton creation flow, flat infographic." /></div><h6>Prompt: singleton creation flow, flat infographic.</h6></section>
+
+            <section id="implementacion">
+                <h2>3. Implementación en C#: Código Paso a Paso</h2>
+<p>En .NET, la implementación es simple porque el memory model es fuerte. No necesitas declarar _instance como volatile en versiones modernas (aunque es educacional hacerlo).</p>
+<pre><code class="language-csharp">public class DatabaseConnection
+{
+    private static DatabaseConnection _instance;
+    private static readonly object _lock = new();
+    
+    private DatabaseConnection() { }
+    
+    public static DatabaseConnection GetInstance()
+    {
+        // Primera verificación (sin lock)
+        if (_instance != null)
+            return _instance;
+        
+        // Si null, entra al lock
+        lock (_lock)
+        {
+            // Segunda verificación (con lock)
+            if (_instance == null)
+                _instance = new DatabaseConnection();
+        }
+        
+        return _instance;
+    }
+}
+
+// Uso
+var db1 = DatabaseConnection.GetInstance(); // Crea
+var db2 = DatabaseConnection.GetInstance(); // Retorna existente sin lock</code></pre>
+<p>La lógica: GetInstance() se llamará muchas veces. La mayoría de veces, _instance != null, retorna sin entrar al lock. Solo la primera llamada verá _instance == null, entra al lock, crea la instancia. Las siguientes cientos de llamadas pasan por la primera verificación sin lock.</p><p>La "doble verificación" es clave: (1) Verificación sin lock para optimización. (2) Verificación con lock para corrección (evita que dos threads creen instancias simultáneamente). Si dos threads ven _instance == null simultáneamente (primera verificación), ambos entran al lock. El que llega primero (dentro del lock) ve _instance == null y crea. El segundo ve _instance != null (ya creada) y retorna. Sin la segunda verificación, ambos crearían.</p><p>Otra forma moderna es usar Lazy&lt;T&gt;, que maneja todo automáticamente:</p>
+<pre><code class="language-csharp">public class DatabaseConnection
+{
+    private static readonly Lazy&lt;DatabaseConnection&gt; _instance
+        = new(() => new DatabaseConnection());
+    
+    public static DatabaseConnection GetInstance() => _instance.Value;
+}
+
+// Lazy&lt;T&gt; maneja el double-checked locking internamente</code></pre>
+<p>Con Lazy&lt;T&gt;, no necesitas implementar DCL manualmente. Lazy&lt;T&gt;.Value garantiza inicialización thread-safe con bajo overhead. Esta es la forma preferida en .NET moderno.</p><p>Memoria volátil: en versiones antiguas de .NET, la verificación de _instance podría ser optimizada por el compilador. Declararla volatile previene esto: `private static volatile DatabaseConnection _instance;`. En .NET Framework 2.0+, los guarantees de memory barriers son suficientes, pero volatile documenta la intención.</p>
+            </section>
+
+            <section id="diferencias"><h2>4. DCL vs Lazy&lt;T&gt;: comparación práctica</h2><p>Históricamente, DCL fue necesario porque los lenguajes no ofrecían sincronización integrada. Java, C++, incluso C# antiguo necesitaban DCL manual. Era la forma estándar de hacer lazy initialization thread-safe.</p><p>Con Lazy&lt;T&gt; en .NET, DCL manual es raramente necesario. Lazy&lt;T&gt; ofrece: (1) Lazy initialization (crea solo cuando se accede). (2) Thread-safety (usa internamente DCL o similar). (3) Simplicidad (una línea vs. 5 líneas de DCL). El código es más limpio, menos propenso a errores.</p><p>Comparación: DCL requiere entender locks, memory barriers, volatility. Un paso en falso y el código es incorrecto. Lazy&lt;T&gt; abstraer todo. Costo de rendimiento es similar, pero Lazy&lt;T&gt; es más seguro y legible.</p><p>Cuándo usar DCL en lugar de Lazy&lt;T&gt;: (1) Compatibilidad con .NET Framework antiguo (aunque esto es raro hoy). (2) Control fino: quieres manejar excepciones durante inicialización de formas específicas. Lazy&lt;T&gt; te permite pasar un Func&lt;T&gt;, así que puedes controlar. (3) Educacional: aprender concurrencia requiere entender DCL.</p><p>Rendimiento: DCL y Lazy&lt;T&gt; son prácticamente idénticos. Ambos evitan locks después de inicialización. La diferencia es microsópica. Usa Lazy&lt;T&gt; por simplici dad.</p><p>Equivalencia: DCL manual es a Lazy&lt;T&gt; lo que usar FileStream es a usar using (FileStream). Ambos funcionan, pero uno es claramente preferible. En código moderno, Lazy&lt;T&gt; dominará. DCL es un patrón histórico, aún relevante para entender, pero menos usado en práctica.</p></section>
+
+            <section id="diagrama"><h2>5. Diagrama UML</h2><p>El patrón DCL es más un algoritmo que una estructura. No hay múltiples clases involucrads, por eso el UML es simple. Una clase con un método estático GetInstance() que retorna una instancia lazily. El método mantiene estado privado (la instancia) y un lock para sincronización. Las relaciones: la clase depende de sí misma (singleton), depende de un lock object.</p><div class="image-container"><img src="../../../images/patrones-arquitectura/concurrencia/69_04.png" alt="UML DCL" title="Prompt: UML double-checked locking, clean vector." /></div><h6>Prompt: UML double-checked locking, clean vector.</h6><p>El diagrama de flujo es más revelador. Flujo: inicio => verificar _instance sin lock => si null, entrar lock => verificar de nuevo con lock => si aún null, crear => salir lock => retornar. Este flujo muestra dónde se optimiza: la mayoría de invocaciones no llegan al lock (primera verificación exitosa). Solo la primer invocación pasa los locks. Las 1000 invocaciones subsecuentes evitan todo trabajo sincrónico.</p><div class="image-container"><img src="../../../images/patrones-arquitectura/concurrencia/69_05.png" alt="Flow DCL" title="Prompt: DCL flow diagram, minimal infographic." /></div><h6>Prompt: DCL flow diagram, minimal infographic.</h6></section>
+
+            <section id="no-usar" class="info-box warning-box"><h2>⚠️ Cuándo NO Usar DCL</h2><ul><li><strong>Usa Lazy&lt;T&gt; en su lugar:</strong> Si .NET está disponible (que lo está si estás escribiendo C#), Lazy&lt;T&gt; es siempre preferible. Más simple, más seguro, menos propenso a errores.</li><li><strong>Si el recurso es cheap de crear:</strong> Si la inicialización es casi gratuita (p.ej., crear un int, una lista vacía), lazy initialization no agrega valor. El costo de DCL supera el beneficio.</li><li><strong>Si puedes inicializar en el constructor:</strong> Eager initialization (crear siempre) es válida. Si el recurso no es prohibitivamente costoso, mejor crear durante startup y olvidarse de la sincronización.</li><li><strong>Código que no es critico:</strong> Si el código no está en un path de alto rendimiento, la simplicidad de Lazy&lt;T&gt; es claramente superior. La optimización de evitar locks es insignificante si el código se ejecuta pocas veces.</li><li><strong>Múltiple niveles de inicialización:</strong> Si necesitas inizializar A, que requiere B, que requiere C (dependencias en cadena), DCL se vuelve complejo. Considera un factory or builder pattern en su lugar.</li></ul></section>
+
+            <section id="ejercicio" class="info-box exercise-box"><h2>💪 Ejercicio</h2><p><strong>Implementa un Connection Pool thread-safe usando DCL.</strong></p><p>Especificaciones: (1) Una clase ConnectionPool que mantiene una lista de conexiones reutilizables. (2) El constructor recibe un maxConnections (p.ej., 5). (3) GetConnection() retorna una conexión disponible o crea una nueva si hay espacio. (4) ReturnConnection(conn) devuelve una conexión al pool. (5) Usa DCL para sincronizar acceso al pool, evitando locks en cada GetConnection() si hay conexiones disponibles. (6) Simula 100 threads accediendo simultáneamente. Cada thread: get connection, usa 10ms, return. Mide cuántos locks ocurrieron vs. cuántos accesos (debería ser mucho más accesos que locks).</p><p>Paso 1: Define Message types: GetConnection, ReturnConnection, ConnectionAvailable, NoConnection.</p><p>Paso 2: Implementa ConnectionPool con lista privada de conexiones. Sincronización: primera verificación (hay disponibles?) sin lock. Si hay, retorna. Si no, entra al lock, verifica de nuevo, crea o espera.</p><p>Paso 3: Crea 100 threads simularlos clientes. Cada uno GetConnection (5ms), ReturnConnection.</p><p>Paso 4: Loguea cuándo ocurren locks. Después de 10 segundos, imprime estadísticas.</p><p>Bonificación: Compara el rendimiento con versión que lockea en cada acceso (sin DCL). Mide latencia. La versión DCL debería ser notablemente más rápida.</p></section>
+
+            <section id="conclusion"><h2>Conclusión</h2><p>Double-Checked Locking es un patrón de optimización clásico. Reduce overhead de sincronización evitando locks cuando ya está inicializado. Verifica sin lock, luego con lock. Elegante y efectivo. Pero en C# moderno, Lazy&lt;T&gt; es preferible: más simple, igual performance, sin riesgo de error. DCL sigue siendo importante para entender concurrencia y memory barriers. Y sigue usado en lenguajes sin Lazy. Es un pattern histórico que continúa relevante.</p></section>
+        </article>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-column"><h4>Navegación</h4><ul class="footer-links"><li><a href="../../../index.html">Inicio</a></li><li><a href="../../../sobre-mi.html">Sobre mí</a></li><li><a href="../../../helios-nexus.html">Proyecto Helios Nexus</a></li></ul></div>
+            <div class="footer-column"><h4>Conectar</h4><div class="social-links"><a href="https://linkedin.com/in/magolo" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a></div></div>
+            <div class="footer-column footer-mission"><h4>La Misión</h4><p><strong>magolo.net</strong> documenta el camino hacia sistemas autónomos, cloud-native e inteligentes.</p><p class="mission-tech">De .NET a Kubernetes, de microservicios a agentes IA. Este blog explora arquitecturas modernas mientras construyo <a href="../../../helios-nexus.html">Helios Nexus</a>, una arquitectura de referencia evolutiva.</p><div class="tech-radar"><div class="radar-item">🔵 <strong>Adoptando:</strong> Semantic Kernel, .NET Aspire</div><div class="radar-item">🟢 <strong>Experimentando:</strong> Dapr, Temporal</div></div></div>
+        </div>
+        <div class="footer-bottom"><div class="footer-bottom-content"><p class="copyright">© 2025-2028 Marcelo González</p><p class="tech-stack">Stack: HTML5 + CSS3 → GitHub Pages</p></div></div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

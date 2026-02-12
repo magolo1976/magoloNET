@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MH6TJV68');</script>
+<!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Pessimistic Locking en C#: Guía Completa | magolo.NET</title>
+    <meta name="description" content="Pessimistic Locking en C#: bloquea recursos para evitar conflictos de concurrencia.">
+    <meta name="keywords" content="Pessimistic Locking, C#, Concurrencia">
+    <meta name="author" content="Marcelo González">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Pessimistic Locking en C#: Guía Completa">
+    <meta property="og:description" content="Bloqueos preventivos para consistencia fuerte." />
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.magolo.net/articles/patrones-arquitectura/concurrencia/concurrencia-patron-pessimistic-locking-csharp_68.html">
+    <meta property="og:image" content="https://www.magolo.net/images/patrones-arquitectura/concurrencia/68_01.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../articles-favicon.svg">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Pessimistic Locking en C#: Guía Completa",
+        "description": "Guía completa del patrón Pessimistic Locking con implementación en C#.",
+        "author": {"@type": "Person","name": "Marcelo González"},
+        "datePublished": "2026-02-21",
+        "dateModified": "2026-02-21",
+        "programmingLanguage": "C#",
+        "articleSection": "Concurrencia",
+        "keywords": ["Pessimistic Locking", "C#", "Concurrencia", "Locks"]
+    }
+    </script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../style-patrones-article.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MH6TJV68"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+ 
+    <header class="article-nav-header">
+        <nav class="article-nav-content">
+            <a href="../../../index.html" class="back-link">← Volver al Blog</a>
+            <div class="article-arrows">
+                <a href="concurrencia-patron-optimistic-locking-csharp_67.html" class="arrow-btn arrow-prev">
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    <div class="arrow-text"><span class="arrow-label">Anterior</span><span class="arrow-title">Optimistic Locking</span></div>
+                </a>
+                <a href="concurrencia-patron-double-checked-locking-csharp_69.html" class="arrow-btn arrow-next">
+                    <div class="arrow-text"><span class="arrow-label">Siguiente</span><span class="arrow-title">Double-Checked Locking</span></div>
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-article">
+        <header>
+            <h1>Pessimistic Locking en C#: Guía Completa</h1>
+            <div class="article-meta">
+                <span class="reading-time">⏱️ 14 min de lectura</span>
+                <div class="article-tags"><span class="article-tag">Concurrencia</span><span class="article-tag">C#</span><span class="article-tag">.NET</span></div>
+            </div>
+        </header>
+
+        <nav class="toc">
+            <h2>Tabla de Contenidos</h2>
+            <ul>
+                <li><a href="#intro">Introducción: bloquear para evitar conflictos</a></li>
+                <li><a href="#natural">1. Naturaleza: turnos explícitos</a></li>
+                <li><a href="#mundo-real">2. Mundo Real: inventario crítico</a></li>
+                <li><a href="#implementacion">3. Implementación en C#: Código Paso a Paso</a></li>
+                <li><a href="#diferencias">4. Pessimistic vs Optimistic</a></li>
+                <li><a href="#diagrama">5. Diagrama UML</a></li>
+                <li><a href="#no-usar">⚠️ Cuándo NO Usar Pessimistic Locking</a></li>
+                <li><a href="#ejercicio">💪 Ejercicio</a></li>
+                <li><a href="#conclusion">Conclusión</a></li>
+            </ul>
+        </nav>
+
+        <article>
+            <section id="intro"><h2>Introducción: bloquear para evitar conflictos</h2><p>Pessimistic Locking es una estrategia defensiva: asume que la contención es alta, así que bloquea recursos de antemano. Si dos transacciones necesitan acceder a los mismos datos, la primera los lockea, la segunda espera. Simple, predecible, evita conflictos. No hay surpresas de race conditions; el lock garantiza exclusión mutua.</p><p>El nombre "pessimistic" (pesimista) viene de la filosofía: asume lo peor (conflicto es probable), así que protege. El opuesto es optimistic locking: asume lo mejor (conflicto es raro), procede sin locks, verifica al final. Pessimistic es más conservador.</p><p>En bases de datos, pessimistic locking es FOR UPDATE: SELECT ... FROM table WHERE id=5 FOR UPDATE. Lockea la fila antes de actualizarla. Otro usuario debe esperar. Transacción 1 actualiza, commitea, libera el lock. Transacción 2 continúa. Garantizado: sin race conditions, sin conflictos.</p><p>En memoria (C#), es similar: lock (obj) { ... }. El lock bloquea acceso a obj. Crítico: dentro del lock, eres el único accediendo obj. Afuera, múltiples threads compiten. Pessimistic = siempre lock.</p><p>Ventajas: simplicidad conceptual, garantía de corrección, predecible. Desventajas: overhead de locks (contención), posible deadlock si no cuidado con orden de acquisition, posible livelocks. Para sistemas con alta contención, pessimistic es a menudo el único práctico. Para baja contención, optimistic es más eficiente.</p></section>
+            <div class="image-container"><img src="../../../images/patrones-arquitectura/concurrencia/68_01.png" alt="Pessimistic Locking" title="Prompt: padlock on data row, minimal style." /></div>
+            <h6>Prompt: padlock on data row, minimal style.</h6>
+
+            <section id="natural"><h2>1. Naturaleza: turnos explícitos</h2><p>Imagina un restaurante con un baño compartido. Para evitar conflictos, requiere reserva previa. Pides permiso (lock), usas exclusivamente, liberas (unlock). Si está ocupado, esperas. Pessimistic: bloquea antes de usar. Es ordenado, justo, predecible. Las colas de un banco funcionan así: turno, servido exclusivamente, siguiente. Naturaleza: cuando los recursos son valiosos y la contención probable, reservar es lógico. Evita caos, garantiza orden. En vida real vemos esto en consultorios, salas de reunión, parqueos. Predictibilidad tiene un costo (espera) pero evita sorpresas (conflictos). Pessimistic es conservador: "asumo que otros quieren el recurso, así que lo reservo primero".</p><div class="image-container"><img src="../../../images/patrones-arquitectura/concurrencia/68_02.png" alt="Semáforo" title="Prompt: one-lane bridge with traffic light, soft illustration." /></div><h6>Prompt: one-lane bridge with traffic light, soft illustration.</h6></section>
+
+            <section id="mundo-real"><h2>2. Mundo Real: inventario crítico e-commerce</h2><p>Una tienda online vende un producto popular. 10000 pedidos/segundo durante black friday. Stock inicial: 1000. Cada pedido decrementa stock. Sin pessimistic locking, dos pedidos simultáneos podrían decrementar stock por separado, resultando en sobreventa (vender 1001 unidades de 1000 disponibles). Desastro. Con pessimistic locking: cada pedido que quiere actualizar stock, primero lockea la fila de stock. BEGIN TRANSACTION; SELECT * FROM products WHERE id=5 FOR UPDATE; luego actualiza stock = stock - 1. Otro pedido simultáneo espera el lock. Primer pedido commitea, libera, segundo continúa. Garantizado: sin sobreventa. La consistencia es crítica en e-commerce. El costo: contención en el lock de stock. Múltiples transacciones esperan. Pero la corrección es no-negociable. Con optimistic locking, descubrirías sobreventa al final (demasiado tarde). Casos reales: mercados de bolsa (prohibido sobrevender acciones), bancos (prohibido sobregiro), tiendas online (prohibido oversell). Todos usan pessimistic locking para datos críticos.</p><div class="image-container"><img src="../../../images/patrones-arquitectura/concurrencia/68_03.png" alt="Inventario" title="Prompt: inventory lock, flat infographic." /></div><h6>Prompt: inventory lock, flat infographic.</h6></section>
+
+            <section id="implementacion">
+                <h2>3. Implementación en C#: Código Paso a Paso</h2>
+<p>En Entity Framework, pessimistic locking se implementa con FOR UPDATE (algunos providers) o equivalentes.</p>
+<pre><code class="language-csharp">using var tx = db.Database.BeginTransaction();
+try
+{
+    // SELECT ... FOR UPDATE (bloquea la fila)
+    var item = db.Items
+        .FromSqlInterpolated($"SELECT * FROM Items WHERE Id = {id} FOR UPDATE")
+        .AsNoTracking()
+        .FirstOrDefault();
+    
+    if (item != null && item.Stock > 0)
+    {
+        item.Stock -= 1;
+        db.Items.Update(item);
+        db.SaveChanges();
+    }
+    
+    tx.Commit();
+}
+catch
+{
+    tx.Rollback();
+    throw;
+}</code></pre>
+<p>La clave: FOR UPDATE lockea la fila. Si otro usuario intenta actualizar la misma fila, espera. Cuando comiteas, liberas el lock. En memoria (lock statement), es similar:</p>
+<pre><code class="language-csharp">private static readonly object _lock = new();
+
+public void UpdateInventory(int productId)
+{
+    lock (_lock)  // Bloquea acceso
+    {
+        var item = _inventory[productId];
+        if (item.Stock > 0)
+            item.Stock -= 1;
+    }  // Libera al salir
+}</code></pre>
+<p>El lock garantiza exclusión mutua. Mientras un thread está dentro del lock, otros esperan. Costo: contención. Pero garantía: sin race conditions. En bases de datos, deadlock es un riesgo. Siempre acquire locks en el mismo orden para evitar circular dependencies. En aplicación, usa ConcurrentDictionary o ReaderWriterLockSlim para granularidad fina si necesario.</p>
+            </section>
+
+            <section id="diferencias"><h2>4. Pessimistic vs Optimistic: estrategias opuestas</h2><p>Pessimistic asume contención probable. Bloquea preemptivamente. Caro cuando contención es baja (muchos locks innecesarios). Pero barato cuando contención es alta (evita retries). Optimistic asume contención rara. Procede sin locks, verifica al final. Barato cuando contención es baja (sin locks). Pero caro cuando contención es alta (muchos retries). La elección depende del patrón de contención esperado. E-commerce inventario: alta contención => pessimistic. Blog comments: baja contención => optimistic. Regla heurística: >30% conflictos esperados => pessimistic. <10% => optimistic. En medio, depende del contexto. Pessimistic proporciona garantía fuerte: "mientras estés dentro del lock, eres el único". Optimistic proporciona garantía débil: "si no hay conflicto, perfecto; si hay, retres e intenta de nuevo". Para datos críticos (dinero, inventario), pessimistic. Para datos no-críticos (preferencias, vistas), optimistic.</p></section>
+
+            <section id="diagrama"><h2>5. Diagrama UML</h2><p>Pessimistic locking no tiene estructura UML compleja. Es un patrón de comportamiento: la forma en que se ejecutan transacciones. Un Transaction objeto que comienza, lockea recursos, opera, commitea/rollback. Los locks son primitivos del OS (mutex, semáforo). El flujo: BEGIN => LOCK (esperar si necesario) => READ/MODIFY => COMMIT (release lock). El diagrama muestra estados: locked vs unlocked. Transiciones: acquire lock => locked, release => unlocked. Si alguien intenta acquire mientras locked, entra a wait queue.</p><div class="image-container"><img src="../../../images/patrones-arquitectura/concurrencia/68_04.png" alt="UML Pessimistic" title="Prompt: UML pessimistic locking, clean vector." /></div><h6>Prompt: UML pessimistic locking, clean vector.</h6><p>El flujo de tiempo muestra dos transacciones. T1 inicia, lockea recurso. T2 intenta, espera. T1 modifica, commitea, libera. T2 continúa. Secuencial, sin concurrencia real, pero correcto. Este es el tradeoff: correctness vs performance.</p><div class="image-container"><img src="../../../images/patrones-arquitectura/concurrencia/68_05.png" alt="Flow Pessimistic" title="Prompt: pessimistic locking flow diagram, minimal infographic." /></div><h6>Prompt: pessimistic locking flow diagram, minimal infographic.</h6></section>
+
+            <section id="no-usar" class="info-box warning-box"><h2>⚠️ Cuándo NO Usar Pessimistic Locking</h2><ul><li><strong>Contención baja:</strong> Si conflictos son raros (<5%), overhead de locks supera beneficio. Usa optimistic.</li><li><strong>Latencia crítica:</strong> Si necesitas <10ms, esperar locks es prohibitivo. Usa optimistic o sin sincronización.</li><li><strong>Transacciones largas:</strong> Si una transacción toma 1 segundo, hold locks 1 segundo. Otros esperan. Redesigna para transacciones cortas.</li><li><strong>Jerarquía de locks desconocida:</strong> Riesgo de deadlock. Si no puedes garantizar orden de acquisition, evita pessimistic complejo.</li><li><strong>Sistema distribuido puro:</strong> Locks globales son difíciles en red distribuida. Usa quórum, consensus, optimistic.</li></ul></section>
+
+            <section id="ejercicio" class="info-box exercise-box"><h2>💪 Ejercicio</h2><p><strong>Implementa un sistema de reservas de asientos con pessimistic locking.</strong></p><p>Especificaciones: (1) Base de datos con tabla Seats (id, seatNumber, status:available/reserved). (2) 100 asientos. (3) Múltiples usuarios quieren reservar simultáneamente. (4) Usa pessimistic locking para garantizar sin overbooking. (5) Simula 50 threads, cada uno intenta reservar aleatoriamente. (6) Mide cuántos success, cuántos fallaron, latencia de lock.</p></section>
+
+            <section id="conclusion"><h2>Conclusión</h2><p>Pessimistic Locking sacrifica rendimiento por consistencia. Ideal para datos críticos, contención alta. Evita sobreventa, inconsistencias, violaciones de reglas de negocio. Costo: espera, deadlock potencial. Beneficio: garantía fuerte. En sistemas financieros, e-commerce, recursos críticos, pessimistic es la elección correcta. Es conservador pero confiable.</p></section>
+        </article>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-column"><h4>Navegación</h4><ul class="footer-links"><li><a href="../../../index.html">Inicio</a></li><li><a href="../../../sobre-mi.html">Sobre mí</a></li><li><a href="../../../helios-nexus.html">Proyecto Helios Nexus</a></li></ul></div>
+            <div class="footer-column"><h4>Conectar</h4><div class="social-links"><a href="https://linkedin.com/in/magolo" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a></div></div>
+            <div class="footer-column footer-mission"><h4>La Misión</h4><p><strong>magolo.net</strong> documenta el camino hacia sistemas autónomos, cloud-native e inteligentes.</p><p class="mission-tech">De .NET a Kubernetes, de microservicios a agentes IA. Este blog explora arquitecturas modernas mientras construyo <a href="../../../helios-nexus.html">Helios Nexus</a>, una arquitectura de referencia evolutiva.</p><div class="tech-radar"><div class="radar-item">🔵 <strong>Adoptando:</strong> Semantic Kernel, .NET Aspire</div><div class="radar-item">🟢 <strong>Experimentando:</strong> Dapr, Temporal</div></div></div>
+        </div>
+        <div class="footer-bottom"><div class="footer-bottom-content"><p class="copyright">© 2025-2028 Marcelo González</p><p class="tech-stack">Stack: HTML5 + CSS3 → GitHub Pages</p></div></div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
