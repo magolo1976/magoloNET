@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IA Portfolio Optimizer - Markowitz v3</title>
+    <title>Portfolio Optimizer - Markowitz v3</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -260,9 +260,6 @@ function buildStockStats(textAnalisis) {
     const priceRow = getRowByAliases(rowMap, ['price', 'precio', 'close', 'last', 'precios']);
     const muRow = getRowByAliases(rowMap, ['mu', 'media', 'mean', 'retorno', 'return', 'expectedreturn']);
 
-    const missingPrice = [];
-    const missingMu = [];
-
     stockStats = finalTickers.map(t => {
         const row = rowMap[normalizeHeader(t)] || null;
         const headerTicker = findHeaderByTicker(headers, t);
@@ -285,9 +282,6 @@ function buildStockStats(textAnalisis) {
 
         const vol = row && volKey ? toNumber(row[volKey]) : 0;
 
-        if (!Number.isFinite(price)) missingPrice.push(t);
-        if (!Number.isFinite(mu)) missingMu.push(t);
-
         return {
             ticker: t,
             price,
@@ -301,14 +295,7 @@ function buildStockStats(textAnalisis) {
                 return 0;
             })
         };
-    }).filter(s => s.ticker && Number.isFinite(s.price) && Number.isFinite(s.mu));
-
-    if (missingPrice.length || missingMu.length) {
-        const parts = [];
-        if (missingPrice.length) parts.push(`sin precio: ${missingPrice.join(', ')}`);
-        if (missingMu.length) parts.push(`sin retorno(mu): ${missingMu.join(', ')}`);
-        throw new Error(`Faltan datos obligatorios en Análisis (${parts.join(' | ')}). Añade columnas price/mu o filas PRICE/MU.`);
-    }
+    }).filter(s => s.ticker);
 
     if (!stockStats.length) {
         throw new Error('No se pudieron construir activos válidos desde el CSV de análisis.');
