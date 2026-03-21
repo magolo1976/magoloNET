@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio Optimizer - Markowitz v3</title>
+    <title>BKI Portfolio</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -44,8 +44,7 @@
 
 <div class="container">
     <div class="header">
-        <h1>Portfolio Optimizer</h1>
-        <p>Modelo de Markowitz con Matriz de Covarianza v3</p>
+        <h1>BKI Portfolio</h1>
     </div>
 
     <div class="controls">
@@ -70,13 +69,13 @@
     </div>
     <div id="charts-container" style="display:none; margin-top:20px;">
         <div class="chart-card">
-            <p class="chart-title">Evolución histórica de acciones recomendadas</p>
+            <p class="chart-title">Evolución histórica de acciones</p>
             <div class="chart-wrapper">
                 <canvas id="assets-chart"></canvas>
             </div>
         </div>
         <div class="chart-card">
-            <p class="chart-title">Evolución histórica de la cartera recomendada</p>
+            <p class="chart-title">Evolución histórica de la cartera</p>
             <div class="chart-wrapper">
                 <canvas id="portfolio-chart"></canvas>
             </div>
@@ -117,6 +116,14 @@ function isDateHeader(value) {
 
 function sortDateLabels(labels) {
     return [...labels].sort((a, b) => parseDateLabel(a) - parseDateLabel(b));
+}
+
+function formatMonthYearLabel(value) {
+    const d = parseDateLabel(value);
+    if (!d) return value;
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${mm}/${yyyy}`;
 }
 
 function parseCSV(text) {
@@ -672,7 +679,15 @@ function renderCharts(activeItems) {
             },
             scales: {
                 x: {
-                    ticks: { autoSkip: true, maxTicksLimit: 12, maxRotation: 0 }
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 12,
+                        maxRotation: 0,
+                        callback: function(value) {
+                            const raw = this.getLabelForValue(value);
+                            return formatMonthYearLabel(raw);
+                        }
+                    }
                 },
                 y: {
                     title: { display: true, text: 'Índice base 100' }
@@ -705,7 +720,15 @@ function renderCharts(activeItems) {
             },
             scales: {
                 x: {
-                    ticks: { autoSkip: true, maxTicksLimit: 12, maxRotation: 0 }
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 12,
+                        maxRotation: 0,
+                        callback: function(value) {
+                            const raw = this.getLabelForValue(value);
+                            return formatMonthYearLabel(raw);
+                        }
+                    }
                 },
                 y: {
                     title: { display: true, text: 'Valor ($)' }
