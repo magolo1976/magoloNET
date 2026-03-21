@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IA Portfolio Optimizer - Markowitz v3</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg: #f8fafc; --card: #ffffff; --text: #1e293b;
@@ -27,6 +28,8 @@
         .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 20px; }
         .stock-card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; animation: slideUp 0.4s ease-out forwards; }
         .summary-card { background: #1e293b; color: white; padding: 25px; border-radius: 16px; margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; }
+        .chart-card { background: var(--card); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-top: 16px; }
+        .chart-title { margin: 0 0 10px 0; font-size: 0.95rem; font-weight: 700; }
         
         .ticker { font-weight: 800; font-size: 1.2rem; color: var(--accent); }
         .qty { font-size: 0.85rem; color: #64748b; }
@@ -64,13 +67,27 @@
     <div id="results-container" class="results-grid">
         <div class="loading">Cargando datos estadísticos de Google Sheets...</div>
     </div>
+    <div id="charts-container" style="display:none; margin-top:20px;">
+        <div class="chart-card">
+            <p class="chart-title">Evolución histórica de acciones recomendadas</p>
+            <canvas id="assets-chart" height="120"></canvas>
+        </div>
+        <div class="chart-card">
+            <p class="chart-title">Evolución histórica de la cartera recomendada</p>
+            <canvas id="portfolio-chart" height="120"></canvas>
+        </div>
+    </div>
 </div>
 
 <script>
 // --- CONFIGURACIÓN DE URLs ---
+const URL_DATOS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRsnmjygWG6TxoCh01ThLVM5YDD5NOQnMkBgMHxVqc9MF8d2fn1J7LCUyItMoZ-BoGfL5iU0Dw2yLWR/pub?gid=2022586956&single=true&output=csv';
 const URL_ANALISIS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRsnmjygWG6TxoCh01ThLVM5YDD5NOQnMkBgMHxVqc9MF8d2fn1J7LCUyItMoZ-BoGfL5iU0Dw2yLWR/pub?gid=459208884&single=true&output=csv';
 
 let stockStats = []; // Ticker, Media, Vol, CovMatrix
+let historicalByTicker = {}; // { TICKER: [ {date, price} ] }
+let assetsChart = null;
+let portfolioChart = null;
 
 function normalizeHeader(h) {
     return String(h || '').trim().toLowerCase()
@@ -170,6 +187,29 @@ function pickFirstKey(headers, aliases) {
     return null;
 }
 
+function findHeaderByTicker(headers, ticker) {
+    return headers.find(h => normalizeHeader(h) === normalizeHeader(ticker)) || null;
+}
+
+function getRowByAliases(rowMap, aliases) {
+    for (const a of aliases) {
+        const row = rowMap[normalizeHeader(a)];
+        if (row) return row;
+    }
+    return null;
+}
+
+function isMetaRowLabel(label) {
+    const n = normalizeHeader(label);
+    const meta = [
+        'price', 'precio', 'close', 'last', 'precios',
+        'mu', 'media', 'mean', 'retorno', 'return', 'expectedreturn',
+        'vol', 'volatilidad', 'std', 'sigma',
+        'ticker', 'symbol', 'activo', 'asset'
+    ];
+    return meta.includes(n);
+}
+
 function buildStockStats(textAnalisis) {
     const analisis = parseCSV(textAnalisis);
 
@@ -192,7 +232,13 @@ function buildStockStats(textAnalisis) {
     }
 
     const tickers = headers.filter(h => rowTickers.some(t => normalizeHeader(t) === normalizeHeader(h)));
-    const finalTickers = tickers.length ? tickers : rowTickers;
+    const finalTickers = (tickers.length ? tickers : rowTickers)
+        .filter(t => !isMetaRowLabel(t));
+
+    if (!finalTickers.length) {
+        throw new Error('No se pudieron identificar tickers válidos en el CSV de análisis.');
+    }
+
     const covByTicker = {};
 
     const rowMap = {};
@@ -210,14 +256,36 @@ function buildStockStats(textAnalisis) {
         }
     }
 
+    const priceRow = getRowByAliases(rowMap, ['price', 'precio', 'close', 'last', 'precios']);
+    const muRow = getRowByAliases(rowMap, ['mu', 'media', 'mean', 'retorno', 'return', 'expectedreturn']);
+
+    const missingPrice = [];
+    const missingMu = [];
+
     stockStats = finalTickers.map(t => {
         const row = rowMap[normalizeHeader(t)] || null;
-        let price = row && priceKey ? toNumber(row[priceKey]) : NaN;
-        let mu = row && muKey ? toNumber(row[muKey]) : NaN;
+        const headerTicker = findHeaderByTicker(headers, t);
+
+        let price = NaN;
+        if (row && priceKey) {
+            price = toNumber(row[priceKey]);
+        }
+        if (!Number.isFinite(price) && priceRow && headerTicker) {
+            price = toNumber(priceRow[headerTicker]);
+        }
+
+        let mu = NaN;
+        if (row && muKey) {
+            mu = toNumber(row[muKey]);
+        }
+        if (!Number.isFinite(mu) && muRow && headerTicker) {
+            mu = toNumber(muRow[headerTicker]);
+        }
+
         const vol = row && volKey ? toNumber(row[volKey]) : 0;
 
-        if (!Number.isFinite(price)) price = 1.0;
-        if (!Number.isFinite(mu)) mu = 0.0;
+        if (!Number.isFinite(price)) missingPrice.push(t);
+        if (!Number.isFinite(mu)) missingMu.push(t);
 
         return {
             ticker: t,
@@ -234,8 +302,93 @@ function buildStockStats(textAnalisis) {
         };
     }).filter(s => s.ticker && Number.isFinite(s.price) && Number.isFinite(s.mu));
 
+    if (missingPrice.length || missingMu.length) {
+        const parts = [];
+        if (missingPrice.length) parts.push(`sin precio: ${missingPrice.join(', ')}`);
+        if (missingMu.length) parts.push(`sin retorno(mu): ${missingMu.join(', ')}`);
+        throw new Error(`Faltan datos obligatorios en Análisis (${parts.join(' | ')}). Añade columnas price/mu o filas PRICE/MU.`);
+    }
+
     if (!stockStats.length) {
         throw new Error('No se pudieron construir activos válidos desde el CSV de análisis.');
+    }
+}
+
+function buildStatsFromDatos(textDatos) {
+    const datos = parseCSV(textDatos);
+    if (!datos.records.length) {
+        throw new Error('CSV de datos vacío o inválido.');
+    }
+
+    const headers = datos.headers;
+    const tickerKey = pickFirstKey(headers, ['ticker', 'symbol', 'activo', 'asset']);
+    const priceKey = pickFirstKey(headers, ['price', 'precio', 'close', 'last']);
+    const muKey = pickFirstKey(headers, ['mu', 'media', 'mean', 'retorno', 'return', 'expectedreturn']);
+
+    const mapPrice = {};
+    const mapMu = {};
+
+    if (tickerKey && priceKey && muKey) {
+        for (const r of datos.records) {
+            const t = String(r[tickerKey] || '').trim();
+            if (!t) continue;
+            const p = toNumber(r[priceKey]);
+            const m = toNumber(r[muKey]);
+            if (Number.isFinite(p)) mapPrice[normalizeHeader(t)] = p;
+            if (Number.isFinite(m)) mapMu[normalizeHeader(t)] = m;
+        }
+    }
+
+    return { mapPrice, mapMu, datos };
+}
+
+function buildHistoricalFromDatos(datosCsv, tickers) {
+    const datos = datosCsv.records ? datosCsv : parseCSV(datosCsv);
+    const headers = datos.headers;
+    if (!headers.length || !datos.records.length) return {};
+
+    const dateKey = pickFirstKey(headers, ['date', 'fecha', 'time', 'datetime', 'dia']);
+    if (!dateKey) return {};
+
+    const out = {};
+    for (const t of tickers) out[t] = [];
+
+    const tickerHeaderMap = {};
+    for (const t of tickers) {
+        const h = findHeaderByTicker(headers, t);
+        if (h) tickerHeaderMap[t] = h;
+    }
+
+    for (const row of datos.records) {
+        const date = String(row[dateKey] || '').trim();
+        if (!date) continue;
+
+        for (const t of tickers) {
+            const h = tickerHeaderMap[t];
+            if (!h) continue;
+            const p = toNumber(row[h]);
+            if (!Number.isFinite(p)) continue;
+            out[t].push({ date, price: p });
+        }
+    }
+
+    return out;
+}
+
+function mergeStatsWithDatos(stats, datosInfo) {
+    const missing = [];
+    for (const s of stats) {
+        const nk = normalizeHeader(s.ticker);
+        const p = datosInfo.mapPrice[nk];
+        const m = datosInfo.mapMu[nk];
+        if (Number.isFinite(p)) s.price = p;
+        if (Number.isFinite(m)) s.mu = m;
+        if (!Number.isFinite(s.price) || !Number.isFinite(s.mu)) {
+            missing.push(s.ticker);
+        }
+    }
+    if (missing.length) {
+        throw new Error(`Faltan precio/mu para: ${missing.join(', ')}. Revisa hoja Datos.`);
     }
 }
 
@@ -262,9 +415,16 @@ async function fetchCsvWithFallback(url) {
 
 async function loadData() {
     try {
-        const textAnalisis = await fetchCsvWithFallback(URL_ANALISIS);
+        const [textDatos, textAnalisis] = await Promise.all([
+            fetchCsvWithFallback(URL_DATOS),
+            fetchCsvWithFallback(URL_ANALISIS)
+        ]);
 
         buildStockStats(textAnalisis);
+        const datosInfo = buildStatsFromDatos(textDatos);
+        mergeStatsWithDatos(stockStats, datosInfo);
+        historicalByTicker = buildHistoricalFromDatos(datosInfo.datos, stockStats.map(s => s.ticker));
+
         console.log("Datos cargados correctamente", stockStats.length);
         document.getElementById('results-container').innerHTML =
             `<div class="loading" style="color:#10b981"><b>Datos cargados:</b> ${stockStats.length} activos listos para optimizar.</div>`;
@@ -279,6 +439,7 @@ async function loadData() {
                 <i>1) Publicar la hoja en Google (acceso público),</i><br>
                 <i>2) Abrir esta web desde servidor (localhost o hosting).</i>
             </div>`;
+            document.getElementById('charts-container').style.display = 'none';
     }
 }
 
@@ -375,6 +536,104 @@ function renderResults(portfolio, invested, budget) {
             </div>
         </div>
     `;
+
+    renderCharts(activeItems);
+}
+
+function renderCharts(activeItems) {
+    const container = document.getElementById('charts-container');
+    if (!activeItems.length) {
+        container.style.display = 'none';
+        return;
+    }
+
+    const available = activeItems.filter(a => Array.isArray(historicalByTicker[a.ticker]) && historicalByTicker[a.ticker].length > 2);
+    if (!available.length) {
+        container.style.display = 'none';
+        return;
+    }
+
+    container.style.display = 'block';
+
+    const dateSet = new Set();
+    for (const a of available) {
+        for (const p of historicalByTicker[a.ticker]) dateSet.add(p.date);
+    }
+    const dates = Array.from(dateSet).sort();
+
+    const colors = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'];
+
+    const datasetsAssets = available.map((a, idx) => {
+        const map = new Map(historicalByTicker[a.ticker].map(x => [x.date, x.price]));
+        let base = null;
+        const values = dates.map(d => {
+            const v = map.get(d);
+            if (!Number.isFinite(v)) return null;
+            if (base === null) base = v;
+            if (!Number.isFinite(base) || base === 0) return null;
+            return (v / base) * 100;
+        });
+        return {
+            label: `${a.ticker} (base=100)`,
+            data: values,
+            spanGaps: true,
+            borderColor: colors[idx % colors.length],
+            backgroundColor: colors[idx % colors.length],
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.15
+        };
+    });
+
+    const portfolioSeries = dates.map(d => {
+        let total = 0;
+        let hasAny = false;
+        for (const a of available) {
+            const v = historicalByTicker[a.ticker].find(x => x.date === d);
+            if (v && Number.isFinite(v.price)) {
+                total += a.qty * v.price;
+                hasAny = true;
+            }
+        }
+        return hasAny ? total : null;
+    });
+
+    if (assetsChart) assetsChart.destroy();
+    if (portfolioChart) portfolioChart.destroy();
+
+    assetsChart = new Chart(document.getElementById('assets-chart'), {
+        type: 'line',
+        data: { labels: dates, datasets: datasetsAssets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: { y: { title: { display: true, text: 'Índice base 100' } } }
+        }
+    });
+
+    portfolioChart = new Chart(document.getElementById('portfolio-chart'), {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Valor cartera',
+                data: portfolioSeries,
+                spanGaps: true,
+                borderColor: '#1e293b',
+                backgroundColor: '#1e293b',
+                borderWidth: 2.5,
+                pointRadius: 0,
+                tension: 0.15
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: { y: { title: { display: true, text: 'Valor ($)' } } }
+        }
+    });
 }
 
 // Iniciar carga
