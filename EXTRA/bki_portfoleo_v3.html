@@ -29,6 +29,7 @@
         .stock-card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; animation: slideUp 0.4s ease-out forwards; }
         .summary-card { background: #1e293b; color: white; padding: 25px; border-radius: 16px; margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; }
         .chart-card { background: var(--card); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-top: 16px; }
+        .chart-wrapper { position: relative; width: 100%; height: 320px; overflow: hidden; }
         .chart-title { margin: 0 0 10px 0; font-size: 0.95rem; font-weight: 700; }
         
         .ticker { font-weight: 800; font-size: 1.2rem; color: var(--accent); }
@@ -70,11 +71,15 @@
     <div id="charts-container" style="display:none; margin-top:20px;">
         <div class="chart-card">
             <p class="chart-title">Evolución histórica de acciones recomendadas</p>
-            <canvas id="assets-chart" height="120"></canvas>
+            <div class="chart-wrapper">
+                <canvas id="assets-chart"></canvas>
+            </div>
         </div>
         <div class="chart-card">
             <p class="chart-title">Evolución histórica de la cartera recomendada</p>
-            <canvas id="portfolio-chart" height="120"></canvas>
+            <div class="chart-wrapper">
+                <canvas id="portfolio-chart"></canvas>
+            </div>
         </div>
     </div>
 </div>
@@ -662,7 +667,17 @@ function renderCharts(activeItems) {
             responsive: true,
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
-            scales: { y: { title: { display: true, text: 'Índice base 100' } } }
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                x: {
+                    ticks: { autoSkip: true, maxTicksLimit: 12, maxRotation: 0 }
+                },
+                y: {
+                    title: { display: true, text: 'Índice base 100' }
+                }
+            }
         }
     });
 
@@ -685,7 +700,17 @@ function renderCharts(activeItems) {
             responsive: true,
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
-            scales: { y: { title: { display: true, text: 'Valor ($)' } } }
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                x: {
+                    ticks: { autoSkip: true, maxTicksLimit: 12, maxRotation: 0 }
+                },
+                y: {
+                    title: { display: true, text: 'Valor ($)' }
+                }
+            }
         }
     });
 }
