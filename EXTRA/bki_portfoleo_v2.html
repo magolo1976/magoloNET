@@ -3,1191 +3,869 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BKI Portfolio - Datos V2</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <title>BKI Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg: #f8fafc; --card: #ffffff; --text: #1e293b;
+            --accent: #3b82f6; --success: #10b981; --border: #e2e8f0;
         }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 900px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        
+        /* Panel de Control */
+        .controls { background: var(--card); padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border); margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-weight: 600; font-size: 0.9rem; }
+        input, select { padding: 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 1rem; }
+        
+        .btn-optimize { grid-column: 1 / -1; background: var(--accent); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-optimize:hover { opacity: 0.9; transform: translateY(-1px); }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+        /* Resultados */
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 20px; }
+        .stock-card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; animation: slideUp 0.4s ease-out forwards; }
+        .summary-card { background: #1e293b; color: white; padding: 25px; border-radius: 16px; margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; }
+        .chart-card { background: var(--card); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-top: 16px; }
+        .chart-wrapper { position: relative; width: 100%; height: 320px; overflow: hidden; }
+        .chart-title { margin: 0 0 10px 0; font-size: 0.95rem; font-weight: 700; }
+        
+        .ticker { font-weight: 800; font-size: 1.2rem; color: var(--accent); }
+        .qty { font-size: 0.85rem; color: #64748b; }
+        .price { font-weight: 700; font-size: 1.1rem; }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .controls {
-            padding: 20px 30px;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e9ecef;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .status {
-            flex: 1;
-            text-align: right;
-            font-weight: 600;
-            color: #495057;
-        }
-
-        .status.loading {
-            color: #667eea;
-        }
-
-        .status.success {
-            color: #28a745;
-        }
-
-        .status.error {
-            color: #dc3545;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            text-align: center;
-        }
-
-        .stat-card .value {
-            font-size: 2em;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .stat-card .label {
-            font-size: 0.9em;
-            opacity: 0.9;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .chart-container {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .chart-container h3 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.3em;
-            text-align: center;
-        }
-
-        .chart-wrapper {
-            position: relative;
-            height: 500px;
-            width: 100%;
-        }
-
-        .stock-filter {
-            padding: 20px 30px;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .slider-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .slider-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .slider-header h3 {
-            color: #667eea;
-            font-size: 1.2em;
-            margin: 0;
-        }
-
-        .slider-value {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 1.1em;
-            min-width: 150px;
-            text-align: center;
-        }
-
-        .slider-wrapper {
-            position: relative;
-            padding: 10px 0;
-        }
-
-        .stock-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 100%;
-            height: 12px;
-            border-radius: 6px;
-            background: linear-gradient(to right, 
-                #ff6b6b 0%, 
-                #ffd93d 25%, 
-                #95e1d3 50%, 
-                #6BCF7F 75%, 
-                #43e97b 100%);
-            outline: none;
-            opacity: 0.9;
-            transition: opacity 0.2s;
-        }
-
-        .stock-slider:hover {
-            opacity: 1;
-        }
-
-        .stock-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
-            transition: all 0.3s ease;
-        }
-
-        .stock-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.7);
-        }
-
-        .stock-slider::-moz-range-thumb {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
-            transition: all 0.3s ease;
-        }
-
-        .stock-slider::-moz-range-thumb:hover {
-            transform: scale(1.2);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.7);
-        }
-
-        .slider-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-size: 0.85em;
-            color: #6c757d;
-        }
-
-        .filter-info {
-            margin-top: 15px;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-
-        .filter-info p {
-            margin: 5px 0;
-            color: #495057;
-            font-size: 0.95em;
-        }
-
-        .filter-info strong {
-            color: #667eea;
-        }
-
-        .reset-button {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin-left: 15px;
-        }
-
-        .reset-button:hover {
-            background: #5a6268;
-            transform: translateY(-1px);
-        }
-
-        @media (max-width: 768px) {
-            .chart-wrapper {
-                height: 350px;
-            }
-            .header h1 {
-                font-size: 1.8em;
-            }
-
-            .controls {
-                justify-content: center;
-            }
-
-            .status {
-                width: 100%;
-                text-align: center;
-                margin-top: 10px;
-            }
-
-            .slider-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .slider-value {
-                width: 100%;
-            }
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .loading { text-align: center; padding: 50px; color: #64748b; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📊 BKI Portfolio Data V2</h1>
-            <p>Visualización de datos del Portfolio con Filtro de Rentabilidad</p>
-        </div>
 
-        <div class="controls">
-            <button class="btn" onclick="loadData()">🔄 Recargar Datos</button>
-            <div class="status" id="status">Presiona "Recargar Datos" para comenzar</div>
-        </div>
+<div class="container">
+    <div class="header">
+        <h1>BKI Portfolio</h1>
+    </div>
 
-        <div class="content">
-            <div class="stats" id="stats" style="display: none;"></div>
-            
-            <!-- Slider de filtro de acciones -->
-            <div class="stock-filter" id="stockFilter" style="display: none;">
-                <div class="slider-container">
-                    <div class="slider-header">
-                        <h3>🎯 Seleccionar Acciones Más Rentables</h3>
-                        <div style="display: flex; align-items: center;">
-                            <div class="slider-value" id="sliderValue">Todas las acciones (0)</div>
-                            <button class="reset-button" onclick="resetFilter()">↺ Reset</button>
-                        </div>
-                    </div>
-                    <div class="slider-wrapper">
-                        <input type="range" class="stock-slider" id="stockSlider" 
-                               min="1" max="77" value="77" 
-                               oninput="updateStockFilter(this.value)">
-                        <div class="slider-labels">
-                            <span>1 acción (más rentable)</span>
-                            <span>Todas las acciones</span>
-                        </div>
-                    </div>
-                    <div class="filter-info" id="filterInfo">
-                        <p><strong>ℹ️ Información:</strong> El slider ordena las acciones por rentabilidad total y muestra las N más rentables.</p>
-                        <p id="topStocksInfo"></p>
-                    </div>
-                </div>
+    <div class="controls">
+        <div class="input-group">
+            <label>Presupuesto Total (€)</label>
+            <input type="number" id="budget" value="1000" step="100">
+        </div>
+        <div class="input-group">
+            <label>Perfil de Riesgo (Aversión: λ)</label>
+            <input type="range" id="lambda" min="0" max="2" step="0.1" value="0.5">
+            <div style="display:flex; justify-content: space-between; font-size: 0.7rem;">
+                <span>Agresivo (Retorno)</span>
+                <span>Conservador (Estable)</span>
             </div>
-            
-            <div class="chart-container" id="chartContainer" style="display: none;">
-                <h3>📈 Cambio Porcentual por Acción</h3>
-                <div class="chart-wrapper">
-                    <canvas id="portfolioChart"></canvas>
-                </div>
+        </div>
+        <button class="btn-optimize" onclick="runOptimization()">Generar Cartera Óptima</button>
+    </div>
+
+    <div id="summary-container"></div>
+    <div id="results-container" class="results-grid">
+        <div class="loading">Cargando datos estadísticos de Google Sheets...</div>
+    </div>
+    <div id="charts-container" style="display:none; margin-top:20px;">
+        <div class="chart-card" id="assets-chart-card">
+            <p class="chart-title">Evolución histórica de acciones</p>
+            <div class="chart-wrapper">
+                <canvas id="assets-chart"></canvas>
             </div>
-            
-            <div class="chart-container" id="chartContainerTreemap" style="display: none;">
-                <h3>� Ranking de Acciones por Valor</h3>
-                <div class="chart-wrapper">
-                    <canvas id="portfolioTreemap"></canvas>
-                </div>
+        </div>
+        <div class="chart-card" id="ranking-chart-card">
+            <p class="chart-title">Ranking de Acciones por Valor</p>
+            <div class="chart-wrapper">
+                <canvas id="ranking-treemap"></canvas>
             </div>
-            
-            <div class="chart-container" id="chartContainerCumulative" style="display: none;">
-                <h3>💹 Cambio Porcentual Acumulado del Portfolio</h3>
-                <div class="chart-wrapper">
-                    <canvas id="portfolioChartCumulative"></canvas>
-                </div>
+        </div>
+        <div class="chart-card" id="portfolio-chart-card">
+            <p class="chart-title">Evolución histórica de la cartera</p>
+            <div class="chart-wrapper">
+                <canvas id="portfolio-chart"></canvas>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        // Usar la versión HTML de Google Sheets que permite embedding
-        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRsnmjygWG6TxoCh01ThLVM5YDD5NOQnMkBgMHxVqc9MF8d2fn1J7LCUyItMoZ-BoGfL5iU0Dw2yLWR/pub?gid=2022586956&single=true&output=csv';
-        
-        // Lista de proxies CORS como fallback
-        const CORS_PROXIES = [
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?',
-            'https://api.codetabs.com/v1/proxy?quest='
-        ];
-        
-        let currentData = [];
-        let sortedStocks = []; // Acciones ordenadas por rentabilidad
-        let currentStockCount = 0; // Número de acciones seleccionadas
-        let allHeaders = []; // Headers globales
+<script>
+// --- CONFIGURACIÓN DE URLs ---
+const URL_DATOS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRsnmjygWG6TxoCh01ThLVM5YDD5NOQnMkBgMHxVqc9MF8d2fn1J7LCUyItMoZ-BoGfL5iU0Dw2yLWR/pub?gid=2022586956&single=true&output=csv';
+const URL_ANALISIS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRsnmjygWG6TxoCh01ThLVM5YDD5NOQnMkBgMHxVqc9MF8d2fn1J7LCUyItMoZ-BoGfL5iU0Dw2yLWR/pub?gid=459208884&single=true&output=csv';
 
-        function updateStatus(message, type = '') {
-            const statusEl = document.getElementById('status');
-            statusEl.textContent = message;
-            statusEl.className = 'status ' + type;
-        }
+let stockStats = []; // Ticker, Media, Vol, CovMatrix
+let historicalByTicker = {}; // { TICKER: [ {date, price} ] }
+let assetsChart = null;
+let portfolioChart = null;
+let rankingTreemapChart = null;
 
-        function showLoader() {
-            updateStatus('', 'loading');
-            const statusEl = document.getElementById('status');
-            statusEl.innerHTML = '<div class="loader"></div>Cargando datos...';
-        }
+function normalizeHeader(h) {
+    return String(h || '').trim().toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9_]/g, '');
+}
 
-        // Calcular rentabilidad total y ordenar acciones
-        function calculateAndSortByProfitability() {
-            const dateColumns = allHeaders.slice(2);
-            
-            sortedStocks = currentData.map((row, index) => {
-                const ticker = row[allHeaders[0]] || `Acción ${index + 1}`;
-                
-                // Encontrar primer y último valor no nulo
-                let firstValue = null;
-                let lastValue = null;
-                
-                for (let i = 0; i < dateColumns.length; i++) {
-                    const value = row[dateColumns[i]];
-                    if (value !== null && value !== '' && value !== undefined) {
-                        if (firstValue === null) firstValue = parseFloat(value);
-                        lastValue = parseFloat(value);
-                    }
-                }
-                
-                // Calcular rentabilidad total en porcentaje
-                let profitability = 0;
-                if (firstValue !== null && lastValue !== null && firstValue !== 0) {
-                    profitability = ((lastValue - firstValue) / firstValue) * 100;
-                }
-                
-                return {
-                    ticker: ticker,
-                    profitability: profitability,
-                    originalIndex: index,
-                    data: row
-                };
-            });
-            
-            // Ordenar de mayor a menor rentabilidad
-            sortedStocks.sort((a, b) => b.profitability - a.profitability);
-        }
+function parseDateLabel(value) {
+    const s = String(value || '').trim();
+    const match = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (!match) return null;
+    const day = Number(match[1]);
+    const month = Number(match[2]) - 1;
+    const year = Number(match[3]);
+    const d = new Date(year, month, day);
+    return Number.isNaN(d.getTime()) ? null : d;
+}
 
-        // Actualizar filtro de acciones
-        function updateStockFilter(count) {
-            count = parseInt(count);
-            currentStockCount = count;
-            updateSliderDisplay(count);
-            
-            // Filtrar las N acciones más rentables
-            const topStocks = sortedStocks.slice(0, count);
-            const filteredData = topStocks.map(stock => stock.data);
-            
-            // Actualizar gráficos y estadísticas
-            displayStats(filteredData);
-            createChart(filteredData, allHeaders);
-            createTreemap(filteredData, allHeaders);
-            createCumulativeChart(filteredData, allHeaders);
-            
-            // Mostrar info de acciones seleccionadas
-            updateTopStocksInfo(topStocks);
-        }
+function isDateHeader(value) {
+    return parseDateLabel(value) !== null;
+}
 
-        // Actualizar display del slider
-        function updateSliderDisplay(count) {
-            const sliderValue = document.getElementById('sliderValue');
-            if (count === currentData.length) {
-                sliderValue.textContent = `Todas las acciones (${count})`;
+function sortDateLabels(labels) {
+    return [...labels].sort((a, b) => parseDateLabel(a) - parseDateLabel(b));
+}
+
+function formatMonthYearLabel(value) {
+    const d = parseDateLabel(value);
+    if (!d) return value;
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${mm}/${yyyy}`;
+}
+
+function parseCSV(text) {
+    const raw = String(text || '').replace(/^\uFEFF/, ''); // quitar BOM
+    const firstLine = raw.split(/\r?\n/)[0] || '';
+    const commaCount = (firstLine.match(/,/g) || []).length;
+    const semicolonCount = (firstLine.match(/;/g) || []).length;
+    const tabCount = (firstLine.match(/\t/g) || []).length;
+    const delimiter = tabCount > Math.max(commaCount, semicolonCount)
+        ? '\t'
+        : (semicolonCount > commaCount ? ';' : ',');
+
+    const rows = [];
+    let row = [];
+    let field = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < raw.length; i++) {
+        const ch = raw[i];
+        const next = raw[i + 1];
+
+        if (ch === '"') {
+            if (inQuotes && next === '"') {
+                field += '"';
+                i++;
             } else {
-                sliderValue.textContent = `Top ${count} más rentables`;
+                inQuotes = !inQuotes;
+            }
+        } else if (ch === delimiter && !inQuotes) {
+            row.push(field);
+            field = '';
+        } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+            if (ch === '\r' && next === '\n') i++;
+            row.push(field);
+            if (row.some(c => String(c).trim() !== '')) rows.push(row);
+            row = [];
+            field = '';
+        } else {
+            field += ch;
+        }
+    }
+
+    if (field.length > 0 || row.length > 0) {
+        row.push(field);
+        if (row.some(c => String(c).trim() !== '')) rows.push(row);
+    }
+
+    if (!rows.length) return { headers: [], records: [] };
+
+    const headers = rows[0].map(h => String(h).trim());
+    const records = rows.slice(1).map(r => {
+        const obj = {};
+        headers.forEach((h, idx) => obj[h] = (r[idx] ?? '').trim());
+        return obj;
+    });
+
+    return { headers, records };
+}
+
+function toNumber(v) {
+    if (v === null || v === undefined) return NaN;
+    let s = String(v).trim().replace(/\s/g, '');
+    if (!s) return NaN;
+
+    // Detectar formato decimal:
+    // 1) "1.234,56" => miles='.' decimal=','
+    // 2) "1,234.56" => miles=',' decimal='.'
+    // 3) "1234,56"  => decimal=','
+    // 4) "1234.56"  => decimal='.'
+    if (s.includes(',') && s.includes('.')) {
+        const lastComma = s.lastIndexOf(',');
+        const lastDot = s.lastIndexOf('.');
+        if (lastComma > lastDot) {
+            s = s.replace(/\./g, '').replace(',', '.');
+        } else {
+            s = s.replace(/,/g, '');
+        }
+    } else if (s.includes(',')) {
+        s = s.replace(',', '.');
+    }
+
+    const n = Number(s);
+    return Number.isFinite(n) ? n : NaN;
+}
+
+function pickFirstKey(headers, aliases) {
+    const normalized = headers.map(h => ({ raw: h, n: normalizeHeader(h) }));
+    for (const a of aliases) {
+        const found = normalized.find(h => h.n === a || h.n.includes(a));
+        if (found) return found.raw;
+    }
+    return null;
+}
+
+function findHeaderByTicker(headers, ticker) {
+    return headers.find(h => normalizeHeader(h) === normalizeHeader(ticker)) || null;
+}
+
+function getRowByAliases(rowMap, aliases) {
+    for (const a of aliases) {
+        const row = rowMap[normalizeHeader(a)];
+        if (row) return row;
+    }
+    return null;
+}
+
+function isMetaRowLabel(label) {
+    const n = normalizeHeader(label);
+    const meta = [
+        'price', 'precio', 'close', 'last', 'precios',
+        'mu', 'media', 'mean', 'retorno', 'return', 'expectedreturn',
+        'vol', 'volatilidad', 'std', 'sigma',
+        'ticker', 'symbol', 'activo', 'asset'
+    ];
+    return meta.includes(n);
+}
+
+function buildStockStats(textAnalisis) {
+    const analisis = parseCSV(textAnalisis);
+
+    if (!analisis.records.length) {
+        throw new Error('CSV de análisis vacío o inválido.');
+    }
+
+    const headers = analisis.headers;
+    const rowTickerKey = pickFirstKey(headers, ['ticker', 'symbol', 'activo']) || headers[0];
+    const priceKey = pickFirstKey(headers, ['price', 'precio', 'close', 'last']);
+    const muKey = pickFirstKey(headers, ['mu', 'media', 'mean', 'retorno', 'return']);
+    const volKey = pickFirstKey(headers, ['vol', 'volatilidad', 'std', 'sigma']);
+
+    const rowTickers = analisis.records
+        .map(r => String(r[rowTickerKey] || '').trim())
+        .filter(Boolean);
+
+    if (!rowTickers.length) {
+        throw new Error('No se encontraron tickers en la primera columna del CSV de análisis.');
+    }
+
+    const tickers = headers.filter(h => rowTickers.some(t => normalizeHeader(t) === normalizeHeader(h)));
+    const finalTickers = (tickers.length ? tickers : rowTickers)
+        .filter(t => !isMetaRowLabel(t));
+
+    if (!finalTickers.length) {
+        throw new Error('No se pudieron identificar tickers válidos en el CSV de análisis.');
+    }
+
+    const covByTicker = {};
+
+    const rowMap = {};
+    for (const row of analisis.records) {
+        const rt = String(row[rowTickerKey] || '').trim();
+        if (!rt) continue;
+        rowMap[normalizeHeader(rt)] = row;
+
+        covByTicker[rt] = {};
+        for (const t of finalTickers) {
+            const k = headers.find(h => normalizeHeader(h) === normalizeHeader(t));
+            if (!k) continue;
+            const v = toNumber(row[k]);
+            if (Number.isFinite(v)) covByTicker[rt][t] = v;
+        }
+    }
+
+    const priceRow = getRowByAliases(rowMap, ['price', 'precio', 'close', 'last', 'precios']);
+    const muRow = getRowByAliases(rowMap, ['mu', 'media', 'mean', 'retorno', 'return', 'expectedreturn']);
+
+    stockStats = finalTickers.map(t => {
+        const row = rowMap[normalizeHeader(t)] || null;
+        const headerTicker = findHeaderByTicker(headers, t);
+
+        let price = NaN;
+        if (row && priceKey) {
+            price = toNumber(row[priceKey]);
+        }
+        if (!Number.isFinite(price) && priceRow && headerTicker) {
+            price = toNumber(priceRow[headerTicker]);
+        }
+
+        let mu = NaN;
+        if (row && muKey) {
+            mu = toNumber(row[muKey]);
+        }
+        if (!Number.isFinite(mu) && muRow && headerTicker) {
+            mu = toNumber(muRow[headerTicker]);
+        }
+
+        const vol = row && volKey ? toNumber(row[volKey]) : 0;
+
+        return {
+            ticker: t,
+            price,
+            mu,
+            vol: Number.isFinite(vol) ? vol : 0,
+            cov: finalTickers.map(t2 => {
+                if (covByTicker[t] && Number.isFinite(covByTicker[t][t2])) {
+                    return covByTicker[t][t2];
+                }
+                if (t === t2 && Number.isFinite(vol) && vol > 0) return vol * vol;
+                return 0;
+            })
+        };
+    }).filter(s => s.ticker);
+
+    if (!stockStats.length) {
+        throw new Error('No se pudieron construir activos válidos desde el CSV de análisis.');
+    }
+}
+
+function buildStatsFromDatos(textDatos) {
+    const datos = parseCSV(textDatos);
+    if (!datos.records.length) {
+        throw new Error('CSV de datos vacío o inválido.');
+    }
+
+    const headers = datos.headers;
+    const tickerKey = pickFirstKey(headers, ['ticker', 'symbol', 'activo', 'asset']);
+    const priceKey = pickFirstKey(headers, ['price', 'precio', 'close', 'last']);
+    const muKey = pickFirstKey(headers, ['mu', 'media', 'mean', 'retorno', 'return', 'expectedreturn']);
+
+    const mapPrice = {};
+    const mapMu = {};
+
+    if (tickerKey && priceKey && muKey) {
+        for (const r of datos.records) {
+            const t = String(r[tickerKey] || '').trim();
+            if (!t) continue;
+            const p = toNumber(r[priceKey]);
+            const m = toNumber(r[muKey]);
+            if (Number.isFinite(p)) mapPrice[normalizeHeader(t)] = p;
+            if (Number.isFinite(m)) mapMu[normalizeHeader(t)] = m;
+        }
+    }
+
+    const dateHeaders = headers.filter(isDateHeader);
+    if (tickerKey && dateHeaders.length) {
+        const sortedDateHeaders = sortDateLabels(dateHeaders);
+        for (const r of datos.records) {
+            const ticker = String(r[tickerKey] || '').trim();
+            if (!ticker) continue;
+
+            const series = sortedDateHeaders
+                .map(date => ({ date, price: toNumber(r[date]) }))
+                .filter(point => Number.isFinite(point.price));
+
+            if (!series.length) continue;
+
+            mapPrice[normalizeHeader(ticker)] = series[series.length - 1].price;
+
+            if (!Number.isFinite(mapMu[normalizeHeader(ticker)])) {
+                const returns = [];
+                for (let i = 1; i < series.length; i++) {
+                    const prev = series[i - 1].price;
+                    const curr = series[i].price;
+                    if (Number.isFinite(prev) && prev > 0 && Number.isFinite(curr)) {
+                        returns.push((curr / prev) - 1);
+                    }
+                }
+                if (returns.length) {
+                    const avgReturn = returns.reduce((sum, val) => sum + val, 0) / returns.length;
+                    mapMu[normalizeHeader(ticker)] = avgReturn;
+                }
+            }
+        }
+    }
+
+    return { mapPrice, mapMu, datos };
+}
+
+function buildHistoricalFromDatos(datosCsv, tickers) {
+    const datos = datosCsv.records ? datosCsv : parseCSV(datosCsv);
+    const headers = datos.headers;
+    if (!headers.length || !datos.records.length) return {};
+
+    const dateKey = pickFirstKey(headers, ['date', 'fecha', 'time', 'datetime', 'dia']);
+    const tickerKey = pickFirstKey(headers, ['ticker', 'symbol', 'activo', 'asset']);
+
+    const out = {};
+    for (const t of tickers) out[t] = [];
+
+    const dateHeaders = headers.filter(isDateHeader);
+    if (tickerKey && dateHeaders.length) {
+        const sortedDateHeaders = sortDateLabels(dateHeaders);
+        for (const row of datos.records) {
+            const ticker = String(row[tickerKey] || '').trim();
+            if (!ticker || !out[ticker]) continue;
+            out[ticker] = sortedDateHeaders
+                .map(date => ({ date, price: toNumber(row[date]) }))
+                .filter(point => Number.isFinite(point.price));
+        }
+        return out;
+    }
+
+    if (!dateKey) return {};
+
+    const tickerHeaderMap = {};
+    for (const t of tickers) {
+        const h = findHeaderByTicker(headers, t);
+        if (h) tickerHeaderMap[t] = h;
+    }
+
+    for (const row of datos.records) {
+        const date = String(row[dateKey] || '').trim();
+        if (!date) continue;
+
+        for (const t of tickers) {
+            const h = tickerHeaderMap[t];
+            if (!h) continue;
+            const p = toNumber(row[h]);
+            if (!Number.isFinite(p)) continue;
+            out[t].push({ date, price: p });
+        }
+    }
+
+    return out;
+}
+
+function mergeStatsWithDatos(stats, datosInfo) {
+    const missing = [];
+    for (const s of stats) {
+        const nk = normalizeHeader(s.ticker);
+        const p = datosInfo.mapPrice[nk];
+        const m = datosInfo.mapMu[nk];
+        if (Number.isFinite(p)) s.price = p;
+        if (Number.isFinite(m)) s.mu = m;
+        if (!Number.isFinite(s.price) || !Number.isFinite(s.mu)) {
+            missing.push(s.ticker);
+        }
+    }
+    if (missing.length) {
+        throw new Error(`Faltan precio/mu para: ${missing.join(', ')}. Revisa hoja Datos.`);
+    }
+}
+
+async function fetchCsvWithFallback(url) {
+    const finalUrl = `${url}&t=${Date.now()}`;
+    const tries = [];
+
+    tries.push(finalUrl);
+    tries.push(`https://api.allorigins.win/raw?url=${encodeURIComponent(finalUrl)}`);
+
+    let lastError = null;
+    for (const u of tries) {
+        try {
+            const res = await fetch(u, { redirect: 'follow' });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return await res.text();
+        } catch (err) {
+            lastError = err;
+        }
+    }
+
+    throw lastError || new Error('No se pudo descargar el CSV.');
+}
+
+async function loadData() {
+    try {
+        const [textDatos, textAnalisis] = await Promise.all([
+            fetchCsvWithFallback(URL_DATOS),
+            fetchCsvWithFallback(URL_ANALISIS)
+        ]);
+
+        buildStockStats(textAnalisis);
+        const datosInfo = buildStatsFromDatos(textDatos);
+        mergeStatsWithDatos(stockStats, datosInfo);
+        historicalByTicker = buildHistoricalFromDatos(datosInfo.datos, stockStats.map(s => s.ticker));
+
+        console.log("Datos cargados correctamente", stockStats.length);
+        document.getElementById('results-container').innerHTML =
+            `<div class="loading" style="color:#10b981"><b>Datos cargados:</b> ${stockStats.length} activos listos para optimizar.</div>`;
+        
+    } catch (e) {
+        console.error("Error detallado:", e);
+        document.getElementById('results-container').innerHTML = 
+            `<div class="loading" style="color:red">
+                <b>Error de Conexión:</b><br>
+                ${e.message}<br><br>
+                <i>Si estás en file:// puede bloquear por CORS. Soluciones:</i><br>
+                <i>1) Publicar la hoja en Google (acceso público),</i><br>
+                <i>2) Abrir esta web desde servidor (localhost o hosting).</i>
+            </div>`;
+            document.getElementById('charts-container').style.display = 'none';
+    }
+}
+
+function runOptimization() {
+    const budget = parseFloat(document.getElementById('budget').value);
+    const lambda = parseFloat(document.getElementById('lambda').value);
+    
+    if (stockStats.length === 0) return;
+
+    // --- ALGORITMO: GREEDY SMART + LOCAL SEARCH ---
+    // (Debido a la complejidad de Markowitz discreto, usamos un Greedy ponderado por Sharpe 
+    // y ajustado por covarianza incremental)
+    
+    let remainingBudget = budget;
+    let portfolio = stockStats.map(s => ({ ...s, qty: 0 }));
+    let totalInvested = 0;
+
+    // Proceso iterativo: añadimos la acción que mejor mejora la función objetivo (Markowitz)
+    // Función Objetivo: Sum(qty*price*mu) - lambda * Variancia_Cartera
+    
+    while(true) {
+        let bestScore = -Infinity;
+        let bestStockIdx = -1;
+
+        for(let i=0; i<portfolio.length; i++) {
+            const s = portfolio[i];
+            if(remainingBudget < s.price) continue;
+
+            // Calculamos el impacto de añadir UNA acción más de este tipo
+            // 1. Retorno incremental
+            const addedReturn = s.price * s.mu;
+            
+            // 2. Riesgo incremental (Covarianzas)
+            let addedRisk = 0;
+            for(let j=0; j<portfolio.length; j++) {
+                const s2 = portfolio[j];
+                // 2 * qty_i * qty_j * cov_ij
+                addedRisk += 2 * (portfolio[i].qty + 1) * s.price * portfolio[j].qty * s2.price * s.cov[j];
+            }
+            // Riesgo propio
+            addedRisk += Math.pow(s.price, 2) * s.cov[i];
+
+            const score = addedReturn - (lambda * addedRisk / budget);
+
+            if(score > bestScore) {
+                bestScore = score;
+                bestStockIdx = i;
             }
         }
 
-        // Mostrar info de acciones seleccionadas
-        function updateTopStocksInfo(topStocks) {
-            const infoEl = document.getElementById('topStocksInfo');
-            if (topStocks.length <= 10) {
-                const stockNames = topStocks.map((s, i) => 
-                    `${i+1}. ${s.ticker} (${s.profitability.toFixed(2)}%)`
-                ).join(', ');
-                infoEl.innerHTML = `<strong>Acciones seleccionadas:</strong> ${stockNames}`;
-            } else {
-                const top3 = topStocks.slice(0, 3).map((s, i) => 
-                    `${i+1}. ${s.ticker} (${s.profitability.toFixed(2)}%)`
-                ).join(', ');
-                const avgProfit = (topStocks.reduce((sum, s) => sum + s.profitability, 0) / topStocks.length).toFixed(2);
-                infoEl.innerHTML = `<strong>Top 3:</strong> ${top3}... <strong>Rentabilidad promedio:</strong> ${avgProfit}%`;
-            }
-        }
+        if(bestStockIdx === -1) break; // No caben más acciones o no mejoran el perfil
+        
+        portfolio[bestStockIdx].qty++;
+        remainingBudget -= portfolio[bestStockIdx].price;
+        totalInvested += portfolio[bestStockIdx].price;
+    }
 
-        // Resetear filtro
-        function resetFilter() {
-            const slider = document.getElementById('stockSlider');
-            slider.value = currentData.length;
-            updateStockFilter(currentData.length);
-        }
+    renderResults(portfolio, totalInvested, budget);
+}
 
-        // Función para cargar datos usando proxy CORS con fallback
-        async function loadDataWithProxy(url) {
-            // Intentar con cada proxy en orden
-            for (let i = 0; i < CORS_PROXIES.length; i++) {
-                try {
-                    const proxyUrl = CORS_PROXIES[i] + encodeURIComponent(url);
-                    
-                    const response = await fetch(proxyUrl, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'text/csv,text/plain,*/*'
-                        }
-                    });
-                    
-                    if (response.ok) {
-                        const text = await response.text();
-                        if (text && text.length > 100) {
-                            return text;
-                        }
-                    }
-                } catch (e) {
-                    // Continuar con el siguiente proxy
-                }
-            }
-            
-            // Si todos los proxies fallan, intentar carga directa
-            try {
-                const response = await fetch(url);
-                if (response.ok) {
-                    return await response.text();
-                }
-            } catch (e) {
-                // Fallo final
-            }
-            
-            throw new Error('No se pudo cargar los datos. Verifica tu conexión a internet.');
-        }
+function renderResults(portfolio, invested, budget) {
+    const resultsCont = document.getElementById('results-container');
+    const summaryCont = document.getElementById('summary-container');
+    resultsCont.innerHTML = '';
+    
+    const activeItems = portfolio.filter(p => p.qty > 0);
 
-        async function loadData() {
-            showLoader();
-            
-            try {
-                // Usar proxy CORS para que funcione desde file://
-                const text = await loadDataWithProxy(CSV_URL);
-                
-                // Parsear CSV
-                const parsedData = parseCSV(text);
-                
-                if (parsedData.data.length > 0) {
-                    currentData = parsedData.data;
-                    allHeaders = parsedData.headers;
-                    
-                    // Calcular rentabilidad y ordenar acciones
-                    calculateAndSortByProfitability();
-                    
-                    // Inicializar slider
-                    currentStockCount = currentData.length;
-                    const slider = document.getElementById('stockSlider');
-                    slider.max = currentData.length;
-                    slider.value = currentData.length;
-                    document.getElementById('stockFilter').style.display = 'block';
-                    updateSliderDisplay(currentData.length);
-                    
-                    // Mostrar datos con todas las acciones
-                    displayStats(currentData);
-                    createChart(currentData, parsedData.headers);
-                    createTreemap(currentData, parsedData.headers);
-                    createCumulativeChart(currentData, parsedData.headers);
-                    updateStatus(`✅ ${currentData.length} filas cargadas correctamente`, 'success');
-                } else {
-                    throw new Error('No se encontraron datos en la hoja');
-                }
-            } catch (error) {
-                updateStatus(`❌ Error: ${error.message}`, 'error');
-                alert(`⚠️ Error al cargar datos\n\n${error.message}\n\n💡 Recarga la página (F5) o verifica tu conexión a internet.`);
-            }
-        }
+    activeItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'stock-card';
+        card.innerHTML = `
+            <div>
+                <div class="ticker">${item.ticker}</div>
+                <div class="qty">${item.qty} acciones × $${item.price.toFixed(2)}</div>
+            </div>
+            <div class="price">$${(item.qty * item.price).toFixed(2)}</div>
+        `;
+        resultsCont.appendChild(card);
+    });
 
-        function parseCSV(csvText) {
-            const lines = csvText.split('\n').filter(line => line.trim() !== '');
-            
-            if (lines.length === 0) {
-                return { headers: [], data: [] };
-            }
+    summaryCont.innerHTML = `
+        <div class="summary-card">
+            <div>
+                <div style="font-size:0.8rem; opacity:0.8">Invertido</div>
+                <div style="font-size:1.4rem; font-weight:700">$${invested.toFixed(2)}</div>
+            </div>
+            <div>
+                <div style="font-size:0.8rem; opacity:0.8">Efectivo Sobrante</div>
+                <div style="font-size:1.4rem; font-weight:700">$${(budget - invested).toFixed(2)}</div>
+            </div>
+            <div>
+                <div style="font-size:0.8rem; opacity:0.8">Eficiencia</div>
+                <div style="font-size:1.4rem; font-weight:700">${((invested/budget)*100).toFixed(1)}%</div>
+            </div>
+        </div>
+    `;
 
-            // Primera línea son los headers
-            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-            const data = [];
+    renderCharts(activeItems);
+}
 
-            // Procesar cada fila de datos
-            for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',');
-                const rowData = {};
-                
-                headers.forEach((header, index) => {
-                    let value = values[index] || '';
-                    // Limpiar comillas si existen
-                    value = value.trim().replace(/^"|"$/g, '');
-                    
-                    // Intentar convertir a número si es posible
-                    if (value !== '' && !isNaN(value)) {
-                        value = parseFloat(value);
-                    }
-                    
-                    rowData[header] = value;
-                });
-                
-                data.push(rowData);
-            }
-            
-            return { headers, data };
-        }
+function renderCharts(activeItems) {
+    const container = document.getElementById('charts-container');
+    const assetsCard = document.getElementById('assets-chart-card');
+    const rankingCard = document.getElementById('ranking-chart-card');
+    const portfolioCard = document.getElementById('portfolio-chart-card');
 
-        function displayStats(data) {
-            if (data.length === 0) {
-                document.getElementById('stats').style.display = 'none';
-                return;
-            }
+    if (!activeItems.length) {
+        container.style.display = 'none';
+        if (assetsChart) { assetsChart.destroy(); assetsChart = null; }
+        if (portfolioChart) { portfolioChart.destroy(); portfolioChart = null; }
+        if (rankingTreemapChart) { rankingTreemapChart.destroy(); rankingTreemapChart = null; }
+        return;
+    }
 
-            const statsContainer = document.getElementById('stats');
-            statsContainer.style.display = 'grid';
-            
-            const numRows = data.length;
-            const totalRows = currentData.length;
-            const numCols = Object.keys(data[0]).length;
-            const lastUpdate = new Date().toLocaleString('es-ES');
-            
-            // Mostrar si está filtrado
-            const labelText = (numRows === totalRows) ? 'Nº Acciones' : `Nº Acciones (de ${totalRows})`;
+    container.style.display = 'block';
+    rankingCard.style.display = 'block';
+    renderRankingTreemap(activeItems);
 
-            statsContainer.innerHTML = `
-                <div class="stat-card">
-                    <div class="value">${numRows}</div>
-                    <div class="label">${labelText}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="value">${numCols - 2}</div>
-                    <div class="label">Días</div>
-                </div>
-                <div class="stat-card">
-                    <div class="value">${lastUpdate.split(',')[1]}</div>
-                    <div class="label">Última actualización</div>
-                </div>
-            `;
-        }
+    const available = activeItems.filter(a => Array.isArray(historicalByTicker[a.ticker]) && historicalByTicker[a.ticker].length > 2);
+    if (!available.length) {
+        assetsCard.style.display = 'none';
+        portfolioCard.style.display = 'none';
+        if (assetsChart) { assetsChart.destroy(); assetsChart = null; }
+        if (portfolioChart) { portfolioChart.destroy(); portfolioChart = null; }
+        return;
+    }
 
-        let portfolioChart = null;
-        let portfolioTreemap = null;
-        let portfolioChartCumulative = null;
+    assetsCard.style.display = 'block';
+    portfolioCard.style.display = 'block';
 
-        function createChart(data, headers) {
-            if (data.length === 0) {
-                document.getElementById('chartContainer').style.display = 'none';
-                return;
-            }
+    const dateSet = new Set();
+    for (const a of available) {
+        for (const p of historicalByTicker[a.ticker]) dateSet.add(p.date);
+    }
+    const dates = sortDateLabels(Array.from(dateSet));
 
-            // Mostrar el contenedor del gráfico
-            document.getElementById('chartContainer').style.display = 'block';
+    const colors = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'];
 
-            // Las primeras dos columnas no son fechas, extraer desde la tercera
-            const dateColumns = headers.slice(2);
-            
-            // Generar colores distintos para cada acción
-            const colors = [
-                '#667eea', '#764ba2', '#f093fb', '#4facfe',
-                '#43e97b', '#fa709a', '#fee140', '#30cfd0',
-                '#a8edea', '#fed6e3', '#c471f5', '#12c2e9',
-                '#f64f59', '#c471ed', '#2af598', '#009efd',
-                '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24'
-            ];
-
-            // Preparar datasets (una línea por acción)
-            const datasets = data.map((row, index) => {
-                const actionName = row[headers[0]] || `Acción ${index + 1}`;
-                
-                // Extraer valores para esta acción desde las columnas de fecha
-                const rawValues = dateColumns.map(dateCol => {
-                    const value = row[dateCol];
-                    if (value === '' || value === null || value === undefined) {
-                        return null;
-                    }
-                    return typeof value === 'number' ? value : parseFloat(value);
-                });
-
-                // Contar cuántos valores no nulos tiene esta acción
-                const nonNullCount = rawValues.filter(v => v !== null).length;
-                
-                // Si solo tiene un valor, retornar 0 para evitar mostrar valor absoluto
-                if (nonNullCount <= 1) {
-                    const zeroData = rawValues.map(v => v !== null ? 0 : null);
-                    return {
-                        label: actionName,
-                        data: zeroData,
-                        borderColor: colors[index % colors.length],
-                        backgroundColor: colors[index % colors.length] + '20',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        pointRadius: 0,
-                        pointHoverRadius: 4,
-                        fill: false,
-                        spanGaps: false
-                    };
-                }
-
-                // Encontrar el primer valor no nulo (valor inicial de referencia)
-                let firstValue = null;
-                for (let i = 0; i < rawValues.length; i++) {
-                    if (rawValues[i] !== null) {
-                        firstValue = rawValues[i];
-                        break;
-                    }
-                }
-
-                // Si el primer valor es 0, evitar división por cero
-                if (firstValue === 0) {
-                    firstValue = 0.0001;
-                }
-
-                // Calcular cambio porcentual respecto al primer valor
-                const percentageChanges = rawValues.map((value, i) => {
-                    if (value === null) return null;
-                    return ((value - firstValue) / firstValue) * 100;
-                });
-
-                return {
-                    label: actionName,
-                    data: percentageChanges,
-                    borderColor: colors[index % colors.length],
-                    backgroundColor: colors[index % colors.length] + '20',
-                    borderWidth: 2,
-                    tension: 0,
-                    pointRadius: 0,
-                    pointHoverRadius: 4,
-                    fill: false,
-                    spanGaps: false,
-                    segment: {
-                        borderColor: ctx => ctx.p0.parsed.y === null || ctx.p1.parsed.y === null ? 'transparent' : undefined
-                    }
-                };
-            });
-
-            // Destruir gráfico anterior si existe
-            if (portfolioChart) {
-                portfolioChart.destroy();
-            }
-
-            // Crear el gráfico
-            const ctx = document.getElementById('portfolioChart').getContext('2d');
-            portfolioChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dateColumns,
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                boxWidth: 15,
-                                padding: 10,
-                                font: {
-                                    size: 11
-                                }
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            padding: 12,
-                            titleFont: {
-                                size: 14
-                            },
-                            bodyFont: {
-                                size: 13
-                            },
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        label += context.parsed.y.toLocaleString('es-ES', {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        }) + '%';
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            display: true,
-                            title: {
-                                display: true,
-                                text: 'Fecha',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            },
-                            ticks: {
-                                maxRotation: 45,
-                                minRotation: 45,
-                                font: {
-                                    size: 10
-                                }
-                            }
-                        },
-                        y: {
-                            display: true,
-                            title: {
-                                display: true,
-                                text: 'Cambio Porcentual (%)',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            },
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString('es-ES', {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    }) + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createTreemap(data, headers) {
-            if (data.length === 0) {
-                document.getElementById('chartContainerTreemap').style.display = 'none';
-                return;
-            }
-
-            document.getElementById('chartContainerTreemap').style.display = 'block';
-
-            const dateColumns = headers.slice(2);
-            
-            const chartData = data.map((row, index) => {
-                const ticker = row[headers[0]] || `Acción ${index + 1}`;
-                
-                let lastValue = null;
-                let firstValue = null;
-                
-                for (let i = 0; i < dateColumns.length; i++) {
-                    const value = row[dateColumns[i]];
-                    if (value !== null && value !== '' && value !== undefined) {
-                        const numValue = typeof value === 'number' ? value : parseFloat(value);
-                        if (firstValue === null) firstValue = numValue;
-                        lastValue = numValue;
-                    }
-                }
-                
-                let change = 0;
-                if (firstValue !== null && lastValue !== null && firstValue !== 0) {
-                    change = ((lastValue - firstValue) / firstValue) * 100;
-                }
-                
-                let color;
-                if (change > 10) color = 'rgba(67, 233, 123, 0.8)';
-                else if (change > 0) color = 'rgba(107, 207, 127, 0.8)';
-                else if (change > -10) color = 'rgba(255, 159, 67, 0.8)';
-                else color = 'rgba(255, 107, 107, 0.8)';
-                
-                return {
-                    ticker: ticker,
-                    value: lastValue !== null ? lastValue : 0,
-                    change: change,
-                    color: color
-                };
-            }).filter(item => item.value > 0);
-
-            if (portfolioTreemap) {
-                portfolioTreemap.destroy();
-            }
-
-            const ctx = document.getElementById('portfolioTreemap').getContext('2d');
-            portfolioTreemap = new Chart(ctx, {
-                type: 'treemap',
-                data: {
-                    datasets: [{
-                        tree: chartData,
-                        key: 'value',
-                        groups: ['ticker'],
-                        spacing: 1,
-                        borderWidth: 2,
-                        borderColor: 'white',
-                        backgroundColor: function(context) {
-                            if (!context.raw || !context.raw.g) return 'transparent';
-                            const item = chartData.find(d => d.ticker === context.raw.g);
-                            return item ? item.color : 'gray';
-                        },
-                        labels: {
-                            display: true,
-                            formatter: function(context) {
-                                if (!context.raw || !context.raw.g) return '';
-                                const item = chartData.find(d => d.ticker === context.raw.g);
-                                if (!item) return '';
-                                return [
-                                    item.ticker,
-                                    '$' + item.value.toFixed(2),
-                                    (item.change >= 0 ? '+' : '') + item.change.toFixed(1) + '%'
-                                ];
-                            },
-                            color: 'white',
-                            font: {
-                                size: 11,
-                                weight: 'bold'
-                            }
-                        }
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                title: function(context) {
-                                    if (!context[0].raw || !context[0].raw.g) return '';
-                                    return context[0].raw.g;
-                                },
-                                label: function(context) {
-                                    if (!context.raw || !context.raw.g) return '';
-                                    const item = chartData.find(d => d.ticker === context.raw.g);
-                                    if (!item) return '';
-                                    return [
-                                        `Valor: $${item.value.toFixed(2)}`,
-                                        `Cambio: ${item.change >= 0 ? '+' : ''}${item.change.toFixed(2)}%`
-                                    ];
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createCumulativeChart(data, headers) {
-            if (data.length === 0) {
-                document.getElementById('chartContainerCumulative').style.display = 'none';
-                return;
-            }
-
-            // Mostrar el contenedor del gráfico acumulativo
-            document.getElementById('chartContainerCumulative').style.display = 'block';
-
-            // Las primeras dos columnas no son fechas, extraer desde la tercera
-            const dateColumns = headers.slice(2);
-            
-            // Calcular las diferencias porcentuales para cada acción
-            const allPercentageChanges = data.map((row, index) => {
-                const actionName = row[headers[0]] || `Acción ${index + 1}`;
-                
-                // Extraer valores para esta acción desde las columnas de fecha
-                const rawValues = dateColumns.map(dateCol => {
-                    const value = row[dateCol];
-                    if (value === '' || value === null || value === undefined) {
-                        return null;
-                    }
-                    return typeof value === 'number' ? value : parseFloat(value);
-                });
-
-                // Contar cuántos valores no nulos tiene esta acción
-                const nonNullCount = rawValues.filter(v => v !== null).length;
-                
-                // Si solo tiene un valor, retornar array de ceros
-                if (nonNullCount <= 1) {
-                    return rawValues.map(v => v !== null ? 0 : null);
-                }
-
-                // Encontrar el primer valor no nulo (valor inicial)
-                let firstValue = null;
-                for (let i = 0; i < rawValues.length; i++) {
-                    if (rawValues[i] !== null) {
-                        firstValue = rawValues[i];
-                        break;
-                    }
-                }
-
-                if (firstValue === 0) firstValue = 0.0001;
-
-                // Calcular cambio porcentual respecto al día anterior
-                const percentageChanges = rawValues.map((value, i) => {
-                    if (value === null) return null;
-                    
-                    // Buscar el valor anterior no nulo
-                    let prevValue = null;
-                    for (let j = i - 1; j >= 0; j--) {
-                        if (rawValues[j] !== null) {
-                            prevValue = rawValues[j];
-                            break;
-                        }
-                    }
-                    
-                    // Si no hay valor anterior, retornar 0
-                    if (prevValue === null) {
-                        return 0;
-                    }
-                    
-                    if (prevValue === 0) prevValue = 0.0001;
-                    
-                    // Retornar cambio porcentual: ((actual - anterior) / anterior) * 100
-                    return ((value - prevValue) / prevValue) * 100;
-                });
-
-                return percentageChanges;
-            });
-
-            // Sumar todos los cambios porcentuales por columna (día)
-            const aggregatedData = dateColumns.map((dateCol, colIndex) => {
-                let sum = 0;
-                let hasValues = false;
-                
-                allPercentageChanges.forEach(actionChanges => {
-                    const value = actionChanges[colIndex];
-                    if (value !== null && !isNaN(value)) {
-                        sum += value;
-                        hasValues = true;
-                    }
-                });
-                
-                return hasValues ? sum : null;
-            });
-
-            // Calcular suma acumulativa: cada punto incluye la suma de todos los anteriores
-            const cumulativeData = [];
-            let runningTotal = 0;
-            
-            aggregatedData.forEach((value, index) => {
-                if (value !== null) {
-                    runningTotal += value;
-                    cumulativeData.push(runningTotal);
-                } else {
-                    cumulativeData.push(null);
-                }
-            });
-
-            // Destruir gráfico anterior si existe
-            if (portfolioChartCumulative) {
-                portfolioChartCumulative.destroy();
-            }
-
-            // Crear el gráfico acumulativo
-            const ctx = document.getElementById('portfolioChartCumulative').getContext('2d');
-            portfolioChartCumulative = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dateColumns,
-                    datasets: [{
-                        label: 'Diferencia Acumulada del Portfolio',
-                        data: cumulativeData,
-                        borderColor: '#43e97b',
-                        backgroundColor: 'rgba(67, 233, 123, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        pointRadius: 0,
-                        pointHoverRadius: 5,
-                        fill: true,
-                        spanGaps: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    size: 13,
-                                    weight: 'bold'
-                                }
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            padding: 12,
-                            titleFont: {
-                                size: 14
-                            },
-                            bodyFont: {
-                                size: 13
-                            },
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        label += context.parsed.y.toLocaleString('es-ES', {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        }) + '%';
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            display: true,
-                            title: {
-                                display: true,
-                                text: 'Fecha',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            },
-                            ticks: {
-                                maxRotation: 45,
-                                minRotation: 45,
-                                font: {
-                                    size: 10
-                                }
-                            }
-                        },
-                        y: {
-                            display: true,
-                            title: {
-                                display: true,
-                                text: 'Cambio Porcentual Acumulado (Σ%)',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            },
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString('es-ES', {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    }) + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Cargar datos automáticamente al abrir la página
-        window.addEventListener('load', () => {
-            loadData();
+    const datasetsAssets = available.map((a, idx) => {
+        const map = new Map(historicalByTicker[a.ticker].map(x => [x.date, x.price]));
+        let base = null;
+        const values = dates.map(d => {
+            const v = map.get(d);
+            if (!Number.isFinite(v)) return null;
+            if (base === null) base = v;
+            if (!Number.isFinite(base) || base === 0) return null;
+            return (v / base) * 100;
         });
-    </script>
+        return {
+            label: `${a.ticker} (base=100)`,
+            data: values,
+            spanGaps: true,
+            borderColor: colors[idx % colors.length],
+            backgroundColor: colors[idx % colors.length],
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.15
+        };
+    });
+
+    const portfolioSeries = dates.map(d => {
+        let total = 0;
+        let hasAny = false;
+        for (const a of available) {
+            const seriesMap = new Map(historicalByTicker[a.ticker].map(x => [x.date, x.price]));
+            const price = seriesMap.get(d);
+            if (Number.isFinite(price)) {
+                total += a.qty * price;
+                hasAny = true;
+            }
+        }
+        return hasAny ? total : null;
+    });
+
+    if (assetsChart) assetsChart.destroy();
+    if (portfolioChart) portfolioChart.destroy();
+
+    assetsChart = new Chart(document.getElementById('assets-chart'), {
+        type: 'line',
+        data: { labels: dates, datasets: datasetsAssets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 12,
+                        maxRotation: 0,
+                        callback: function(value) {
+                            const raw = this.getLabelForValue(value);
+                            return formatMonthYearLabel(raw);
+                        }
+                    }
+                },
+                y: {
+                    title: { display: true, text: 'Índice base 100' }
+                }
+            }
+        }
+    });
+
+    portfolioChart = new Chart(document.getElementById('portfolio-chart'), {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Valor cartera',
+                data: portfolioSeries,
+                spanGaps: true,
+                borderColor: '#1e293b',
+                backgroundColor: '#1e293b',
+                borderWidth: 2.5,
+                pointRadius: 0,
+                tension: 0.15
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 12,
+                        maxRotation: 0,
+                        callback: function(value) {
+                            const raw = this.getLabelForValue(value);
+                            return formatMonthYearLabel(raw);
+                        }
+                    }
+                },
+                y: {
+                    title: { display: true, text: 'Valor ($)' }
+                }
+            }
+        }
+    });
+}
+
+function renderRankingTreemap(activeItems) {
+    const chartData = activeItems
+        .map(item => {
+            const value = item.qty * item.price;
+            if (!Number.isFinite(value) || value <= 0) return null;
+
+            const series = historicalByTicker[item.ticker] || [];
+            let change = 0;
+            if (series.length >= 2) {
+                const first = series[0].price;
+                const last = series[series.length - 1].price;
+                if (Number.isFinite(first) && first > 0 && Number.isFinite(last)) {
+                    change = ((last - first) / first) * 100;
+                }
+            }
+
+            let color;
+            // Paleta más oscura para mejorar contraste con texto blanco
+            if (change > 10) color = 'rgba(22, 163, 74, 0.95)';       // verde fuerte
+            else if (change > 0) color = 'rgba(21, 128, 61, 0.95)';   // verde oscuro
+            else if (change > -10) color = 'rgba(180, 83, 9, 0.95)';  // ámbar oscuro
+            else color = 'rgba(185, 28, 28, 0.95)';                   // rojo oscuro
+
+            return {
+                ticker: item.ticker,
+                value,
+                change,
+                color
+            };
+        })
+        .filter(Boolean);
+
+    if (rankingTreemapChart) {
+        rankingTreemapChart.destroy();
+        rankingTreemapChart = null;
+    }
+
+    if (!chartData.length) return;
+
+    const ctx = document.getElementById('ranking-treemap').getContext('2d');
+    rankingTreemapChart = new Chart(ctx, {
+        type: 'treemap',
+        data: {
+            datasets: [{
+                tree: chartData,
+                key: 'value',
+                groups: ['ticker'],
+                spacing: 1,
+                borderWidth: 2,
+                borderColor: 'white',
+                backgroundColor: function(context) {
+                    if (!context.raw || !context.raw.g) return 'transparent';
+                    const item = chartData.find(d => d.ticker === context.raw.g);
+                    return item ? item.color : 'gray';
+                },
+                labels: {
+                    display: true,
+                    formatter: function(context) {
+                        if (!context.raw || !context.raw.g) return '';
+                        const item = chartData.find(d => d.ticker === context.raw.g);
+                        if (!item) return '';
+                        return [
+                            item.ticker,
+                            '$' + item.value.toFixed(2),
+                            (item.change >= 0 ? '+' : '') + item.change.toFixed(1) + '%'
+                        ];
+                    },
+                    color: 'white',
+                    font: {
+                        size: 11,
+                        weight: 'bold'
+                    }
+                }
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            if (!context[0].raw || !context[0].raw.g) return '';
+                            return context[0].raw.g;
+                        },
+                        label: function(context) {
+                            if (!context.raw || !context.raw.g) return '';
+                            const item = chartData.find(d => d.ticker === context.raw.g);
+                            if (!item) return '';
+                            return [
+                                `Valor: $${item.value.toFixed(2)}`,
+                                `Cambio: ${item.change >= 0 ? '+' : ''}${item.change.toFixed(2)}%`
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Iniciar carga
+loadData();
+</script>
+
 </body>
 </html>
