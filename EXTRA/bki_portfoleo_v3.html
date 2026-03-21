@@ -84,7 +84,6 @@
 const URL_DATOS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRsnmjygWG6TxoCh01ThLVM5YDD5NOQnMkBgMHxVqc9MF8d2fn1J7LCUyItMoZ-BoGfL5iU0Dw2yLWR/pub?gid=2022586956&single=true&output=csv';
 const URL_ANALISIS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRsnmjygWG6TxoCh01ThLVM5YDD5NOQnMkBgMHxVqc9MF8d2fn1J7LCUyItMoZ-BoGfL5iU0Dw2yLWR/pub?gid=459208884&single=true&output=csv';
 
-
 let stockStats = []; // Ticker, Media, Vol, CovMatrix
 let historicalByTicker = {}; // { TICKER: [ {date, price} ] }
 let assetsChart = null;
@@ -94,6 +93,25 @@ function normalizeHeader(h) {
     return String(h || '').trim().toLowerCase()
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
         .replace(/[^a-z0-9_]/g, '');
+}
+
+function parseDateLabel(value) {
+    const s = String(value || '').trim();
+    const match = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (!match) return null;
+    const day = Number(match[1]);
+    const month = Number(match[2]) - 1;
+    const year = Number(match[3]);
+    const d = new Date(year, month, day);
+    return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function isDateHeader(value) {
+    return parseDateLabel(value) !== null;
+}
+
+function sortDateLabels(labels) {
+    return [...labels].sort((a, b) => parseDateLabel(a) - parseDateLabel(b));
 }
 
 function parseCSV(text) {
@@ -327,6 +345,38 @@ function buildStatsFromDatos(textDatos) {
         }
     }
 
+    const dateHeaders = headers.filter(isDateHeader);
+    if (tickerKey && dateHeaders.length) {
+        const sortedDateHeaders = sortDateLabels(dateHeaders);
+        for (const r of datos.records) {
+            const ticker = String(r[tickerKey] || '').trim();
+            if (!ticker) continue;
+
+            const series = sortedDateHeaders
+                .map(date => ({ date, price: toNumber(r[date]) }))
+                .filter(point => Number.isFinite(point.price));
+
+            if (!series.length) continue;
+
+            mapPrice[normalizeHeader(ticker)] = series[series.length - 1].price;
+
+            if (!Number.isFinite(mapMu[normalizeHeader(ticker)])) {
+                const returns = [];
+                for (let i = 1; i < series.length; i++) {
+                    const prev = series[i - 1].price;
+                    const curr = series[i].price;
+                    if (Number.isFinite(prev) && prev > 0 && Number.isFinite(curr)) {
+                        returns.push((curr / prev) - 1);
+                    }
+                }
+                if (returns.length) {
+                    const avgReturn = returns.reduce((sum, val) => sum + val, 0) / returns.length;
+                    mapMu[normalizeHeader(ticker)] = avgReturn;
+                }
+            }
+        }
+    }
+
     return { mapPrice, mapMu, datos };
 }
 
@@ -336,10 +386,25 @@ function buildHistoricalFromDatos(datosCsv, tickers) {
     if (!headers.length || !datos.records.length) return {};
 
     const dateKey = pickFirstKey(headers, ['date', 'fecha', 'time', 'datetime', 'dia']);
-    if (!dateKey) return {};
+    const tickerKey = pickFirstKey(headers, ['ticker', 'symbol', 'activo', 'asset']);
 
     const out = {};
     for (const t of tickers) out[t] = [];
+
+    const dateHeaders = headers.filter(isDateHeader);
+    if (tickerKey && dateHeaders.length) {
+        const sortedDateHeaders = sortDateLabels(dateHeaders);
+        for (const row of datos.records) {
+            const ticker = String(row[tickerKey] || '').trim();
+            if (!ticker || !out[ticker]) continue;
+            out[ticker] = sortedDateHeaders
+                .map(date => ({ date, price: toNumber(row[date]) }))
+                .filter(point => Number.isFinite(point.price));
+        }
+        return out;
+    }
+
+    if (!dateKey) return {};
 
     const tickerHeaderMap = {};
     for (const t of tickers) {
@@ -547,7 +612,7 @@ function renderCharts(activeItems) {
     for (const a of available) {
         for (const p of historicalByTicker[a.ticker]) dateSet.add(p.date);
     }
-    const dates = Array.from(dateSet).sort();
+    const dates = sortDateLabels(Array.from(dateSet));
 
     const colors = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'];
 
@@ -577,9 +642,10 @@ function renderCharts(activeItems) {
         let total = 0;
         let hasAny = false;
         for (const a of available) {
-            const v = historicalByTicker[a.ticker].find(x => x.date === d);
-            if (v && Number.isFinite(v.price)) {
-                total += a.qty * v.price;
+            const seriesMap = new Map(historicalByTicker[a.ticker].map(x => [x.date, x.price]));
+            const price = seriesMap.get(d);
+            if (Number.isFinite(price)) {
+                total += a.qty * price;
                 hasAny = true;
             }
         }
