@@ -58,11 +58,6 @@
             </div>
         </div>
         <button class="btn-optimize" onclick="runOptimization()">Generar Cartera Óptima</button>
-        <div class="input-group">
-            <label>CSV Análisis/Covarianza (opcional, fallback local)</label>
-            <input type="file" id="csv-analisis" accept=".csv,text/csv">
-        </div>
-        <button class="btn-optimize" onclick="loadDataFromLocalFiles()">Cargar CSV Análisis (local)</button>
     </div>
 
     <div id="summary-container"></div>
@@ -282,32 +277,8 @@ async function loadData() {
                 ${e.message}<br><br>
                 <i>Si estás en file:// puede bloquear por CORS. Soluciones:</i><br>
                 <i>1) Publicar la hoja en Google (acceso público),</i><br>
-                <i>2) Abrir esta web desde servidor (localhost o hosting),</i><br>
-                <i>3) Usar los inputs de CSV local y pulsar "Cargar CSV locales".</i>
+                <i>2) Abrir esta web desde servidor (localhost o hosting).</i>
             </div>`;
-    }
-}
-
-async function readTextFile(file) {
-    return await file.text();
-}
-
-async function loadDataFromLocalFiles() {
-    try {
-        const fAnalisis = document.getElementById('csv-analisis').files[0];
-        if (!fAnalisis) {
-            throw new Error('Selecciona el archivo CSV de Análisis.');
-        }
-
-        const textAnalisis = await readTextFile(fAnalisis);
-
-        buildStockStats(textAnalisis);
-        document.getElementById('results-container').innerHTML =
-            `<div class="loading" style="color:#10b981"><b>CSV local cargado:</b> ${stockStats.length} activos listos para optimizar.</div>`;
-    } catch (e) {
-        console.error('Error carga local:', e);
-        document.getElementById('results-container').innerHTML =
-            `<div class="loading" style="color:red"><b>Error cargando CSV local:</b><br>${e.message}</div>`;
     }
 }
 
