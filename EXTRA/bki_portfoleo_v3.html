@@ -6,6 +6,7 @@
     <title>BKI Portfolio</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap"></script>
     <style>
         :root {
             --bg: #f8fafc; --card: #ffffff; --text: #1e293b;
@@ -68,13 +69,19 @@
         <div class="loading">Cargando datos estadísticos de Google Sheets...</div>
     </div>
     <div id="charts-container" style="display:none; margin-top:20px;">
-        <div class="chart-card">
+        <div class="chart-card" id="assets-chart-card">
             <p class="chart-title">Evolución histórica de acciones</p>
             <div class="chart-wrapper">
                 <canvas id="assets-chart"></canvas>
             </div>
         </div>
-        <div class="chart-card">
+        <div class="chart-card" id="ranking-chart-card">
+            <p class="chart-title">Ranking de Acciones por Valor</p>
+            <div class="chart-wrapper">
+                <canvas id="ranking-treemap"></canvas>
+            </div>
+        </div>
+        <div class="chart-card" id="portfolio-chart-card">
             <p class="chart-title">Evolución histórica de la cartera</p>
             <div class="chart-wrapper">
                 <canvas id="portfolio-chart"></canvas>
@@ -92,6 +99,7 @@ let stockStats = []; // Ticker, Media, Vol, CovMatrix
 let historicalByTicker = {}; // { TICKER: [ {date, price} ] }
 let assetsChart = null;
 let portfolioChart = null;
+let rankingTreemapChart = null;
 
 function normalizeHeader(h) {
     return String(h || '').trim().toLowerCase()
@@ -607,18 +615,33 @@ function renderResults(portfolio, invested, budget) {
 
 function renderCharts(activeItems) {
     const container = document.getElementById('charts-container');
+    const assetsCard = document.getElementById('assets-chart-card');
+    const rankingCard = document.getElementById('ranking-chart-card');
+    const portfolioCard = document.getElementById('portfolio-chart-card');
+
     if (!activeItems.length) {
         container.style.display = 'none';
-        return;
-    }
-
-    const available = activeItems.filter(a => Array.isArray(historicalByTicker[a.ticker]) && historicalByTicker[a.ticker].length > 2);
-    if (!available.length) {
-        container.style.display = 'none';
+        if (assetsChart) { assetsChart.destroy(); assetsChart = null; }
+        if (portfolioChart) { portfolioChart.destroy(); portfolioChart = null; }
+        if (rankingTreemapChart) { rankingTreemapChart.destroy(); rankingTreemapChart = null; }
         return;
     }
 
     container.style.display = 'block';
+    rankingCard.style.display = 'block';
+    renderRankingTreemap(activeItems);
+
+    const available = activeItems.filter(a => Array.isArray(historicalByTicker[a.ticker]) && historicalByTicker[a.ticker].length > 2);
+    if (!available.length) {
+        assetsCard.style.display = 'none';
+        portfolioCard.style.display = 'none';
+        if (assetsChart) { assetsChart.destroy(); assetsChart = null; }
+        if (portfolioChart) { portfolioChart.destroy(); portfolioChart = null; }
+        return;
+    }
+
+    assetsCard.style.display = 'block';
+    portfolioCard.style.display = 'block';
 
     const dateSet = new Set();
     for (const a of available) {
@@ -732,6 +755,108 @@ function renderCharts(activeItems) {
                 },
                 y: {
                     title: { display: true, text: 'Valor ($)' }
+                }
+            }
+        }
+    });
+}
+
+function renderRankingTreemap(activeItems) {
+    const chartData = activeItems
+        .map(item => {
+            const value = item.qty * item.price;
+            if (!Number.isFinite(value) || value <= 0) return null;
+
+            const series = historicalByTicker[item.ticker] || [];
+            let change = 0;
+            if (series.length >= 2) {
+                const first = series[0].price;
+                const last = series[series.length - 1].price;
+                if (Number.isFinite(first) && first > 0 && Number.isFinite(last)) {
+                    change = ((last - first) / first) * 100;
+                }
+            }
+
+            let color;
+            // Paleta más oscura para mejorar contraste con texto blanco
+            if (change > 10) color = 'rgba(22, 163, 74, 0.95)';       // verde fuerte
+            else if (change > 0) color = 'rgba(21, 128, 61, 0.95)';   // verde oscuro
+            else if (change > -10) color = 'rgba(180, 83, 9, 0.95)';  // ámbar oscuro
+            else color = 'rgba(185, 28, 28, 0.95)';                   // rojo oscuro
+
+            return {
+                ticker: item.ticker,
+                value,
+                change,
+                color
+            };
+        })
+        .filter(Boolean);
+
+    if (rankingTreemapChart) {
+        rankingTreemapChart.destroy();
+        rankingTreemapChart = null;
+    }
+
+    if (!chartData.length) return;
+
+    const ctx = document.getElementById('ranking-treemap').getContext('2d');
+    rankingTreemapChart = new Chart(ctx, {
+        type: 'treemap',
+        data: {
+            datasets: [{
+                tree: chartData,
+                key: 'value',
+                groups: ['ticker'],
+                spacing: 1,
+                borderWidth: 2,
+                borderColor: 'white',
+                backgroundColor: function(context) {
+                    if (!context.raw || !context.raw.g) return 'transparent';
+                    const item = chartData.find(d => d.ticker === context.raw.g);
+                    return item ? item.color : 'gray';
+                },
+                labels: {
+                    display: true,
+                    formatter: function(context) {
+                        if (!context.raw || !context.raw.g) return '';
+                        const item = chartData.find(d => d.ticker === context.raw.g);
+                        if (!item) return '';
+                        return [
+                            item.ticker,
+                            '$' + item.value.toFixed(2),
+                            (item.change >= 0 ? '+' : '') + item.change.toFixed(1) + '%'
+                        ];
+                    },
+                    color: 'white',
+                    font: {
+                        size: 11,
+                        weight: 'bold'
+                    }
+                }
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            if (!context[0].raw || !context[0].raw.g) return '';
+                            return context[0].raw.g;
+                        },
+                        label: function(context) {
+                            if (!context.raw || !context.raw.g) return '';
+                            const item = chartData.find(d => d.ticker === context.raw.g);
+                            if (!item) return '';
+                            return [
+                                `Valor: $${item.value.toFixed(2)}`,
+                                `Cambio: ${item.change >= 0 ? '+' : ''}${item.change.toFixed(2)}%`
+                            ];
+                        }
+                    }
                 }
             }
         }
