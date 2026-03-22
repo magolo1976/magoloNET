@@ -418,6 +418,7 @@ function renderPortfolioChart(payload) {
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
+                legend: { display: false },
                 tooltip: {
                     callbacks: getDateTooltipCallbacks()
                 },
