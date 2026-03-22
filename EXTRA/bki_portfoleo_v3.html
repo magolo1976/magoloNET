@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BKI Portfolio v3</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap"></script>
+    <style>
+        :root {
+            --bg: #f8fafc; --card: #ffffff; --text: #1e293b;
+            --accent: #3b82f6; --success: #10b981; --border: #e2e8f0;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 980px; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .controls { background: var(--card); padding: 20px; border-radius: 14px; border: 1px solid var(--border); box-shadow: 0 4px 8px rgba(0,0,0,.05); display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-weight: 600; font-size: .92rem; }
+        input { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; }
+        .range-hints { display: flex; justify-content: space-between; gap: 12px; font-size: .8rem; color: #64748b; }
+        .btn { grid-column: 1 / -1; background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 13px; font-weight: 700; cursor: pointer; }
+        .btn:hover { opacity: .92; }
+
+        .status { margin-top: 12px; font-size: .92rem; color: #475569; }
+        .status.error { color: #b91c1c; }
+        .status.ok { color: #166534; }
+
+        .summary-card { background: #0f172a; color: white; padding: 20px; border-radius: 14px; margin-top: 14px; display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 8px; }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 14px; }
+        .stock-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .ticker { font-size: 1.1rem; font-weight: 800; color: var(--accent); }
+        .qty { color: #64748b; font-size: .86rem; }
+        .price { font-weight: 700; font-size: 1rem; }
+
+        .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-top: 14px; }
+        .chart-title { margin: 0 0 8px 0; font-size: .95rem; font-weight: 700; }
+        .chart-wrapper { position: relative; width: 100%; height: 320px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>BKI Portfolio v3</h1>
+    </div>
+
+    <div class="controls">
+        <div class="input-group">
+            <label>Presupuesto Total (€)</label>
+            <input type="number" id="budget" value="1000" step="100">
+        </div>
+        <div class="input-group">
+            <label>Perfil de Riesgo (Aversión: λ)</label>
+            <input type="range" id="lambda" min="0" max="2" step="0.1" value="0.5">
+            <div class="range-hints">
+                <span>Agresivo (Retorno)</span>
+                <span>Conservador (Estable)</span>
+            </div>
+        </div>
+        <button class="btn" onclick="runOptimization()">Generar Cartera Óptima</button>
+    </div>
+
+    <div id="status" class="status">Configura la URL de Apps Script en API_URL y pulsa Generar.</div>
+    <div id="summary-container"></div>
+    <div id="results-container" class="results-grid"></div>
+
+    <div id="charts-container" style="display:none;">
+        <div class="chart-card" id="portfolio-chart-card">
+            <p class="chart-title">Evolución histórica de la cartera</p>
+            <div class="chart-wrapper"><canvas id="portfolio-chart"></canvas></div>
+        </div>
+
+        <div class="chart-card" id="ranking-chart-card">
+            <p class="chart-title">Ranking de Acciones por Valor</p>
+            <div class="chart-wrapper"><canvas id="ranking-treemap"></canvas></div>
+        </div>
+
+        <div class="chart-card" id="assets-chart-card">
+            <p class="chart-title">Evolución histórica de acciones</p>
+            <div class="chart-wrapper"><canvas id="assets-chart"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Pega aquí tu URL /exec de Apps Script
+const API_URL = 'https://script.google.com/macros/s/AKfycbxRpPntpElz4wYRpZ4Gk9z1qlRAxh9LsN75NZEkxcD2d3CBe107eLjR5175yBgrzj7mkw/exec';
+// Opcional: token simple (también configúralo en Apps Script)
+const API_KEY = 'bki_2026';
+// true = intenta POST primero; si falla, hace fallback a GET
+const PREFER_POST = true;
+
+let portfolioChart = null;
+let rankingTreemapChart = null;
+let assetsChart = null;
+
+function setStatus(message, ok = false) {
+    const el = document.getElementById('status');
+    el.textContent = message;
+    el.className = 'status ' + (ok ? 'ok' : 'error');
+}
+
+function parseDateLabel(value) {
+    if (value instanceof Date) {
+        return Number.isNaN(value.getTime()) ? null : value;
+    }
+
+    const s = String(value || '').trim();
+    if (!s) return null;
+
+    const slashMatch = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (slashMatch) {
+        const d = new Date(Number(slashMatch[3]), Number(slashMatch[2]) - 1, Number(slashMatch[1]));
+        return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    const parsed = new Date(s);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function sortDateLabels(labels) {
+    return [...labels].sort((a, b) => {
+        const da = parseDateLabel(a);
+        const db = parseDateLabel(b);
+        if (!da && !db) return 0;
+        if (!da) return 1;
+        if (!db) return -1;
+        return da.getTime() - db.getTime();
+    });
+}
+
+function formatMonthYearLabel(value) {
+    const d = parseDateLabel(value);
+    if (!d) return value;
+    return `${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+
+function getTimeAxisOptions() {
+    return {
+        x: {
+            title: {
+                display: true,
+                text: 'Fecha'
+            },
+            ticks: {
+                autoSkip: true,
+                maxTicksLimit: 12,
+                maxRotation: 0,
+                callback: function(value) {
+                    return formatMonthYearLabel(this.getLabelForValue(value));
+                }
+            }
+        }
+    };
+}
+
+function getDateTooltipCallbacks() {
+    return {
+        title(items) {
+            return items && items.length ? items[0].label : '';
+        }
+    };
+}
+
+async function callApi(budget, lambda) {
+    const cleanUrl = API_URL.replace(/\/$/, '');
+    const auth = (API_KEY || '').trim();
+
+    const body = {
+        budget,
+        lambda,
+        apiKey: auth || undefined,
+        token: auth || undefined,
+        key: auth || undefined
+    };
+
+    if (PREFER_POST) {
+        try {
+            const postRes = await fetch(cleanUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': auth || '',
+                    'authorization': auth ? `Bearer ${auth}` : ''
+                },
+                body: JSON.stringify(body)
+            });
+
+            if (postRes.ok) {
+                return await postRes.json();
+            }
+        } catch (_) {
+            // fallback abajo a GET
+        }
+    }
+
+    const qs = new URLSearchParams({
+        budget: String(budget),
+        lambda: String(lambda)
+    });
+    if (auth) {
+        qs.set('apiKey', auth);
+        qs.set('token', auth);
+        qs.set('key', auth);
+    }
+
+    const getRes = await fetch(`${cleanUrl}?${qs.toString()}`);
+    return await getRes.json();
+}
+
+async function runOptimization() {
+    try {
+        const budget = Number(document.getElementById('budget').value || 1000);
+        const lambda = Number(document.getElementById('lambda').value || 0.5);
+
+        if (!API_URL.includes('/exec')) {
+            throw new Error('Configura API_URL con tu endpoint /exec de Apps Script.');
+        }
+
+        setStatus('Calculando cartera en servidor...', true);
+
+        const payload = await callApi(budget, lambda);
+
+        if (!payload.ok) {
+            throw new Error(payload.error || 'La API devolvió un error.');
+        }
+
+        renderSummary(payload, budget);
+        renderResults(payload.positions || []);
+        renderCharts(payload);
+
+        setStatus(`Cartera generada: ${payload.positions?.length || 0} posiciones.`, true);
+    } catch (err) {
+        setStatus(`Error: ${err.message}`);
+        document.getElementById('charts-container').style.display = 'none';
+        document.getElementById('summary-container').innerHTML = '';
+        document.getElementById('results-container').innerHTML = '';
+    }
+}
+
+function renderSummary(payload, budget) {
+    const invested = Number(payload.invested || 0);
+    const cash = Number.isFinite(payload.cash) ? Number(payload.cash) : Math.max(0, budget - invested);
+
+    document.getElementById('summary-container').innerHTML = `
+        <div class="summary-card">
+            <div><div style="opacity:.85;font-size:.8rem">Invertido</div><div style="font-size:1.3rem;font-weight:700">$${invested.toFixed(2)}</div></div>
+            <div><div style="opacity:.85;font-size:.8rem">Efectivo</div><div style="font-size:1.3rem;font-weight:700">$${cash.toFixed(2)}</div></div>
+            <div><div style="opacity:.85;font-size:.8rem">Eficiencia</div><div style="font-size:1.3rem;font-weight:700">${budget > 0 ? ((invested/budget)*100).toFixed(1) : '0.0'}%</div></div>
+        </div>
+    `;
+}
+
+function renderResults(positions) {
+    const cont = document.getElementById('results-container');
+    cont.innerHTML = '';
+
+    positions.forEach(p => {
+        const value = Number.isFinite(p.value) ? p.value : (p.qty * p.price);
+        const card = document.createElement('div');
+        card.className = 'stock-card';
+        card.innerHTML = `
+            <div>
+                <div class="ticker">${p.ticker}</div>
+                <div class="qty">${p.qty} acciones × $${Number(p.price).toFixed(2)}</div>
+            </div>
+            <div class="price">$${Number(value).toFixed(2)}</div>
+        `;
+        cont.appendChild(card);
+    });
+}
+
+function renderCharts(payload) {
+    const container = document.getElementById('charts-container');
+    const positions = payload.positions || [];
+    if (!positions.length) {
+        container.style.display = 'none';
+        return;
+    }
+
+    container.style.display = 'block';
+
+    renderRankingTreemap(payload);
+    renderPortfolioChart(payload);
+    renderAssetsChart(payload);
+}
+
+function renderRankingTreemap(payload) {
+    const ranking = (payload.ranking && payload.ranking.length)
+        ? payload.ranking
+        : (payload.positions || []).map(p => ({ ticker: p.ticker, value: p.value ?? (p.qty * p.price), change: p.change ?? 0 }));
+
+    const chartData = ranking.filter(x => Number.isFinite(x.value) && x.value > 0).map(item => {
+        const c = Number(item.change || 0);
+        let color;
+        if (c > 10) color = 'rgba(22,163,74,0.95)';
+        else if (c > 0) color = 'rgba(21,128,61,0.95)';
+        else if (c > -10) color = 'rgba(180,83,9,0.95)';
+        else color = 'rgba(185,28,28,0.95)';
+        return { ...item, color };
+    });
+
+    if (rankingTreemapChart) rankingTreemapChart.destroy();
+    if (!chartData.length) return;
+
+    rankingTreemapChart = new Chart(document.getElementById('ranking-treemap').getContext('2d'), {
+        type: 'treemap',
+        data: {
+            datasets: [{
+                tree: chartData,
+                key: 'value',
+                groups: ['ticker'],
+                spacing: 1,
+                borderWidth: 2,
+                borderColor: 'white',
+                backgroundColor: ctx => {
+                    if (!ctx.raw || !ctx.raw.g) return 'transparent';
+                    const item = chartData.find(d => d.ticker === ctx.raw.g);
+                    return item ? item.color : 'gray';
+                },
+                labels: {
+                    display: true,
+                    formatter: ctx => {
+                        if (!ctx.raw || !ctx.raw.g) return '';
+                        const item = chartData.find(d => d.ticker === ctx.raw.g);
+                        if (!item) return '';
+                        return [item.ticker, `$${Number(item.value).toFixed(2)}`, `${item.change >= 0 ? '+' : ''}${Number(item.change).toFixed(1)}%`];
+                    },
+                    color: 'white',
+                    font: { size: 11, weight: 'bold' }
+                }
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+}
+
+function renderPortfolioChart(payload) {
+    // Esperado: payload.history = { labels:[...], portfolio:[...] }
+    const labels = sortDateLabels((payload.history && payload.history.labels) || []);
+    const seriesMap = new Map((payload.history?.labels || []).map((d, i) => [d, payload.history.portfolio?.[i]]));
+    const values = labels.map(d => seriesMap.get(d));
+
+    if (portfolioChart) portfolioChart.destroy();
+    if (!labels.length || !values.length) return;
+
+    portfolioChart = new Chart(document.getElementById('portfolio-chart'), {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Valor cartera',
+                data: values,
+                borderColor: '#1e293b',
+                backgroundColor: '#1e293b',
+                borderWidth: 2.5,
+                pointRadius: 0,
+                tension: 0.15,
+                spanGaps: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                tooltip: {
+                    callbacks: getDateTooltipCallbacks()
+                }
+            },
+            scales: getTimeAxisOptions()
+        }
+    });
+}
+
+function renderAssetsChart(payload) {
+    // Esperado: payload.history.assets = { MSFT:[...], AAPL:[...] }
+    const labels = sortDateLabels((payload.history && payload.history.labels) || []);
+    const assets = payload.history?.assets || {};
+    const tickers = Object.keys(assets);
+
+    if (assetsChart) assetsChart.destroy();
+    if (!labels.length || !tickers.length) return;
+
+    const colors = ['#2563eb','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#84cc16','#f97316'];
+    const datasets = tickers.map((ticker, idx) => {
+        const raw = assets[ticker] || [];
+        let base = null;
+        const data = raw.map(v => {
+            const n = Number(v);
+            if (!Number.isFinite(n)) return null;
+            if (base === null) base = n;
+            if (!Number.isFinite(base) || base === 0) return null;
+            return (n / base) * 100;
+        });
+        return {
+            label: `${ticker} (base=100)`,
+            data,
+            borderColor: colors[idx % colors.length],
+            backgroundColor: colors[idx % colors.length],
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.15,
+            spanGaps: true
+        };
+    });
+
+    assetsChart = new Chart(document.getElementById('assets-chart'), {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                tooltip: {
+                    callbacks: getDateTooltipCallbacks()
+                }
+            },
+            scales: getTimeAxisOptions()
+        }
+    });
+}
+
+// carga inicial con valores por defecto
+runOptimization();
+</script>
+</body>
+</html>
