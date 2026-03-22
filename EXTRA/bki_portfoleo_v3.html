@@ -6,6 +6,8 @@
     <title>BKI Portfolio</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap"></script>
     <style>
         :root {
@@ -37,6 +39,9 @@
         .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-top: 14px; }
         .chart-title { margin: 0 0 8px 0; font-size: .95rem; font-weight: 700; }
         .chart-wrapper { position: relative; width: 100%; height: 320px; }
+        .chart-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
+        .btn-secondary { background: #334155; color: #fff; border: none; border-radius: 8px; padding: 8px 12px; font-size: .84rem; font-weight: 600; cursor: pointer; }
+        .btn-secondary:hover { opacity: .9; }
     </style>
 </head>
 <body>
@@ -69,6 +74,9 @@
         <div class="chart-card" id="portfolio-chart-card">
             <p class="chart-title">Evolución histórica de la cartera</p>
             <div class="chart-wrapper"><canvas id="portfolio-chart"></canvas></div>
+            <div class="chart-actions">
+                <button class="btn-secondary" onclick="resetPortfolioZoom()">Restaurar zoom (cartera)</button>
+            </div>
         </div>
 
         <div class="chart-card" id="ranking-chart-card">
@@ -79,6 +87,9 @@
         <div class="chart-card" id="assets-chart-card">
             <p class="chart-title">Evolución histórica de acciones</p>
             <div class="chart-wrapper"><canvas id="assets-chart"></canvas></div>
+            <div class="chart-actions">
+                <button class="btn-secondary" onclick="resetAssetsZoom()">Restaurar zoom (acciones)</button>
+            </div>
         </div>
     </div>
 </div>
@@ -161,6 +172,42 @@ function getDateTooltipCallbacks() {
             return items && items.length ? items[0].label : '';
         }
     };
+}
+
+function getZoomPluginOptions() {
+    return {
+        limits: {
+            x: { minRange: 5 }
+        },
+        pan: {
+            enabled: true,
+            mode: 'x',
+            modifierKey: 'shift'
+        },
+        zoom: {
+            wheel: { enabled: true },
+            pinch: { enabled: true },
+            drag: {
+                enabled: true,
+                backgroundColor: 'rgba(59,130,246,0.12)',
+                borderColor: 'rgba(59,130,246,0.55)',
+                borderWidth: 1
+            },
+            mode: 'x'
+        }
+    };
+}
+
+function resetPortfolioZoom() {
+    if (portfolioChart && typeof portfolioChart.resetZoom === 'function') {
+        portfolioChart.resetZoom();
+    }
+}
+
+function resetAssetsZoom() {
+    if (assetsChart && typeof assetsChart.resetZoom === 'function') {
+        assetsChart.resetZoom();
+    }
 }
 
 async function callApi(budget, lambda) {
@@ -373,7 +420,8 @@ function renderPortfolioChart(payload) {
             plugins: {
                 tooltip: {
                     callbacks: getDateTooltipCallbacks()
-                }
+                },
+                zoom: getZoomPluginOptions()
             },
             scales: getTimeAxisOptions()
         }
@@ -422,7 +470,8 @@ function renderAssetsChart(payload) {
             plugins: {
                 tooltip: {
                     callbacks: getDateTooltipCallbacks()
-                }
+                },
+                zoom: getZoomPluginOptions()
             },
             scales: getTimeAxisOptions()
         }
