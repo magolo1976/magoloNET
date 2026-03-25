@@ -163,8 +163,14 @@
 		function fmt2(n){ return String(n).padStart(2, '0'); }
 		function dateKey(y,m,d){ return `${y}-${fmt2(m+1)}-${fmt2(d)}`; }
 		function prettyDate(key){
+			if (!key || typeof key !== 'string') return '';
 			const [y,m,d] = key.split('-').map(Number);
+			if (!y || !m || !d) return String(key);
 			return `${fmt2(d)}/${fmt2(m)}/${y}`;
+		}
+
+		function isHexColor(v) {
+			return /^#[0-9a-fA-F]{6}$/.test(String(v || '').trim());
 		}
 
 		function getDaysInMonth(year, month) {
@@ -297,10 +303,15 @@
 				return { ok: true, reservas: rows };
 			}
 
-			const clean = API_URL.replace(/\/$/, '');
-			const qs = new URLSearchParams({ action: 'list', year: String(year) });
-			if (API_KEY) qs.set('apiKey', API_KEY);
-			const res = await fetch(`${clean}?${qs.toString()}`);
+			const body = new URLSearchParams();
+			body.set('action', 'list');
+			body.set('year', String(year));
+			if (API_KEY) body.set('apiKey', API_KEY);
+			const res = await fetch(API_URL, {
+				method: 'POST',
+				cache: 'no-store',
+				body
+			});
 			return await res.json();
 		}
 
@@ -354,7 +365,12 @@
 
 				reservations = new Map();
 				(payload.reservas || []).forEach(r => {
-					if (r.fecha && r.texto && r.color) reservations.set(r.fecha, { texto: r.texto, color: r.color });
+					const fecha = String(r.fecha || '').trim();
+					const texto = String(r.texto || '').trim();
+					const color = isHexColor(r.color) ? String(r.color).trim() : COLORS[0];
+					if (/^\d{4}-\d{2}-\d{2}$/.test(fecha) && texto) {
+						reservations.set(fecha, { texto, color });
+					}
 				});
 
 				renderCalendar();
