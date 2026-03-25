@@ -367,6 +367,7 @@
 
 		async function onSave() {
 			if (!selectedDate) return;
+			const targetDate = selectedDate;
 			const texto = $('noteInput').value.trim();
 			if (!texto) {
 				alert('Debes introducir un texto para guardar la reserva.');
@@ -374,13 +375,13 @@
 			}
 			try {
 				setStatus('Guardando reserva...');
-				const payload = await apiUpsert(selectedDate, texto, selectedColor);
+				const payload = await apiUpsert(targetDate, texto, selectedColor);
 				if (!payload.ok) throw new Error(payload.error || 'No se pudo guardar');
 
-				reservations.set(selectedDate, { texto, color: selectedColor });
+				reservations.set(targetDate, { texto, color: selectedColor });
 				renderCalendar();
 				closeModal();
-				setStatus(`Reserva guardada en ${prettyDate(selectedDate)}.`);
+				setStatus(`Reserva guardada en ${prettyDate(targetDate)}.`);
 			} catch (e) {
 				setStatus(`Error al guardar: ${e.message}`, true);
 			}
@@ -388,17 +389,18 @@
 
 		async function onDelete() {
 			if (!selectedDate) return;
-			if (!confirm(`¿Borrar la reserva del ${prettyDate(selectedDate)}?`)) return;
+			const targetDate = selectedDate;
+			if (!confirm(`¿Borrar la reserva del ${prettyDate(targetDate)}?`)) return;
 
 			try {
 				setStatus('Borrando reserva...');
-				const payload = await apiDelete(selectedDate);
+				const payload = await apiDelete(targetDate);
 				if (!payload.ok) throw new Error(payload.error || 'No se pudo borrar');
 
-				reservations.delete(selectedDate);
+				reservations.delete(targetDate);
 				renderCalendar();
 				closeModal();
-				setStatus(`Reserva borrada en ${prettyDate(selectedDate)}.`);
+				setStatus(`Reserva borrada en ${prettyDate(targetDate)}.`);
 			} catch (e) {
 				setStatus(`Error al borrar: ${e.message}`, true);
 			}
