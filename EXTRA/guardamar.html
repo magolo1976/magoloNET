@@ -69,6 +69,9 @@
 		.panel{width:min(560px,100%);background:#fff;border-radius:16px;border:1px solid var(--line);padding:16px;box-shadow:0 20px 45px rgba(2,6,23,.25)}
 		.panel h3{margin:0 0 10px;font-size:1rem}
 		.muted{font-size:.84rem;color:var(--muted);margin:0 0 12px}
+		.date-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+		.field-label{display:block;font-size:.8rem;color:var(--muted);font-weight:700;margin-bottom:6px}
+		.input-date{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;background:#fff}
 		textarea{width:100%;min-height:110px;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;resize:vertical}
 		.palette{display:grid;grid-template-columns:repeat(10,1fr);gap:8px;margin-top:10px}
 		.swatch{height:28px;border-radius:8px;border:2px solid transparent;cursor:pointer}
@@ -77,6 +80,7 @@
 		.left-actions,.right-actions{display:flex;gap:8px}
 		.btn-primary{background:#2563eb;color:#fff;border-color:#2563eb}
 		.btn-danger{background:#dc2626;color:#fff;border-color:#dc2626}
+		@media (max-width:640px){.date-row{grid-template-columns:1fr;}}
 	</style>
 </head>
 <body>
@@ -112,8 +116,19 @@
 
 	<div id="modal" class="modal" role="dialog" aria-modal="true">
 		<div class="panel">
-			<h3>Reserva del día</h3>
+			<h3>Reserva de estancia</h3>
 			<p id="modalDate" class="muted"></p>
+
+			<div class="date-row">
+				<div>
+					<label for="startDateInput" class="field-label">Día inicio</label>
+					<input id="startDateInput" class="input-date" type="date" readonly>
+				</div>
+				<div>
+					<label for="endDateInput" class="field-label">Día fin</label>
+					<input id="endDateInput" class="input-date" type="date">
+				</div>
+			</div>
 
 			<label for="noteInput" class="muted" style="display:block;margin-bottom:6px">Texto de reserva</label>
 			<textarea id="noteInput" maxlength="220" placeholder="Ejemplo: Familia Pérez · entrada 15:00"></textarea>
@@ -167,6 +182,31 @@
 			const [y,m,d] = key.split('-').map(Number);
 			if (!y || !m || !d) return String(key);
 			return `${fmt2(d)}/${fmt2(m)}/${y}`;
+		}
+
+		function prettyRange(startKey, endKey) {
+			if (!startKey) return '';
+			if (!endKey || endKey === startKey) return prettyDate(startKey);
+			return `${prettyDate(startKey)} → ${prettyDate(endKey)}`;
+		}
+
+		function parseDateKey(key) {
+			if (!/^\d{4}-\d{2}-\d{2}$/.test(String(key || ''))) return null;
+			const [y,m,d] = key.split('-').map(Number);
+			return new Date(y, m - 1, d);
+		}
+
+		function listDateRange(startKey, endKey) {
+			const start = parseDateKey(startKey);
+			const end = parseDateKey(endKey);
+			if (!start || !end || end < start) return [];
+			const dates = [];
+			const cursor = new Date(start);
+			while (cursor <= end) {
+				dates.push(dateKey(cursor.getFullYear(), cursor.getMonth(), cursor.getDate()));
+				cursor.setDate(cursor.getDate() + 1);
+			}
+			return dates;
 		}
 
 		function isHexColor(v) {
@@ -272,7 +312,10 @@
 		function openModal(dateStr) {
 			selectedDate = dateStr;
 			const existing = reservations.get(dateStr);
-			$('modalDate').textContent = `Fecha: ${prettyDate(dateStr)}`;
+			$('modalDate').textContent = `Reserva desde ${prettyDate(dateStr)}. Puedes ampliar hasta un día fin.`;
+			$('startDateInput').value = dateStr;
+			$('endDateInput').value = dateStr;
+			$('endDateInput').min = dateStr;
 			$('noteInput').value = existing?.texto || '';
 			selectedColor = existing?.color || COLORS[0];
 			renderPalette();
@@ -336,6 +379,33 @@
 			return await res.json();
 		}
 
+		async function apiUpsertRange(startDate, endDate, texto, color) {
+			const dates = listDateRange(startDate, endDate);
+			if (!dates.length) return { ok: false, error: 'Rango de fechas inválido' };
+
+			if (!API_URL && ENABLE_LOCAL_FALLBACK) {
+				const all = readLocalStore();
+				dates.forEach(fecha => {
+					all[fecha] = { texto, color };
+				});
+				writeLocalStore(all);
+				return { ok: true, affected: dates.length };
+			}
+
+			const body = new URLSearchParams();
+			body.set('action', 'upsert');
+			body.set('fecha', startDate);
+			body.set('endDate', endDate);
+			body.set('texto', texto);
+			body.set('color', color);
+			if (API_KEY) body.set('apiKey', API_KEY);
+			const res = await fetch(API_URL, {
+				method: 'POST',
+				body
+			});
+			return await res.json();
+		}
+
 		async function apiDelete(fecha) {
 			if (!API_URL && ENABLE_LOCAL_FALLBACK) {
 				const all = readLocalStore();
@@ -349,6 +419,31 @@
 			const body = new URLSearchParams();
 			body.set('action', 'delete');
 			body.set('fecha', fecha);
+			if (API_KEY) body.set('apiKey', API_KEY);
+			const res = await fetch(API_URL, {
+				method: 'POST',
+				body
+			});
+			return await res.json();
+		}
+
+		async function apiDeleteRange(startDate, endDate) {
+			const dates = listDateRange(startDate, endDate);
+			if (!dates.length) return { ok: false, error: 'Rango de fechas inválido' };
+
+			if (!API_URL && ENABLE_LOCAL_FALLBACK) {
+				const all = readLocalStore();
+				dates.forEach(fecha => {
+					if (all[fecha]) all[fecha] = { texto: '', color: '' };
+				});
+				writeLocalStore(all);
+				return { ok: true, affected: dates.length };
+			}
+
+			const body = new URLSearchParams();
+			body.set('action', 'delete');
+			body.set('fecha', startDate);
+			body.set('endDate', endDate);
 			if (API_KEY) body.set('apiKey', API_KEY);
 			const res = await fetch(API_URL, {
 				method: 'POST',
@@ -384,20 +479,27 @@
 		async function onSave() {
 			if (!selectedDate) return;
 			const targetDate = selectedDate;
+			const endDate = $('endDateInput').value || targetDate;
 			const texto = $('noteInput').value.trim();
 			if (!texto) {
 				alert('Debes introducir un texto para guardar la reserva.');
 				return;
 			}
+			if (!listDateRange(targetDate, endDate).length) {
+				alert('El día fin debe ser igual o posterior al día de inicio.');
+				return;
+			}
 			try {
 				setStatus('Guardando reserva...');
-				const payload = await apiUpsert(targetDate, texto, selectedColor);
+				const payload = await apiUpsertRange(targetDate, endDate, texto, selectedColor);
 				if (!payload.ok) throw new Error(payload.error || 'No se pudo guardar');
 
-				reservations.set(targetDate, { texto, color: selectedColor });
+				listDateRange(targetDate, endDate).forEach(fecha => {
+					reservations.set(fecha, { texto, color: selectedColor });
+				});
 				renderCalendar();
 				closeModal();
-				setStatus(`Reserva guardada en ${prettyDate(targetDate)}.`);
+				setStatus(`Reserva guardada: ${prettyRange(targetDate, endDate)}.`);
 			} catch (e) {
 				setStatus(`Error al guardar: ${e.message}`, true);
 			}
@@ -406,17 +508,22 @@
 		async function onDelete() {
 			if (!selectedDate) return;
 			const targetDate = selectedDate;
-			if (!confirm(`¿Borrar la reserva del ${prettyDate(targetDate)}?`)) return;
+			const endDate = $('endDateInput').value || targetDate;
+			if (!listDateRange(targetDate, endDate).length) {
+				alert('El día fin debe ser igual o posterior al día de inicio.');
+				return;
+			}
+			if (!confirm(`¿Borrar la reserva de ${prettyRange(targetDate, endDate)}?`)) return;
 
 			try {
 				setStatus('Borrando reserva...');
-				const payload = await apiDelete(targetDate);
+				const payload = await apiDeleteRange(targetDate, endDate);
 				if (!payload.ok) throw new Error(payload.error || 'No se pudo borrar');
 
-				reservations.delete(targetDate);
+				listDateRange(targetDate, endDate).forEach(fecha => reservations.delete(fecha));
 				renderCalendar();
 				closeModal();
-				setStatus(`Reserva borrada en ${prettyDate(targetDate)}.`);
+				setStatus(`Reserva borrada: ${prettyRange(targetDate, endDate)}.`);
 			} catch (e) {
 				setStatus(`Error al borrar: ${e.message}`, true);
 			}
