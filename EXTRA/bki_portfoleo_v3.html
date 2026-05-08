@@ -96,7 +96,7 @@
 
 <script>
 // Pega aquí tu URL /exec de Apps Script
-const API_URL = 'https://script.google.com/macros/s/AKfycbxRpPntpElz4wYRpZ4Gk9z1qlRAxh9LsN75NZEkxcD2d3CBe107eLjR5175yBgrzj7mkw/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycby6m2Duir2RwUhhvHe497E8b9O8gE9CjbLyu0m-lFCBHLcIRdmUy4tQo0oTIfVCmlPJsw/exec';
 // Opcional: token simple (también configúralo en Apps Script)
 const API_KEY = 'bki_2026';
 // true = intenta POST primero; si falla, hace fallback a GET
@@ -269,6 +269,9 @@ async function runOptimization() {
 
         const payload = await callApi(budget, lambda);
 
+        // DEBUG temporal: ver si llega history.benchmark
+        console.log('[DEBUG] history.benchmark:', payload.history?.benchmark);
+
         if (!payload.ok) {
             throw new Error(payload.error || 'La API devolvió un error.');
         }
@@ -389,42 +392,82 @@ function renderRankingTreemap(payload) {
     });
 }
 
+// Normaliza una serie a base 100 en su primer valor no-nulo
+function rebase100(arr) {
+    const base = arr.find(v => v !== null && v !== undefined && isFinite(v));
+    if (!base || base === 0) return arr;
+    return arr.map(v => (v !== null && v !== undefined && isFinite(v)) ? Math.round((v / base) * 10000) / 100 : null);
+}
+
 function renderPortfolioChart(payload) {
-    // Esperado: payload.history = { labels:[...], portfolio:[...] }
     const labels = sortDateLabels((payload.history && payload.history.labels) || []);
     const seriesMap = new Map((payload.history?.labels || []).map((d, i) => [d, payload.history.portfolio?.[i]]));
-    const values = labels.map(d => seriesMap.get(d));
+    const rawValues = labels.map(d => seriesMap.get(d) ?? null);
 
     if (portfolioChart) portfolioChart.destroy();
-    if (!labels.length || !values.length) return;
+    if (!labels.length || !rawValues.length) return;
+
+    const benchmarkRaw = payload.history?.benchmark;
+    const hasBenchmark = Array.isArray(benchmarkRaw) && benchmarkRaw.some(v => v !== null);
+
+    // Normalizar a base 100 solo cuando hay benchmark, para poder comparar
+    const values = hasBenchmark ? rebase100(rawValues) : rawValues;
+
+    const datasets = [{
+        label: 'Cartera BKI',
+        data: values,
+        borderColor: '#1e293b',
+        backgroundColor: '#1e293b',
+        borderWidth: 2.5,
+        pointRadius: 0,
+        tension: 0.15,
+        spanGaps: true
+    }];
+
+    if (hasBenchmark) {
+        const bmMap = new Map((payload.history?.labels || []).map((d, i) => [d, benchmarkRaw[i]]));
+        const bmValues = rebase100(labels.map(d => bmMap.get(d) ?? null));
+        datasets.push({
+            label: 'S&P 500 TR (benchmark)',
+            data: bmValues,
+            borderColor: '#800000',
+            backgroundColor: '#800000',
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.15,
+            spanGaps: true,
+            borderDash: [5, 3]
+        });
+    }
 
     portfolioChart = new Chart(document.getElementById('portfolio-chart'), {
         type: 'line',
-        data: {
-            labels,
-            datasets: [{
-                label: 'Valor cartera',
-                data: values,
-                borderColor: '#1e293b',
-                backgroundColor: '#1e293b',
-                borderWidth: 2.5,
-                pointRadius: 0,
-                tension: 0.15,
-                spanGaps: true
-            }]
-        },
+        data: { labels, datasets },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
-                legend: { display: false },
+                legend: {
+                    display: hasBenchmark,
+                    labels: { boxWidth: 20, font: { size: 12 } }
+                },
                 tooltip: {
-                    callbacks: getDateTooltipCallbacks()
+                    callbacks: {
+                        ...getDateTooltipCallbacks(),
+                        label(item) {
+                            const val = Number(item.raw).toFixed(2);
+                            return hasBenchmark
+                                ? ` ${item.dataset.label}: ${val}`
+                                : ` ${item.dataset.label}: $${val}`;
+                        }
+                    }
                 },
                 zoom: getZoomPluginOptions()
             },
-            scales: getTimeAxisOptions()
+            scales: hasBenchmark
+                ? { ...getTimeAxisOptions(), y: { ...getTimeAxisOptions().y, ticks: { callback: v => v.toFixed(0) } } }
+                : getTimeAxisOptions()
         }
     });
 }
