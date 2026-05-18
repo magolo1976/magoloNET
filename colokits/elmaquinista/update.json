@@ -3,10 +3,10 @@
   "downloadUrl":   "https://www.colokits.com/#descargar",
   "message":       "Nueva version disponible con mejoras v4.",
   "forceUpdate":   false,
-  "signature":     "SqxghDmFNGBguvClUksdcfM5ighaqwNWDw/yxR9ddr0=",
+  "signature":     "URBUZhLZT16aX5+qe9S9pSPmHcmzHOns6nmfI+0uI70=",
   "infoNotif": {
-    "number": 1,
+    "number": 2,
     "color":  "#10B981",
-    "text":   "Hola mundo de las notificaciones"
+    "text":   "Hola mundo de las notificaciones v2"
   }
 }
