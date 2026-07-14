@@ -1,12 +1,12 @@
 {
   "latestVersion": "1.1.6",
-  "downloadUrl":   "https://www.colokits.com/#descargar",
+  "downloadUrl":   "https://www.magolo.net",
   "message":       "Nueva version disponible con mejoras v4.",
   "forceUpdate":   false,
-  "signature":     "km7OCQLiSJkS9Sj1txxgMnD5OF9uI45lSeX2eKpMQgE=",
+  "signature":     "lfw6UgDP9vy0bFyAjZGQqEyTuHEZE7Dr/87Ja7Ms4Uk=",
   "infoNotif": {
     "number": 4,
     "color":  "#10B981",
-    "text":   "Hola mundo de las notificaciones v4"
+    "text":   "Hola mundo de las notificaciones vxx"
   }
 }
