@@ -1,9 +1,9 @@
 {
-  "latestVersion": "1.1.7",
+  "latestVersion": "1.0.0",
   "downloadUrl":   "https://colokits.com/#descargar",
   "message":       "Nueva version disponible con mejoras.",
   "forceUpdate":   false,
-  "signature":     "8DTiX79WzCcAKKCQnazR1OQq0OOhyFwPBDlYyK/snM0=",
+  "signature":     "rpKuvYlBc+mg+9dc9fFyrHhT3y5DVt3JhXW3fENe3P4=",
   "infoNotif": {
     "number": 4,
     "color":  "#10B981",
