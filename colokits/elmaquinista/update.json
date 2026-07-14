@@ -1,9 +1,9 @@
 {
-  "latestVersion": "1.1.6",
-  "downloadUrl":   "https://www.magolo.net",
-  "message":       "Nueva version disponible con mejoras v4.",
+  "latestVersion": "1.1.7",
+  "downloadUrl":   "https://colokits.com/#descargar",
+  "message":       "Nueva version disponible con mejoras.",
   "forceUpdate":   false,
-  "signature":     "lfw6UgDP9vy0bFyAjZGQqEyTuHEZE7Dr/87Ja7Ms4Uk=",
+  "signature":     "8DTiX79WzCcAKKCQnazR1OQq0OOhyFwPBDlYyK/snM0=",
   "infoNotif": {
     "number": 4,
     "color":  "#10B981",
