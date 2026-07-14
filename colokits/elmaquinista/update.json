@@ -1,8 +1,8 @@
 {
   "latestVersion": "1.1.6",
-  "downloadUrl":   "https://www.magolo.net",
-  "message":       "Nueva version disponible con mejoras vxxx.",
-  "forceUpdate":   true,
+  "downloadUrl":   "https://www.colokits.com/#descargar",
+  "message":       "Nueva version disponible con mejoras v4.",
+  "forceUpdate":   false,
   "signature":     "km7OCQLiSJkS9Sj1txxgMnD5OF9uI45lSeX2eKpMQgE=",
   "infoNotif": {
     "number": 4,
