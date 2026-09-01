@@ -2,366 +2,752 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Detector de Plato de Comida</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Escáner de Comida</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
-    font-family: Arial, sans-serif;
-    background: #1a1a1a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #111;
     color: #fff;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 100vh;
-    padding: 20px;
+    padding: 16px;
   }
 
-  h1 { font-size: 1.3rem; margin-bottom: 20px; text-align: center; }
+  h1 { font-size: 18px; margin-bottom: 12px; text-align: center; }
 
-  .buttons {
+  /* ===== Pantalla inicial: botones ===== */
+  #start-screen {
     display: flex;
+    flex-direction: column;
     gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
+    width: 100%;
+    max-width: 420px;
+    margin-top: 40px;
   }
-
-  button {
-    background: #ff6b35;
-    color: #fff;
+  .action-btn {
+    padding: 16px;
+    font-size: 16px;
     border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 1rem;
+    border-radius: 12px;
+    background: #2a7de1;
+    color: #fff;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
+  .action-btn:active { background: #1c5fb0; }
+  #file-input { display: none; }
 
-  button:disabled { background: #555; }
-
-  input[type="file"] { display: none; }
-
-  /* Contenedor de captura (cámara o preview de archivo) */
-  #captureStage {
+  /* ===== Vista cámara con círculo guía ===== */
+  #camera-view {
+    display: none;
     position: relative;
     width: 100%;
-    max-width: 500px;
+    max-width: 420px;
     aspect-ratio: 1 / 1;
-    background: #000;
     border-radius: 12px;
     overflow: hidden;
-    display: none;
-    margin-bottom: 15px;
+    background: #000;
   }
-
-  #captureStage video,
-  #captureStage img {
+  #camera-view video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
   }
-
-  /* Overlay circular fijo */
-  .circle-overlay {
+  #capture-mask {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 80%;
-    height: 80%;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    border: 3px dashed #ff6b35;
-    box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.55);
+    inset: 0;
     pointer-events: none;
   }
-
-  #confirmCaptureBtn {
-    display: none;
-    margin-bottom: 15px;
+  #capture-controls {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    width: 100%;
+    max-width: 420px;
   }
+  #capture-controls button {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  #shoot-btn { background: #2a7de1; color: #fff; }
+  #cancel-btn { background: #444; color: #fff; }
 
-  /* Visor final, solo aparece si hay imagen validada */
-  #resultViewer {
+  /* ===== Visor de imagen ===== */
+  #viewer-container {
     display: none;
     width: 100%;
-    max-width: 500px;
+    max-width: 420px;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  #image-viewer-box {
+    width: 100%;
     aspect-ratio: 1 / 1;
     border-radius: 12px;
     overflow: hidden;
-    border: 3px solid #4caf50;
-    margin-bottom: 15px;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
   }
-
-  #resultViewer img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+  #image-viewer-box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
   }
 
   #status {
     text-align: center;
-    min-height: 24px;
-    font-size: 0.95rem;
+    padding: 10px;
+    font-size: 14px;
+    min-height: 20px;
+  }
+  .status-ok { color: #4caf50; }
+  .status-error { color: #f44336; }
+  .status-loading { color: #ffb300; }
+
+  #result-actions {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+  }
+  #result-actions button {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    background: #333;
+    color: #fff;
+  }
+  #confirm-btn { background: #4caf50 !important; }
+  #confirm-btn:disabled { background: #555 !important; opacity: 0.5; cursor: not-allowed; }
+
+  canvas { display: none; }
+
+  /* ===== Debug panel ===== */
+  .debug-toggle-btn {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: #333;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 9999;
+    opacity: 0.5;
+  }
+  .debug-panel {
+    position: fixed;
+    bottom: 70px;
+    right: 16px;
+    width: 300px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: #1e1e1e;
+    border: 1px solid #444;
+    border-radius: 12px;
+    padding: 14px;
+    z-index: 9999;
+    font-size: 12px;
+  }
+  .debug-panel.hidden { display: none; }
+  .debug-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 10px;
   }
-
-  .error { color: #ff5252; }
-  .success { color: #4caf50; }
-  .loading { color: #ffb74d; }
-
-  #infoSize {
-    font-size: 0.8rem;
-    color: #aaa;
+  .debug-header h3 { font-size: 14px; }
+  .debug-header button {
+    background: none; border: none; color: #fff; font-size: 16px; cursor: pointer;
+  }
+  .debug-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #444;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 6px 4px;
+    border: none;
+    background: none;
+    font-size: 11px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: #999;
+  }
+  .tab-btn.active { color: #fff; border-bottom-color: #2a7de1; font-weight: 600; }
+  .tab-content.hidden { display: none; }
+  .debug-row { margin-bottom: 12px; }
+  .debug-row label { display: block; font-size: 11px; margin-bottom: 4px; color: #ddd; }
+  .debug-row small { display: block; color: #888; font-size: 10px; margin-top: 2px; }
+  .stepper { display: flex; align-items: center; gap: 6px; }
+  .stepper input {
+    width: 70px;
     text-align: center;
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background: #2a2a2a;
+    color: #fff;
+    font-size: 12px;
+  }
+  .step-btn {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: #2a7de1;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .debug-log {
+    background: #000;
+    border-radius: 8px;
+    padding: 8px;
+    margin: 10px 0;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+  .debug-log pre { font-size: 10px; white-space: pre-wrap; color: #0f0; }
+  .debug-actions { display: flex; gap: 8px; }
+  .debug-actions button {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    background: #444;
+    color: #fff;
+    font-size: 11px;
+    cursor: pointer;
   }
 </style>
 </head>
 <body>
 
-<h1>📸 Sube o capta tu plato de comida</h1>
+<h1>🍽️ Escáner de Comida</h1>
 
-<div class="buttons">
-  <button id="uploadBtn">📁 Subir archivo</button>
-  <button id="cameraBtn">📷 Usar cámara</button>
-  <input type="file" id="fileInput" accept="image/*">
+<!-- Pantalla inicial -->
+<div id="start-screen">
+  <button class="action-btn" id="btn-upload">📁 Subir archivo</button>
+  <button class="action-btn" id="btn-camera">📷 Hacer foto</button>
+  <input type="file" id="file-input" accept="image/*">
 </div>
 
-<div id="captureStage">
+<!-- Vista cámara -->
+<div id="camera-view">
   <video id="video" autoplay playsinline muted></video>
-  <img id="previewImg" style="display:none;">
-  <div class="circle-overlay"></div>
+  <canvas id="capture-mask"></canvas>
+</div>
+<div id="capture-controls" style="display:none;">
+  <button id="cancel-btn">✕ Cancelar</button>
+  <button id="shoot-btn">📸 Capturar</button>
 </div>
 
-<button id="confirmCaptureBtn">✅ Confirmar encuadre</button>
-
-<div id="status"></div>
-
-<div id="resultViewer">
-  <img id="finalImg">
+<!-- Visor -->
+<div id="viewer-container">
+  <div id="image-viewer-box">
+    <img id="preview-img" alt="Vista previa">
+  </div>
+  <div id="status"></div>
+  <div id="result-actions">
+    <button id="retry-btn">🔄 Repetir</button>
+    <button id="confirm-btn" disabled>✅ Confirmar</button>
+  </div>
 </div>
 
-<div id="infoSize"></div>
+<canvas id="work-canvas"></canvas>
 
-<!-- TensorFlow.js + MobileNet -->
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+<!-- Debug panel -->
+<button id="debug-toggle" class="debug-toggle-btn" title="Ajustes IA">⚙️</button>
+
+<div id="debug-panel" class="debug-panel hidden">
+  <div class="debug-header">
+    <h3>🎛️ Panel de ajustes</h3>
+    <button id="debug-close">✕</button>
+  </div>
+
+  <div class="debug-tabs">
+    <button class="tab-btn active" data-tab="detection">🍽️ Detección</button>
+    <button class="tab-btn" data-tab="image">🖼️ Imagen</button>
+    <button class="tab-btn" data-tab="capture">⭕ Captura</button>
+  </div>
+
+  <div class="tab-content" data-tab-content="detection">
+    <div class="debug-row">
+      <label>Umbral comida real</label>
+      <div class="stepper">
+        <button class="step-btn" data-target="foodThreshold" data-step="-0.01">−</button>
+        <input type="number" id="foodThreshold" value="0.10" step="0.01" min="0" max="1">
+        <button class="step-btn" data-target="foodThreshold" data-step="0.01">+</button>
+      </div>
+      <small>Prob. mínima para considerar comida real</small>
+    </div>
+    <div class="debug-row">
+      <label>Umbral contenedor vacío</label>
+      <div class="stepper">
+        <button class="step-btn" data-target="containerThreshold" data-step="-0.01">−</button>
+        <input type="number" id="containerThreshold" value="0.15" step="0.01" min="0" max="1">
+        <button class="step-btn" data-target="containerThreshold" data-step="0.01">+</button>
+      </div>
+      <small>Prob. mínima para detectar plato/vaso vacío</small>
+    </div>
+    <div class="debug-row">
+      <label>Top-K predicciones</label>
+      <div class="stepper">
+        <button class="step-btn" data-target="topK" data-step="-1">−</button>
+        <input type="number" id="topK" value="10" step="1" min="1" max="20">
+        <button class="step-btn" data-target="topK" data-step="1">+</button>
+      </div>
+    </div>
+    <div class="debug-row">
+      <label>Confianza mínima (filtro ruido)</label>
+      <div class="stepper">
+        <button class="step-btn" data-target="minConfidenceFilter" data-step="-0.01">−</button>
+        <input type="number" id="minConfidenceFilter" value="0.03" step="0.01" min="0" max="1">
+        <button class="step-btn" data-target="minConfidenceFilter" data-step="0.01">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content hidden" data-tab-content="image">
+    <div class="debug-row">
+      <label>Calidad JPEG envío</label>
+      <div class="stepper">
+        <button class="step-btn" data-target="jpegQuality" data-step="-0.05">−</button>
+        <input type="number" id="jpegQuality" value="0.7" step="0.05" min="0.1" max="1">
+        <button class="step-btn" data-target="jpegQuality" data-step="0.05">+</button>
+      </div>
+    </div>
+    <div class="debug-row">
+      <label>Ancho máximo (px)</label>
+      <div class="stepper">
+        <button class="step-btn" data-target="maxWidth" data-step="-50">−</button>
+        <input type="number" id="maxWidth" value="800" step="50" min="200" max="2000">
+        <button class="step-btn" data-target="maxWidth" data-step="50">+</button>
+      </div>
+    </div>
+    <div class="debug-row">
+      <label>Alto máximo (px)</label>
+      <div class="stepper">
+        <button class="step-btn" data-target="maxHeight" data-step="-50">−</button>
+        <input type="number" id="maxHeight" value="800" step="50" min="200" max="2000">
+        <button class="step-btn" data-target="maxHeight" data-step="50">+</button>
+      </div>
+    </div>
+    <div class="debug-row">
+      <label>
+        <input type="checkbox" id="removeBackground" checked>
+        Recortar a círculo antes de enviar
+      </label>
+    </div>
+  </div>
+
+  <div class="tab-content hidden" data-tab-content="capture">
+    <div class="debug-row">
+      <label>Diámetro círculo (%)</label>
+      <div class="stepper">
+        <button class="step-btn" data-target="circleDiameterPercent" data-step="-5">−</button>
+        <input type="number" id="circleDiameterPercent" value="80" step="5" min="30" max="100">
+        <button class="step-btn" data-target="circleDiameterPercent" data-step="5">+</button>
+      </div>
+    </div>
+    <div class="debug-row">
+      <label>Opacidad máscara</label>
+      <div class="stepper">
+        <button class="step-btn" data-target="maskOpacity" data-step="-0.05">−</button>
+        <input type="number" id="maskOpacity" value="0.85" step="0.05" min="0" max="1">
+        <button class="step-btn" data-target="maskOpacity" data-step="0.05">+</button>
+      </div>
+    </div>
+    <div class="debug-row">
+      <label>Grosor borde (px)</label>
+      <div class="stepper">
+        <button class="step-btn" data-target="circleBorderWidth" data-step="-1">−</button>
+        <input type="number" id="circleBorderWidth" value="3" step="1" min="0" max="10">
+        <button class="step-btn" data-target="circleBorderWidth" data-step="1">+</button>
+      </div>
+    </div>
+    <div class="debug-row">
+      <label>Margen recorte (%)</label>
+      <div class="stepper">
+        <button class="step-btn" data-target="cropMarginPercent" data-step="-2">−</button>
+        <input type="number" id="cropMarginPercent" value="5" step="2" min="0" max="30">
+        <button class="step-btn" data-target="cropMarginPercent" data-step="2">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="debug-log">
+    <strong>Última predicción:</strong>
+    <pre id="debug-predictions">—</pre>
+  </div>
+
+  <div class="debug-actions">
+    <button id="debug-reset">🔄 Reset</button>
+    <button id="debug-copy">📋 Copiar</button>
+  </div>
+</div>
 
 <script>
-  const uploadBtn = document.getElementById('uploadBtn');
-  const cameraBtn = document.getElementById('cameraBtn');
-  const fileInput = document.getElementById('fileInput');
-  const captureStage = document.getElementById('captureStage');
-  const video = document.getElementById('video');
-  const previewImg = document.getElementById('previewImg');
-  const confirmCaptureBtn = document.getElementById('confirmCaptureBtn');
-  const statusDiv = document.getElementById('status');
-  const resultViewer = document.getElementById('resultViewer');
-  const finalImg = document.getElementById('finalImg');
-  const infoSize = document.getElementById('infoSize');
+(function () {
+  'use strict';
 
-  let currentStream = null;
-  let currentMode = null; // 'camera' | 'file'
+  // ============ CONFIG (calibrable en vivo) ============
+  const AI_CONFIG = {
+    foodThreshold: 0.10,
+    containerThreshold: 0.15,
+    topK: 10,
+    minConfidenceFilter: 0.03,
+    jpegQuality: 0.7,
+    maxWidth: 800,
+    maxHeight: 800,
+    aiInputSize: 224,
+    removeBackground: true,
+    circleDiameterPercent: 80,
+    maskOpacity: 0.85,
+    circleBorderWidth: 3,
+    cropMarginPercent: 5
+  };
+  const DEFAULT_CONFIG = JSON.parse(JSON.stringify(AI_CONFIG));
+
+  const REAL_FOOD_KEYWORDS = [
+    'pizza', 'soup', 'burger', 'sandwich', 'salad', 'pasta',
+    'bread', 'cake', 'dessert', 'meat', 'fruit', 'vegetable', 'rice',
+    'noodle', 'taco', 'burrito', 'sushi', 'stew', 'dish',
+    'guacamole', 'pretzel', 'bagel', 'pancake', 'waffle', 'hotdog',
+    'ice cream', 'trifle', 'custard', 'chocolate', 'egg', 'cheese',
+    'mashed potato', 'broccoli', 'cucumber', 'pepper', 'mushroom',
+    'pomegranate', 'banana', 'orange', 'lemon', 'strawberry', 'pineapple',
+    'crab', 'cauliflower', 'potpie', 'consomme', 'meatloaf', 'carbonara',
+    'espresso', 'artichoke', 'zucchini', 'cabbage', 'corn',
+    'pot pie', 'french loaf', 'chili', 'yolk', 'omelet', 'steak',
+    'bacon', 'sausage', 'shrimp', 'lobster'
+  ];
+  const CONTAINER_KEYWORDS = [
+    'plate', 'bowl', 'cup', 'wine glass', 'mug', 'tray',
+    'fork', 'spoon', 'knife', 'chopstick', 'napkin', 'placemat',
+    'saucer', 'dining table'
+  ];
+
   let model = null;
+  let currentStream = null;
+  let capturedBlob = null;
 
-  // Palabras clave relacionadas con comida en las clases de MobileNet (ImageNet)
-  const FOOD_KEYWORDS = [
-	  'pizza', 'soup', 'plate', 'burger', 'sandwich', 'salad', 'pasta',
-	  'bread', 'cake', 'dessert', 'meat', 'fruit', 'vegetable', 'rice',
-	  'noodle', 'taco', 'burrito', 'sushi', 'stew', 'dish', 'food',
-	  'guacamole', 'pretzel', 'bagel', 'pancake', 'waffle', 'hotdog',
-	  'ice cream', 'trifle', 'custard', 'chocolate', 'egg', 'cheese',
-	  'mashed potato', 'broccoli', 'cucumber', 'pepper', 'mushroom',
-	  'pomegranate', 'banana', 'orange', 'lemon', 'strawberry', 'pineapple',
-	  'bowl', 'cup', 'spoon', 'fork', 'plate rack', 'frying pan',
-	  'wok', 'crock pot', 'potpie', 'consomme', 'meatloaf', 'carbonara',
-	  'espresso', 'mixing bowl', 'strainer', 'ladle', 'cutting board'
-	]
+  const els = {
+    startScreen: document.getElementById('start-screen'),
+    btnUpload: document.getElementById('btn-upload'),
+    btnCamera: document.getElementById('btn-camera'),
+    fileInput: document.getElementById('file-input'),
+    cameraView: document.getElementById('camera-view'),
+    video: document.getElementById('video'),
+    captureMask: document.getElementById('capture-mask'),
+    captureControls: document.getElementById('capture-controls'),
+    shootBtn: document.getElementById('shoot-btn'),
+    cancelBtn: document.getElementById('cancel-btn'),
+    viewerContainer: document.getElementById('viewer-container'),
+    previewImg: document.getElementById('preview-img'),
+    status: document.getElementById('status'),
+    retryBtn: document.getElementById('retry-btn'),
+    confirmBtn: document.getElementById('confirm-btn'),
+    workCanvas: document.getElementById('work-canvas'),
+    debugPredictions: document.getElementById('debug-predictions')
+  };
 
-async function loadModel() {
-  try {
-    statusDiv.textContent = 'Cargando modelo de IA...';
-    console.log('Iniciando carga de MobileNet...');
-    model = await mobilenet.load();
-    console.log('Modelo cargado correctamente:', model);
-    statusDiv.textContent = 'Modelo listo. Puedes subir una foto.';
-  } catch (err) {
-    console.error('Error cargando el modelo:', err);
-    statusDiv.textContent = 'Error al cargar el modelo de IA. Revisa la consola.';
+  // ============ Carga del modelo ============
+  async function loadModel() {
+    setStatus('Cargando modelo IA...', 'loading');
+    try {
+      model = await mobilenet.load({ version: 2, alpha: 1.0 });
+      setStatus('', '');
+    } catch (e) {
+      console.error(e);
+      setStatus('Error cargando el modelo IA.', 'error');
+    }
   }
-}
+  loadModel();
 
-loadModel();
+  function setStatus(text, type) {
+    els.status.textContent = text;
+    els.status.className = type ? 'status-' + type : '';
+  }
 
-  // --- Botón subir archivo ---
-  uploadBtn.addEventListener('click', () => fileInput.click());
-
-  fileInput.addEventListener('change', (e) => {
+  // ============ Flujo: subir archivo ============
+  els.btnUpload.addEventListener('click', () => els.fileInput.click());
+  els.fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
-    if (!file) return;
-    stopCamera();
-    currentMode = 'file';
-
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      previewImg.src = ev.target.result;
-      previewImg.style.display = 'block';
-      video.style.display = 'none';
-      captureStage.style.display = 'block';
-      confirmCaptureBtn.style.display = 'inline-block';
-      resultViewer.style.display = 'none';
-      statusDiv.textContent = '';
-      infoSize.textContent = '';
-    };
-    reader.readAsDataURL(file);
+    if (file) handleNewImage(file);
   });
 
-  // --- Botón cámara ---
-  cameraBtn.addEventListener('click', async () => {
+  // ============ Flujo: cámara ============
+  els.btnCamera.addEventListener('click', async () => {
     try {
-      currentMode = 'camera';
-      previewImg.style.display = 'none';
-      video.style.display = 'block';
-      captureStage.style.display = 'block';
-      resultViewer.style.display = 'none';
-      statusDiv.textContent = '';
-      infoSize.textContent = '';
-
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
       const constraints = {
-        video: { facingMode: 'environment' } // cámara trasera en móvil
+        video: isMobile
+          ? { facingMode: { ideal: 'environment' } }
+          : { facingMode: 'user' }
       };
       currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-      video.srcObject = currentStream;
-      confirmCaptureBtn.style.display = 'inline-block';
+      els.video.srcObject = currentStream;
+      els.startScreen.style.display = 'none';
+      els.cameraView.style.display = 'block';
+      els.captureControls.style.display = 'flex';
+      requestAnimationFrame(drawCaptureMask);
     } catch (err) {
-      statusDiv.textContent = 'No se pudo acceder a la cámara: ' + err.message;
-      statusDiv.className = 'error';
+      console.error(err);
+      alert('No se pudo acceder a la cámara. Revisa permisos del navegador.');
     }
   });
+
+  function drawCaptureMask() {
+    if (!currentStream) return;
+    const canvas = els.captureMask;
+    const rect = els.cameraView.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const radius = (Math.min(canvas.width, canvas.height) * AI_CONFIG.circleDiameterPercent / 100) / 2;
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+
+    ctx.fillStyle = `rgba(0,0,0,${AI_CONFIG.maskOpacity})`;
+    ctx.beginPath();
+    ctx.rect(0, 0, canvas.width, canvas.height);
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2, true);
+    ctx.fill('evenodd');
+
+    if (AI_CONFIG.circleBorderWidth > 0) {
+      ctx.strokeStyle = '#2a7de1';
+      ctx.lineWidth = AI_CONFIG.circleBorderWidth;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    requestAnimationFrame(drawCaptureMask);
+  }
+  window.updateCaptureCircle = () => {}; // redibujo continuo ya cubre esto
+
+  els.cancelBtn.addEventListener('click', stopCamera);
 
   function stopCamera() {
     if (currentStream) {
-      currentStream.getTracks().forEach(track => track.stop());
+      currentStream.getTracks().forEach(t => t.stop());
       currentStream = null;
+    }
+    els.cameraView.style.display = 'none';
+    els.captureControls.style.display = 'none';
+    els.startScreen.style.display = 'flex';
+  }
+
+  els.shootBtn.addEventListener('click', () => {
+    const video = els.video;
+    const size = Math.min(video.videoWidth, video.videoHeight);
+    const radiusPx = (size * AI_CONFIG.circleDiameterPercent / 100) / 2;
+    const marginFactor = 1 + (AI_CONFIG.cropMarginPercent / 100);
+    const cropSize = Math.min(size, radiusPx * 2 * marginFactor);
+
+    const sx = (video.videoWidth - cropSize) / 2;
+    const sy = (video.videoHeight - cropSize) / 2;
+
+    const canvas = els.workCanvas;
+    canvas.width = cropSize;
+    canvas.height = cropSize;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, sx, sy, cropSize, cropSize, 0, 0, cropSize, cropSize);
+
+    canvas.toBlob((blob) => {
+      stopCamera();
+      handleNewImage(blob);
+    }, 'image/jpeg', 0.95);
+  });
+
+  // ============ Procesar imagen nueva (archivo o captura) ============
+  function handleNewImage(fileOrBlob) {
+    const url = URL.createObjectURL(fileOrBlob);
+    els.previewImg.src = url;
+    els.startScreen.style.display = 'none';
+    els.viewerContainer.style.display = 'flex';
+    els.confirmBtn.disabled = true;
+    capturedBlob = null;
+
+    els.previewImg.onload = async () => {
+      await validateAndProcess(els.previewImg, fileOrBlob);
+    };
+  }
+
+  async function validateAndProcess(imgEl, originalBlob) {
+    setStatus('Analizando imagen...', 'loading');
+
+    if (!model) {
+      setStatus('Modelo IA no disponible todavía, espera...', 'error');
+      return;
+    }
+
+    try {
+      const predictions = await model.classify(imgEl, AI_CONFIG.topK);
+
+      const filtered = predictions.filter(p => p.probability >= AI_CONFIG.minConfidenceFilter);
+      els.debugPredictions.textContent = filtered
+        .map(p => `${p.className}: ${(p.probability * 100).toFixed(1)}%`)
+        .join('\n') || '—';
+
+      const hasRealFood = filtered.some(pred => {
+        const name = pred.className.toLowerCase();
+        return REAL_FOOD_KEYWORDS.some(k => name.includes(k)) && pred.probability > AI_CONFIG.foodThreshold;
+      });
+
+      const top = filtered[0];
+      const isEmptyContainer = !hasRealFood && top &&
+        CONTAINER_KEYWORDS.some(k => top.className.toLowerCase().includes(k)) &&
+        top.probability > AI_CONFIG.containerThreshold;
+
+      if (hasRealFood) {
+        setStatus('✅ Comida detectada correctamente.', 'ok');
+        const processedBlob = await processImageForUpload(imgEl);
+        capturedBlob = processedBlob;
+        els.confirmBtn.disabled = false;
+      } else if (isEmptyContainer) {
+        setStatus('⚠️ Parece un plato o vaso vacío. Sube una foto con comida real.', 'error');
+      } else {
+        setStatus('⚠️ No se detecta comida en la imagen. Inténtalo de nuevo.', 'error');
+      }
+    } catch (e) {
+      console.error(e);
+      setStatus('Error analizando la imagen.', 'error');
     }
   }
 
-  // --- Confirmar encuadre: recorta al círculo (bounding box) ---
-  confirmCaptureBtn.addEventListener('click', async () => {
-    statusDiv.textContent = 'Analizando imagen...';
-    statusDiv.className = 'loading';
-    confirmCaptureBtn.disabled = true;
-
-    const sourceEl = currentMode === 'camera' ? video : previewImg;
-    const croppedCanvas = cropToCircleBoundingBox(sourceEl);
-
-    // Validar si es comida
-    const tempImg = new Image();
-    tempImg.src = croppedCanvas.toDataURL('image/jpeg');
-    tempImg.onload = async () => {
-      const isFood = await checkIsFood(tempImg);
-
-      if (!isFood) {
-        statusDiv.textContent = '⚠️ La imagen no parece ser un plato de comida. Intenta de nuevo.';
-        statusDiv.className = 'error';
-        confirmCaptureBtn.disabled = false;
-        return;
-      }
-
-      // Es comida: optimizar (resize + calidad 70%)
-      const optimizedBlob = await optimizeImage(croppedCanvas, 800, 0.7);
-      const optimizedUrl = URL.createObjectURL(optimizedBlob);
-
-      finalImg.src = optimizedUrl;
-      resultViewer.style.display = 'block';
-      captureStage.style.display = 'none';
-      confirmCaptureBtn.style.display = 'none';
-      stopCamera();
-
-      statusDiv.textContent = '✅ ¡Plato detectado correctamente!';
-      statusDiv.className = 'success';
-
-      const sizeKB = (optimizedBlob.size / 1024).toFixed(1);
-      infoSize.textContent = `Tamaño optimizado: ${sizeKB} KB — listo para enviar`;
-
-      confirmCaptureBtn.disabled = false;
-    };
-  });
-
-  // --- Recorta al bounding box del círculo (80% centrado) ---
-  function cropToCircleBoundingBox(sourceEl) {
-    const isVideo = sourceEl.tagName === 'VIDEO';
-    const naturalW = isVideo ? sourceEl.videoWidth : sourceEl.naturalWidth;
-    const naturalH = isVideo ? sourceEl.videoHeight : sourceEl.naturalHeight;
-
-    // El elemento se muestra con object-fit: cover en un contenedor cuadrado
-    // Calculamos qué parte de la imagen original corresponde al cuadrado visible
-    const minSide = Math.min(naturalW, naturalH);
-    const offsetX = (naturalW - minSide) / 2;
-    const offsetY = (naturalH - minSide) / 2;
-
-    // El círculo ocupa 80% del contenedor cuadrado visible
-    const circleSize = minSide * 0.8;
-    const circleOffset = (minSide - circleSize) / 2;
-
-    const canvas = document.createElement('canvas');
-    canvas.width = circleSize;
-    canvas.height = circleSize;
-    const ctx = canvas.getContext('2d');
-
-    ctx.drawImage(
-      sourceEl,
-      offsetX + circleOffset, offsetY + circleOffset, circleSize, circleSize,
-      0, 0, circleSize, circleSize
-    );
-
-    return canvas;
-  }
-
-  // --- Validar si es comida con MobileNet ---
-	async function checkIsFood(imgElement) {
-	  if (!model) {
-		statusDiv.textContent = 'El modelo aún está cargando, espera un segundo...';
-		return false;
-	  }
-	  const predictions = await model.classify(imgElement, 10);
-	  console.log('Predicciones:', predictions);
-
-	  const match = predictions.find(pred =>
-		FOOD_KEYWORDS.some(keyword =>
-		  pred.className.toLowerCase().includes(keyword)
-		) && pred.probability > 0.05
-	  );
-
-	  console.log('¿Coincidencia encontrada?', match);
-
-	  return !!match;
-	}
-
-  // --- Optimizar imagen: resize + calidad 70% ---
-  function optimizeImage(canvasSource, maxSize = 800, quality = 0.7) {
+  // ============ Procesar imagen: recorte circular + resize + compresión ============
+  function processImageForUpload(imgEl) {
     return new Promise((resolve) => {
-      let { width, height } = canvasSource;
+      const canvas = els.workCanvas;
+      const ctx = canvas.getContext('2d');
 
-      if (width > height && width > maxSize) {
-        height = Math.round((height * maxSize) / width);
-        width = maxSize;
-      } else if (height > maxSize) {
-        width = Math.round((width * maxSize) / height);
-        height = maxSize;
+      let { naturalWidth: w, naturalHeight: h } = imgEl;
+      const scale = Math.min(1, AI_CONFIG.maxWidth / w, AI_CONFIG.maxHeight / h);
+      const targetW = Math.round(w * scale);
+      const targetH = Math.round(h * scale);
+
+      canvas.width = targetW;
+      canvas.height = targetH;
+      ctx.clearRect(0, 0, targetW, targetH);
+
+      if (AI_CONFIG.removeBackground) {
+        ctx.save();
+        ctx.beginPath();
+        const radius = Math.min(targetW, targetH) / 2;
+        ctx.arc(targetW / 2, targetH / 2, radius, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(imgEl, 0, 0, targetW, targetH);
+        ctx.restore();
+      } else {
+        ctx.drawImage(imgEl, 0, 0, targetW, targetH);
       }
 
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(canvasSource, 0, 0, width, height);
-
-      canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality);
+      canvas.toBlob((blob) => resolve(blob), 'image/jpeg', AI_CONFIG.jpegQuality);
     });
   }
+
+  // ============ Botones resultado ============
+  els.retryBtn.addEventListener('click', () => {
+    els.viewerContainer.style.display = 'none';
+    els.startScreen.style.display = 'flex';
+    setStatus('', '');
+    capturedBlob = null;
+  });
+
+  els.confirmBtn.addEventListener('click', () => {
+    if (!capturedBlob) return;
+    // Aquí se enviaría capturedBlob al backend con fetch/FormData
+    console.log('Imagen lista para enviar. Tamaño:', (capturedBlob.size / 1024).toFixed(1), 'KB');
+    alert('Imagen lista para enviar al servidor (' + (capturedBlob.size / 1024).toFixed(1) + ' KB)');
+  });
+
+  // ============ DEBUG PANEL ============
+  document.getElementById('debug-toggle').addEventListener('click', () =>
+    document.getElementById('debug-panel').classList.remove('hidden'));
+  document.getElementById('debug-close').addEventListener('click', () =>
+    document.getElementById('debug-panel').classList.add('hidden'));
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+      btn.classList.add('active');
+      document.querySelector(`[data-tab-content="${btn.dataset.tab}"]`).classList.remove('hidden');
+    });
+  });
+
+  document.querySelectorAll('.step-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.dataset.target;
+      const step = parseFloat(btn.dataset.step);
+      const input = document.getElementById(targetId);
+      let value = parseFloat(input.value) + step;
+      value = Math.round(value * 1000) / 1000;
+      const min = parseFloat(input.min);
+      const max = parseFloat(input.max);
+      value = Math.max(min, Math.min(max, value));
+      input.value = value;
+      AI_CONFIG[targetId] = value;
+    });
+  });
+
+  Object.keys(AI_CONFIG).forEach(key => {
+    const el = document.getElementById(key);
+    if (!el) return;
+    if (el.type === 'checkbox') {
+      el.checked = AI_CONFIG[key];
+      el.addEventListener('change', (e) => { AI_CONFIG[key] = e.target.checked; });
+    } else {
+      el.addEventListener('change', (e) => { AI_CONFIG[key] = parseFloat(e.target.value); });
+    }
+  });
+
+  document.getElementById('debug-reset').addEventListener('click', () => {
+    Object.assign(AI_CONFIG, JSON.parse(JSON.stringify(DEFAULT_CONFIG)));
+    Object.keys(AI_CONFIG).forEach(key => {
+      const el = document.getElementById(key);
+      if (!el) return;
+      if (el.type === 'checkbox') el.checked = AI_CONFIG[key];
+      else el.value = AI_CONFIG[key];
+    });
+  });
+
+  document.getElementById('debug-copy').addEventListener('click', () => {
+    const text = JSON.stringify(AI_CONFIG, null, 2);
+    navigator.clipboard.writeText(text).then(() => alert('Config copiada:\n' + text));
+  });
+
+})();
 </script>
 
 </body>
