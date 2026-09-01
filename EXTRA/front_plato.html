@@ -18,19 +18,121 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 16px;
+    padding-bottom: 40px;
   }
 
+  /* ===== Panel de ajustes SIEMPRE visible arriba ===== */
+  #debug-panel {
+    width: 100%;
+    background: #1a1a1a;
+    border-bottom: 2px solid #2a7de1;
+    padding: 10px 14px;
+    font-size: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+  }
+  .debug-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 8px;
+  }
+  .debug-header h3 { font-size: 13px; color: #2a7de1; }
+  .debug-header .badge {
+    font-size: 10px;
+    background: #ffb300;
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  #debug-body.collapsed { display: none; }
+  .debug-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #333;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 6px 4px;
+    border: none;
+    background: none;
+    font-size: 11px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: #999;
+  }
+  .tab-btn.active { color: #fff; border-bottom-color: #2a7de1; font-weight: 600; }
+  .tab-content.hidden { display: none; }
+  .debug-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+  }
+  .debug-row label { display: block; font-size: 10px; margin-bottom: 4px; color: #ddd; }
+  .debug-row small { display: block; color: #777; font-size: 9px; margin-top: 2px; }
+  .stepper { display: flex; align-items: center; gap: 4px; }
+  .stepper input {
+    width: 60px;
+    text-align: center;
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background: #2a2a2a;
+    color: #fff;
+    font-size: 11px;
+  }
+  .step-btn {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    border: none;
+    background: #2a7de1;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .debug-log {
+    background: #000;
+    border-radius: 8px;
+    padding: 8px;
+    margin: 10px 0;
+    max-height: 90px;
+    overflow-y: auto;
+  }
+  .debug-log pre { font-size: 10px; white-space: pre-wrap; color: #0f0; }
+  .debug-actions { display: flex; gap: 8px; }
+  .debug-actions button {
+    flex: 1;
+    padding: 6px;
+    border: none;
+    border-radius: 8px;
+    background: #444;
+    color: #fff;
+    font-size: 10px;
+    cursor: pointer;
+  }
+
+  /* ===== Contenido principal ===== */
+  #main-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+  }
   h1 { font-size: 18px; margin-bottom: 12px; text-align: center; }
 
-  /* ===== Pantalla inicial: botones ===== */
   #start-screen {
     display: flex;
     flex-direction: column;
     gap: 12px;
     width: 100%;
     max-width: 420px;
-    margin-top: 40px;
+    margin-top: 20px;
   }
   .action-btn {
     padding: 16px;
@@ -48,7 +150,6 @@
   .action-btn:active { background: #1c5fb0; }
   #file-input { display: none; }
 
-  /* ===== Vista cámara con círculo guía ===== */
   #camera-view {
     display: none;
     position: relative;
@@ -87,7 +188,6 @@
   #shoot-btn { background: #2a7de1; color: #fff; }
   #cancel-btn { background: #444; color: #fff; }
 
-  /* ===== Visor de imagen ===== */
   #viewer-container {
     display: none;
     width: 100%;
@@ -143,282 +243,187 @@
 
   canvas { display: none; }
 
-  /* ===== Debug panel ===== */
-  .debug-toggle-btn {
-    position: fixed;
-    bottom: 16px;
-    right: 16px;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: none;
-    background: #333;
-    color: white;
-    font-size: 20px;
-    cursor: pointer;
-    z-index: 9999;
-    opacity: 0.5;
-  }
-  .debug-panel {
-    position: fixed;
-    bottom: 70px;
-    right: 16px;
-    width: 300px;
-    max-width: 90vw;
-    max-height: 80vh;
-    overflow-y: auto;
-    background: #1e1e1e;
-    border: 1px solid #444;
-    border-radius: 12px;
-    padding: 14px;
-    z-index: 9999;
-    font-size: 12px;
-  }
-  .debug-panel.hidden { display: none; }
-  .debug-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  .debug-header h3 { font-size: 14px; }
-  .debug-header button {
-    background: none; border: none; color: #fff; font-size: 16px; cursor: pointer;
-  }
-  .debug-tabs {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 12px;
-    border-bottom: 1px solid #444;
-  }
-  .tab-btn {
-    flex: 1;
-    padding: 6px 4px;
-    border: none;
-    background: none;
-    font-size: 11px;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    color: #999;
-  }
-  .tab-btn.active { color: #fff; border-bottom-color: #2a7de1; font-weight: 600; }
-  .tab-content.hidden { display: none; }
-  .debug-row { margin-bottom: 12px; }
-  .debug-row label { display: block; font-size: 11px; margin-bottom: 4px; color: #ddd; }
-  .debug-row small { display: block; color: #888; font-size: 10px; margin-top: 2px; }
-  .stepper { display: flex; align-items: center; gap: 6px; }
-  .stepper input {
-    width: 70px;
-    text-align: center;
-    padding: 4px;
-    border-radius: 6px;
-    border: 1px solid #555;
-    background: #2a2a2a;
-    color: #fff;
-    font-size: 12px;
-  }
-  .step-btn {
-    width: 28px; height: 28px;
-    border-radius: 6px;
-    border: none;
-    background: #2a7de1;
-    color: #fff;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  .debug-log {
-    background: #000;
-    border-radius: 8px;
-    padding: 8px;
-    margin: 10px 0;
-    max-height: 120px;
-    overflow-y: auto;
-  }
-  .debug-log pre { font-size: 10px; white-space: pre-wrap; color: #0f0; }
-  .debug-actions { display: flex; gap: 8px; }
-  .debug-actions button {
-    flex: 1;
-    padding: 8px;
-    border: none;
-    border-radius: 8px;
-    background: #444;
-    color: #fff;
-    font-size: 11px;
-    cursor: pointer;
+  @media (min-width: 768px) {
+    .debug-grid { grid-template-columns: repeat(4, 1fr); }
   }
 </style>
 </head>
 <body>
 
-<h1>🍽️ Escáner de Comida</h1>
+<!-- Panel de ajustes: SIEMPRE VISIBLE, arriba -->
+<div id="debug-panel">
+  <div class="debug-header" id="debug-header-toggle">
+    <h3>🎛️ Panel de calibración <span class="badge">MODO DEV</span></h3>
+    <span id="debug-collapse-icon">▲</span>
+  </div>
 
-<!-- Pantalla inicial -->
-<div id="start-screen">
-  <button class="action-btn" id="btn-upload">📁 Subir archivo</button>
-  <button class="action-btn" id="btn-camera">📷 Hacer foto</button>
-  <input type="file" id="file-input" accept="image/*">
+  <div id="debug-body">
+    <div class="debug-tabs">
+      <button class="tab-btn active" data-tab="detection">🍽️ Detección</button>
+      <button class="tab-btn" data-tab="image">🖼️ Imagen</button>
+      <button class="tab-btn" data-tab="capture">⭕ Captura</button>
+    </div>
+
+    <div class="tab-content" data-tab-content="detection">
+      <div class="debug-grid">
+        <div class="debug-row">
+          <label>Umbral comida real</label>
+          <div class="stepper">
+            <button class="step-btn" data-target="foodThreshold" data-step="-0.01">−</button>
+            <input type="number" id="foodThreshold" value="0.10" step="0.01" min="0" max="1">
+            <button class="step-btn" data-target="foodThreshold" data-step="0.01">+</button>
+          </div>
+          <small>Prob. mínima para comida real</small>
+        </div>
+        <div class="debug-row">
+          <label>Umbral contenedor vacío</label>
+          <div class="stepper">
+            <button class="step-btn" data-target="containerThreshold" data-step="-0.01">−</button>
+            <input type="number" id="containerThreshold" value="0.15" step="0.01" min="0" max="1">
+            <button class="step-btn" data-target="containerThreshold" data-step="0.01">+</button>
+          </div>
+          <small>Prob. mínima para plato/vaso vacío</small>
+        </div>
+        <div class="debug-row">
+          <label>Top-K predicciones</label>
+          <div class="stepper">
+            <button class="step-btn" data-target="topK" data-step="-1">−</button>
+            <input type="number" id="topK" value="10" step="1" min="1" max="20">
+            <button class="step-btn" data-target="topK" data-step="1">+</button>
+          </div>
+        </div>
+        <div class="debug-row">
+          <label>Confianza mínima (ruido)</label>
+          <div class="stepper">
+            <button class="step-btn" data-target="minConfidenceFilter" data-step="-0.01">−</button>
+            <input type="number" id="minConfidenceFilter" value="0.03" step="0.01" min="0" max="1">
+            <button class="step-btn" data-target="minConfidenceFilter" data-step="0.01">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content hidden" data-tab-content="image">
+      <div class="debug-grid">
+        <div class="debug-row">
+          <label>Calidad JPEG envío</label>
+          <div class="stepper">
+            <button class="step-btn" data-target="jpegQuality" data-step="-0.05">−</button>
+            <input type="number" id="jpegQuality" value="0.7" step="0.05" min="0.1" max="1">
+            <button class="step-btn" data-target="jpegQuality" data-step="0.05">+</button>
+          </div>
+        </div>
+        <div class="debug-row">
+          <label>Ancho máximo (px)</label>
+          <div class="stepper">
+            <button class="step-btn" data-target="maxWidth" data-step="-50">−</button>
+            <input type="number" id="maxWidth" value="800" step="50" min="200" max="2000">
+            <button class="step-btn" data-target="maxWidth" data-step="50">+</button>
+          </div>
+        </div>
+        <div class="debug-row">
+          <label>Alto máximo (px)</label>
+          <div class="stepper">
+            <button class="step-btn" data-target="maxHeight" data-step="-50">−</button>
+            <input type="number" id="maxHeight" value="800" step="50" min="200" max="2000">
+            <button class="step-btn" data-target="maxHeight" data-step="50">+</button>
+          </div>
+        </div>
+        <div class="debug-row">
+          <label>
+            <input type="checkbox" id="removeBackground" checked>
+            Recortar a círculo
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content hidden" data-tab-content="capture">
+      <div class="debug-grid">
+        <div class="debug-row">
+          <label>Diámetro círculo (%)</label>
+          <div class="stepper">
+            <button class="step-btn" data-target="circleDiameterPercent" data-step="-5">−</button>
+            <input type="number" id="circleDiameterPercent" value="80" step="5" min="30" max="100">
+            <button class="step-btn" data-target="circleDiameterPercent" data-step="5">+</button>
+          </div>
+        </div>
+        <div class="debug-row">
+          <label>Opacidad máscara</label>
+          <div class="stepper">
+            <button class="step-btn" data-target="maskOpacity" data-step="-0.05">−</button>
+            <input type="number" id="maskOpacity" value="0.85" step="0.05" min="0" max="1">
+            <button class="step-btn" data-target="maskOpacity" data-step="0.05">+</button>
+          </div>
+        </div>
+        <div class="debug-row">
+          <label>Grosor borde (px)</label>
+          <div class="stepper">
+            <button class="step-btn" data-target="circleBorderWidth" data-step="-1">−</button>
+            <input type="number" id="circleBorderWidth" value="3" step="1" min="0" max="10">
+            <button class="step-btn" data-target="circleBorderWidth" data-step="1">+</button>
+          </div>
+        </div>
+        <div class="debug-row">
+          <label>Margen recorte (%)</label>
+          <div class="stepper">
+            <button class="step-btn" data-target="cropMarginPercent" data-step="-2">−</button>
+            <input type="number" id="cropMarginPercent" value="5" step="2" min="0" max="30">
+            <button class="step-btn" data-target="cropMarginPercent" data-step="2">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="debug-log">
+      <strong>Última predicción:</strong>
+      <pre id="debug-predictions">—</pre>
+    </div>
+
+    <div class="debug-actions">
+      <button id="debug-reset">🔄 Reset</button>
+      <button id="debug-copy">📋 Copiar config</button>
+    </div>
+  </div>
 </div>
 
-<!-- Vista cámara -->
-<div id="camera-view">
-  <video id="video" autoplay playsinline muted></video>
-  <canvas id="capture-mask"></canvas>
-</div>
-<div id="capture-controls" style="display:none;">
-  <button id="cancel-btn">✕ Cancelar</button>
-  <button id="shoot-btn">📸 Capturar</button>
-</div>
+<!-- Contenido principal -->
+<div id="main-content">
+  <h1>🍽️ Escáner de Comida</h1>
 
-<!-- Visor -->
-<div id="viewer-container">
-  <div id="image-viewer-box">
-    <img id="preview-img" alt="Vista previa">
-  </div>
-  <div id="status"></div>
-  <div id="result-actions">
-    <button id="retry-btn">🔄 Repetir</button>
-    <button id="confirm-btn" disabled>✅ Confirmar</button>
-  </div>
-</div>
-
-<canvas id="work-canvas"></canvas>
-
-<!-- Debug panel -->
-<button id="debug-toggle" class="debug-toggle-btn" title="Ajustes IA">⚙️</button>
-
-<div id="debug-panel" class="debug-panel hidden">
-  <div class="debug-header">
-    <h3>🎛️ Panel de ajustes</h3>
-    <button id="debug-close">✕</button>
+  <div id="start-screen">
+    <button class="action-btn" id="btn-upload">📁 Subir archivo</button>
+    <button class="action-btn" id="btn-camera">📷 Hacer foto</button>
+    <input type="file" id="file-input" accept="image/*">
   </div>
 
-  <div class="debug-tabs">
-    <button class="tab-btn active" data-tab="detection">🍽️ Detección</button>
-    <button class="tab-btn" data-tab="image">🖼️ Imagen</button>
-    <button class="tab-btn" data-tab="capture">⭕ Captura</button>
+  <div id="camera-view">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="capture-mask"></canvas>
+  </div>
+  <div id="capture-controls" style="display:none;">
+    <button id="cancel-btn">✕ Cancelar</button>
+    <button id="shoot-btn">📸 Capturar</button>
   </div>
 
-  <div class="tab-content" data-tab-content="detection">
-    <div class="debug-row">
-      <label>Umbral comida real</label>
-      <div class="stepper">
-        <button class="step-btn" data-target="foodThreshold" data-step="-0.01">−</button>
-        <input type="number" id="foodThreshold" value="0.10" step="0.01" min="0" max="1">
-        <button class="step-btn" data-target="foodThreshold" data-step="0.01">+</button>
-      </div>
-      <small>Prob. mínima para considerar comida real</small>
+  <div id="viewer-container">
+    <div id="image-viewer-box">
+      <img id="preview-img" alt="Vista previa">
     </div>
-    <div class="debug-row">
-      <label>Umbral contenedor vacío</label>
-      <div class="stepper">
-        <button class="step-btn" data-target="containerThreshold" data-step="-0.01">−</button>
-        <input type="number" id="containerThreshold" value="0.15" step="0.01" min="0" max="1">
-        <button class="step-btn" data-target="containerThreshold" data-step="0.01">+</button>
-      </div>
-      <small>Prob. mínima para detectar plato/vaso vacío</small>
-    </div>
-    <div class="debug-row">
-      <label>Top-K predicciones</label>
-      <div class="stepper">
-        <button class="step-btn" data-target="topK" data-step="-1">−</button>
-        <input type="number" id="topK" value="10" step="1" min="1" max="20">
-        <button class="step-btn" data-target="topK" data-step="1">+</button>
-      </div>
-    </div>
-    <div class="debug-row">
-      <label>Confianza mínima (filtro ruido)</label>
-      <div class="stepper">
-        <button class="step-btn" data-target="minConfidenceFilter" data-step="-0.01">−</button>
-        <input type="number" id="minConfidenceFilter" value="0.03" step="0.01" min="0" max="1">
-        <button class="step-btn" data-target="minConfidenceFilter" data-step="0.01">+</button>
-      </div>
+    <div id="status"></div>
+    <div id="result-actions">
+      <button id="retry-btn">🔄 Repetir</button>
+      <button id="confirm-btn" disabled>✅ Confirmar</button>
     </div>
   </div>
 
-  <div class="tab-content hidden" data-tab-content="image">
-    <div class="debug-row">
-      <label>Calidad JPEG envío</label>
-      <div class="stepper">
-        <button class="step-btn" data-target="jpegQuality" data-step="-0.05">−</button>
-        <input type="number" id="jpegQuality" value="0.7" step="0.05" min="0.1" max="1">
-        <button class="step-btn" data-target="jpegQuality" data-step="0.05">+</button>
-      </div>
-    </div>
-    <div class="debug-row">
-      <label>Ancho máximo (px)</label>
-      <div class="stepper">
-        <button class="step-btn" data-target="maxWidth" data-step="-50">−</button>
-        <input type="number" id="maxWidth" value="800" step="50" min="200" max="2000">
-        <button class="step-btn" data-target="maxWidth" data-step="50">+</button>
-      </div>
-    </div>
-    <div class="debug-row">
-      <label>Alto máximo (px)</label>
-      <div class="stepper">
-        <button class="step-btn" data-target="maxHeight" data-step="-50">−</button>
-        <input type="number" id="maxHeight" value="800" step="50" min="200" max="2000">
-        <button class="step-btn" data-target="maxHeight" data-step="50">+</button>
-      </div>
-    </div>
-    <div class="debug-row">
-      <label>
-        <input type="checkbox" id="removeBackground" checked>
-        Recortar a círculo antes de enviar
-      </label>
-    </div>
-  </div>
-
-  <div class="tab-content hidden" data-tab-content="capture">
-    <div class="debug-row">
-      <label>Diámetro círculo (%)</label>
-      <div class="stepper">
-        <button class="step-btn" data-target="circleDiameterPercent" data-step="-5">−</button>
-        <input type="number" id="circleDiameterPercent" value="80" step="5" min="30" max="100">
-        <button class="step-btn" data-target="circleDiameterPercent" data-step="5">+</button>
-      </div>
-    </div>
-    <div class="debug-row">
-      <label>Opacidad máscara</label>
-      <div class="stepper">
-        <button class="step-btn" data-target="maskOpacity" data-step="-0.05">−</button>
-        <input type="number" id="maskOpacity" value="0.85" step="0.05" min="0" max="1">
-        <button class="step-btn" data-target="maskOpacity" data-step="0.05">+</button>
-      </div>
-    </div>
-    <div class="debug-row">
-      <label>Grosor borde (px)</label>
-      <div class="stepper">
-        <button class="step-btn" data-target="circleBorderWidth" data-step="-1">−</button>
-        <input type="number" id="circleBorderWidth" value="3" step="1" min="0" max="10">
-        <button class="step-btn" data-target="circleBorderWidth" data-step="1">+</button>
-      </div>
-    </div>
-    <div class="debug-row">
-      <label>Margen recorte (%)</label>
-      <div class="stepper">
-        <button class="step-btn" data-target="cropMarginPercent" data-step="-2">−</button>
-        <input type="number" id="cropMarginPercent" value="5" step="2" min="0" max="30">
-        <button class="step-btn" data-target="cropMarginPercent" data-step="2">+</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="debug-log">
-    <strong>Última predicción:</strong>
-    <pre id="debug-predictions">—</pre>
-  </div>
-
-  <div class="debug-actions">
-    <button id="debug-reset">🔄 Reset</button>
-    <button id="debug-copy">📋 Copiar</button>
-  </div>
+  <canvas id="work-canvas"></canvas>
 </div>
 
 <script>
 (function () {
   'use strict';
 
-  // ============ CONFIG (calibrable en vivo) ============
   const AI_CONFIG = {
     foodThreshold: 0.10,
     containerThreshold: 0.15,
@@ -458,6 +463,7 @@
   let model = null;
   let currentStream = null;
   let capturedBlob = null;
+  let isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   const els = {
     startScreen: document.getElementById('start-screen'),
@@ -479,7 +485,6 @@
     debugPredictions: document.getElementById('debug-predictions')
   };
 
-  // ============ Carga del modelo ============
   async function loadModel() {
     setStatus('Cargando modelo IA...', 'loading');
     try {
@@ -497,23 +502,41 @@
     els.status.className = type ? 'status-' + type : '';
   }
 
-  // ============ Flujo: subir archivo ============
   els.btnUpload.addEventListener('click', () => els.fileInput.click());
   els.fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file) handleNewImage(file);
   });
 
-  // ============ Flujo: cámara ============
+  // ===== Cámara: trasera forzada en móvil =====
   els.btnCamera.addEventListener('click', async () => {
     try {
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const constraints = {
-        video: isMobile
-          ? { facingMode: { ideal: 'environment' } }
-          : { facingMode: 'user' }
-      };
-      currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+      let stream;
+      if (isMobileDevice) {
+        try {
+          // Intento 1: forzar trasera exacta
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { exact: 'environment' } }
+          });
+        } catch (errExact) {
+          console.warn('facingMode exact falló, probando con enumerateDevices...', errExact);
+          // Intento 2: buscar manualmente la cámara trasera por lista de dispositivos
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          const videoInputs = devices.filter(d => d.kind === 'videoinput');
+          const backCam = videoInputs.find(d =>
+            /back|rear|environment/i.test(d.label)
+          ) || videoInputs[videoInputs.length - 1]; // fallback: última suele ser trasera
+
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: backCam ? { deviceId: { exact: backCam.deviceId } } : { facingMode: 'environment' }
+          });
+        }
+      } else {
+        // PC: cámara frontal (webcam normal)
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      }
+
+      currentStream = stream;
       els.video.srcObject = currentStream;
       els.startScreen.style.display = 'none';
       els.cameraView.style.display = 'block';
@@ -521,7 +544,7 @@
       requestAnimationFrame(drawCaptureMask);
     } catch (err) {
       console.error(err);
-      alert('No se pudo acceder a la cámara. Revisa permisos del navegador.');
+      alert('No se pudo acceder a la cámara trasera. Revisa permisos del navegador.');
     }
   });
 
@@ -553,7 +576,6 @@
     }
     requestAnimationFrame(drawCaptureMask);
   }
-  window.updateCaptureCircle = () => {}; // redibujo continuo ya cubre esto
 
   els.cancelBtn.addEventListener('click', stopCamera);
 
@@ -589,7 +611,6 @@
     }, 'image/jpeg', 0.95);
   });
 
-  // ============ Procesar imagen nueva (archivo o captura) ============
   function handleNewImage(fileOrBlob) {
     const url = URL.createObjectURL(fileOrBlob);
     els.previewImg.src = url;
@@ -599,11 +620,11 @@
     capturedBlob = null;
 
     els.previewImg.onload = async () => {
-      await validateAndProcess(els.previewImg, fileOrBlob);
+      await validateAndProcess(els.previewImg);
     };
   }
 
-  async function validateAndProcess(imgEl, originalBlob) {
+  async function validateAndProcess(imgEl) {
     setStatus('Analizando imagen...', 'loading');
 
     if (!model) {
@@ -645,7 +666,6 @@
     }
   }
 
-  // ============ Procesar imagen: recorte circular + resize + compresión ============
   function processImageForUpload(imgEl) {
     return new Promise((resolve) => {
       const canvas = els.workCanvas;
@@ -676,7 +696,6 @@
     });
   }
 
-  // ============ Botones resultado ============
   els.retryBtn.addEventListener('click', () => {
     els.viewerContainer.style.display = 'none';
     els.startScreen.style.display = 'flex';
@@ -686,16 +705,17 @@
 
   els.confirmBtn.addEventListener('click', () => {
     if (!capturedBlob) return;
-    // Aquí se enviaría capturedBlob al backend con fetch/FormData
     console.log('Imagen lista para enviar. Tamaño:', (capturedBlob.size / 1024).toFixed(1), 'KB');
     alert('Imagen lista para enviar al servidor (' + (capturedBlob.size / 1024).toFixed(1) + ' KB)');
   });
 
-  // ============ DEBUG PANEL ============
-  document.getElementById('debug-toggle').addEventListener('click', () =>
-    document.getElementById('debug-panel').classList.remove('hidden'));
-  document.getElementById('debug-close').addEventListener('click', () =>
-    document.getElementById('debug-panel').classList.add('hidden'));
+  // ===== DEBUG PANEL (siempre visible, colapsable) =====
+  document.getElementById('debug-header-toggle').addEventListener('click', () => {
+    const body = document.getElementById('debug-body');
+    const icon = document.getElementById('debug-collapse-icon');
+    body.classList.toggle('collapsed');
+    icon.textContent = body.classList.contains('collapsed') ? '▼' : '▲';
+  });
 
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
