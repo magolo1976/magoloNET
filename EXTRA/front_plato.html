@@ -1,50 +1,427 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Comida / Escáner de calibración</title>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Validador de Comida</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;600;700;800&display=swap');
-:root{--ink:#17201d;--muted:#74817b;--cream:#f4f1e8;--paper:#fbfaf6;--acid:#d8ef57;--orange:#ef6c43;--line:#d8ddd3;--shadow:0 24px 70px #15221d18}
-*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:Manrope,system-ui,sans-serif;min-height:100vh}body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.17;background-image:radial-gradient(#59645d 0.55px,transparent .55px);background-size:9px 9px;mix-blend-mode:multiply}
-button,input{font:inherit}button{cursor:pointer}.shell{max-width:1120px;margin:auto;padding:20px clamp(16px,4vw,42px) 70px}.devbar{position:sticky;top:0;z-index:20;background:#17201def;color:#f6f5e9;border:1px solid #3d4a43;border-radius:18px;margin-bottom:26px;box-shadow:0 12px 30px #17201d20;backdrop-filter:blur(15px)}.dev-head{display:flex;align-items:center;justify-content:space-between;padding:13px 17px;gap:12px}.dev-title{display:flex;align-items:center;gap:10px;font:500 12px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.12em}.badge{background:var(--acid);color:#283014;padding:5px 8px;border-radius:5px;font-size:10px;font-weight:800}.chevron{transition:.25s}.devbar.closed .chevron{transform:rotate(-90deg)}.dev-body{border-top:1px solid #3d4a43;padding:14px 17px 17px}.devbar.closed .dev-body{display:none}.tabs{display:flex;gap:6px;margin-bottom:13px;flex-wrap:wrap}.tab{border:1px solid #46554c;background:transparent;color:#bfc9c1;border-radius:999px;padding:7px 12px;font-size:12px}.tab.active{background:#e5edcb;color:#1b2922;border-color:#e5edcb}.tabpane{display:none}.tabpane.active{display:block}.controls{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.setting{background:#202b25;border:1px solid #344238;border-radius:10px;padding:10px}.setting label{display:block;font-size:11px;color:#aab7ad;margin-bottom:5px}.number{display:flex;align-items:center;gap:5px}.number input{width:100%;border:0;background:transparent;color:#fff;min-width:0}.step{border:0;background:#405149;color:#d8ef57;width:24px;height:24px;border-radius:5px}.dev-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.tiny{background:#edf1e3;color:#1b2922;border:0;border-radius:7px;padding:8px 11px;font-size:11px;font-weight:700}.log{height:112px;overflow:auto;margin:0;background:#101713;border-radius:10px;padding:10px;color:#d8ef57;font:11px/1.55 'DM Mono',monospace;white-space:pre-wrap}.hero{display:grid;grid-template-columns:1.1fr .9fr;align-items:end;gap:30px;margin:20px 0 30px}.eyebrow{font:500 12px 'DM Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--orange)}h1{font-size:clamp(42px,7vw,84px);line-height:.91;letter-spacing:-.075em;margin:10px 0 20px;max-width:710px}h1 em{font-family:Georgia,serif;font-weight:400;letter-spacing:-.08em} .intro{max-width:390px;color:#52605a;font-size:15px;line-height:1.6}.status{justify-self:end;width:min(100%,300px);border-left:2px solid var(--orange);padding:10px 0 10px 17px}.status strong{display:block;font-size:19px}.status small{color:var(--muted);line-height:1.5;display:block;margin-top:4px}.workbench{background:var(--paper);border:1px solid #e0e2d8;border-radius:25px;box-shadow:var(--shadow);padding:clamp(16px,3vw,28px)}.actions{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:18px}.big-btn{min-height:75px;border-radius:15px;padding:15px 18px;text-align:left;border:1px solid var(--ink);background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:space-between;font-weight:800;transition:transform .2s,box-shadow .2s}.big-btn:hover{transform:translateY(-3px);box-shadow:0 10px 20px #17201d20}.big-btn.secondary{background:var(--acid);color:#263017;border-color:#aabf36}.big-btn span:last-child{font-size:25px;font-weight:400}.hint{font:11px 'DM Mono',monospace;color:#87918b;margin-top:9px}.stage{position:relative;background:#1a231f;min-height:410px;border-radius:18px;overflow:hidden;display:grid;place-items:center}.stage.empty{background:linear-gradient(135deg,#1b2520,#28362d)}.stage.empty:after{content:"VISOR DE RESULTADO";font:11px 'DM Mono',monospace;color:#839187;letter-spacing:.14em}.stage video,.stage img{display:block;max-width:100%;max-height:650px;width:auto;height:auto;object-fit:contain}.stage video{width:100%;height:100%;position:absolute;inset:0}.stage img{position:relative;z-index:2;max-height:650px}.overlay{position:absolute;inset:0;z-index:5;pointer-events:none}.capture{position:absolute;z-index:7;bottom:20px;left:50%;transform:translateX(-50%);background:var(--acid);border:4px solid #fff8;border-radius:999px;padding:14px 23px;font-size:15px;font-weight:800;display:none;box-shadow:0 8px 25px #0005}.capture.visible{display:block}.close-camera{position:absolute;z-index:8;right:16px;top:16px;border:1px solid #fff7;background:#101713cc;color:#fff;border-radius:999px;padding:8px 12px;display:none}.close-camera.visible{display:block}.meta{display:flex;justify-content:space-between;gap:10px;margin-top:13px;color:#69766f;font:11px 'DM Mono',monospace;flex-wrap:wrap}.error{display:none;margin-top:14px;background:#fff0ed;color:#ad3d23;border:1px solid #f1ad9d;border-radius:12px;padding:12px 14px;font-size:13px;font-weight:700}.error.show{display:block}.loader{display:none;position:absolute;z-index:10;background:#17201de8;color:#fff;border-radius:12px;padding:13px 16px;font-size:13px}.loader.show{display:block}.foot{font-size:11px;color:#869089;margin-top:18px;line-height:1.5}.mono{font-family:'DM Mono',monospace}
-@media(max-width:700px){.shell{padding-top:10px}.hero{grid-template-columns:1fr;gap:12px}.status{justify-self:start;width:100%}.controls{grid-template-columns:1fr 1fr}.actions{grid-template-columns:1fr}.stage{min-height:330px}h1{font-size:52px}.dev-head{padding:11px 13px}.dev-body{padding:12px}.workbench{border-radius:20px}}
+  :root{
+    --bg:#0f1115;
+    --panel:#1a1d24;
+    --accent:#4f9dff;
+    --accent2:#2ecc71;
+    --danger:#ff5c5c;
+    --text:#e8eaed;
+    --muted:#9aa0a6;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:24px 16px 60px;
+  }
+  h1{
+    font-size:1.4rem;
+    margin:8px 0 4px;
+    text-align:center;
+  }
+  #modelStatus{
+    font-size:.85rem;
+    color:var(--muted);
+    margin-bottom:16px;
+    text-align:center;
+  }
+  .buttons{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-bottom:20px;
+    width:100%;
+    max-width:480px;
+  }
+  button{
+    flex:1;
+    min-width:140px;
+    padding:14px 18px;
+    font-size:1rem;
+    border:none;
+    border-radius:var(--radius);
+    background:var(--panel);
+    color:var(--text);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    transition:transform .15s ease, background .15s ease;
+    box-shadow:0 2px 8px rgba(0,0,0,.3);
+  }
+  button:active{transform:scale(.96);}
+  button.primary{background:var(--accent); color:#fff;}
+  button.danger{background:var(--danger); color:#fff;}
+  button:disabled{opacity:.4; cursor:not-allowed;}
+
+  #cameraSection, #resultSection{
+    width:100%;
+    max-width:480px;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+    margin-bottom:20px;
+  }
+
+  .viewer{
+    position:relative;
+    width:100%;
+    aspect-ratio: 3/4;
+    max-height:70vh;
+    background:#000;
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 4px 20px rgba(0,0,0,.4);
+  }
+  .viewer video, .viewer img{
+    position:absolute;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+  .viewer .overlay{
+    position:absolute;
+    inset:0;
+    border:3px dashed rgba(255,255,255,.4);
+    border-radius:var(--radius);
+    pointer-events:none;
+    margin: 20px;
+  }
+
+  #captureBtn{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    background:#fff;
+    border:4px solid var(--accent);
+    padding:0;
+    flex:none;
+  }
+  #captureBtn:active{transform:scale(.9);}
+
+  #resultSection .viewer img{
+    object-fit:contain;
+    background:#111;
+  }
+
+  .info-box{
+    width:100%;
+    background:var(--panel);
+    border-radius:var(--radius);
+    padding:14px 18px;
+    font-size:.9rem;
+    line-height:1.5;
+  }
+  .info-box strong{color:var(--accent2);}
+  .info-box.error{background:rgba(255,92,92,.15); color:var(--danger);}
+  .info-box.error strong{color:var(--danger);}
+
+  #diagPanel{
+    width:100%;
+    max-width:480px;
+    margin-top:10px;
+  }
+  #diagPanel summary{
+    cursor:pointer;
+    color:var(--muted);
+    font-size:.85rem;
+    padding:8px 0;
+  }
+  #diagLog{
+    background:#0a0b0e;
+    border-radius:12px;
+    padding:12px;
+    font-family:monospace;
+    font-size:.75rem;
+    white-space:pre-wrap;
+    max-height:300px;
+    overflow-y:auto;
+    color:#9fe8a0;
+  }
+
+  @media (min-width:700px){
+    body{padding-top:40px;}
+    h1{font-size:1.8rem;}
+    .buttons, #cameraSection, #resultSection, #diagPanel{max-width:600px;}
+    .viewer{aspect-ratio:4/3; max-height:520px;}
+  }
 </style>
 </head>
 <body>
-<div class="shell">
-<section class="devbar" id="devbar"><div class="dev-head" id="devToggle"><div class="dev-title"><span class="badge">MODO DEV</span> Calibración del escáner</div><span class="chevron">⌄</span></div><div class="dev-body">
-<div class="tabs"><button class="tab active" data-tab="deteccion">Detección</button><button class="tab" data-tab="salida">Salida</button><button class="tab" data-tab="diagnostico">Diagnóstico</button></div>
-<div class="tabpane active" id="deteccion"><div class="controls"><div class="setting"><label for="foodThreshold">Comida mínima</label><div class="number"><button class="step" data-step="-0.05" data-target="foodThreshold">−</button><input id="foodThreshold" type="number" min="0" max="1" step=".05" value=".18"><button class="step" data-step=".05" data-target="foodThreshold">+</button></div></div><div class="setting"><label for="emptyThreshold">Contenedor vacío</label><div class="number"><button class="step" data-step="-0.05" data-target="emptyThreshold">−</button><input id="emptyThreshold" type="number" min="0" max="1" step=".05" value=".28"><button class="step" data-step=".05" data-target="emptyThreshold">+</button></div></div><div class="setting"><label for="minFoodHits">Coincidencias comida</label><div class="number"><button class="step" data-step="-1" data-target="minFoodHits">−</button><input id="minFoodHits" type="number" min="1" max="5" step="1" value="1"><button class="step" data-step="1" data-target="minFoodHits">+</button></div></div></div></div>
-<div class="tabpane" id="salida"><div class="controls"><div class="setting"><label for="jpegQuality">Calidad JPEG</label><div class="number"><button class="step" data-step="-.05" data-target="jpegQuality">−</button><input id="jpegQuality" type="number" min=".1" max="1" step=".05" value=".7"><button class="step" data-step=".05" data-target="jpegQuality">+</button></div></div><div class="setting"><label for="maxSize">Lado máximo (px)</label><div class="number"><button class="step" data-step="-100" data-target="maxSize">−</button><input id="maxSize" type="number" min="200" max="2000" step="100" value="800"><button class="step" data-step="100" data-target="maxSize">+</button></div></div></div></div>
-<div class="tabpane" id="diagnostico"><pre class="log" id="log">Esperando una imagen…</pre></div><div class="dev-actions"><button class="tiny" id="reset">Restablecer valores</button><button class="tiny" id="copy">Copiar configuración JSON</button></div></div></section>
-<header class="hero"><div><div class="eyebrow">food scan / build 0.9</div><h1>Lo que hay<br>en el <em>plato.</em></h1><p class="intro">Un visor de calibración para comprobar comida real, limpiar el encuadre y preparar una imagen ligera antes del envío simulado.</p></div><div class="status"><strong id="modelStatus">Cargando MobileNet…</strong><small id="statusDetail">El modelo se descarga una vez al iniciar. No se envía ninguna imagen.</small></div></header>
-<main class="workbench"><div class="actions"><div><button class="big-btn" id="uploadBtn"><span>Subir archivo<br><small>JPG, PNG, WEBP</small></span><span>↗</span></button><input id="fileInput" type="file" accept="image/*" hidden><div class="hint">La foto se analiza localmente en tu navegador.</div></div><div><button class="big-btn secondary" id="cameraBtn"><span>Hacer foto<br><small>Activar cámara</small></span><span>◉</span></button><div class="hint">En móvil se prioriza la cámara trasera.</div></div></div><div class="stage empty" id="stage"><video id="video" autoplay playsinline muted hidden></video><canvas class="overlay" id="overlay" hidden></canvas><img id="result" alt="Resultado procesado" hidden><div class="loader" id="loader">Analizando imagen…</div><button class="capture" id="capture">Capturar</button><button class="close-camera" id="closeCamera">Cerrar cámara ×</button></div><div class="meta"><span id="decision">Sin imagen procesada</span><span id="size">—</span></div><div class="error" id="error" role="alert"></div><p class="foot">Desarrollo/calibración · Resultado visual con máscara circular · “Enviar al servidor” es una simulación local.</p></main>
+
+<h1>🍽️ Validador de Comida</h1>
+<div id="modelStatus">Cargando modelo de IA...</div>
+
+<div class="buttons">
+  <button id="uploadBtn" class="primary">📁 Subir archivo</button>
+  <button id="cameraBtn" class="primary">📷 Hacer foto</button>
+  <input type="file" id="fileInput" accept="image/*" hidden>
 </div>
+
+<div id="cameraSection">
+  <div class="viewer">
+    <video id="video" autoplay playsinline muted></video>
+    <div class="overlay"></div>
+  </div>
+  <div class="buttons">
+    <button id="captureBtn"></button>
+    <button id="cancelCameraBtn" class="danger">✖ Cancelar</button>
+  </div>
+</div>
+
+<div id="resultSection">
+  <div class="viewer">
+    <img id="result" hidden>
+  </div>
+  <div class="info-box" id="resultInfo">
+    <div><strong id="decision">Sin imagen procesada</strong></div>
+    <div>Tamaño: <span id="size">—</span></div>
+  </div>
+  <div class="buttons">
+    <button id="retryBtn">🔄 Probar otra</button>
+  </div>
+</div>
+
+<div id="errorBox" class="info-box error" style="display:none; max-width:480px; width:100%;"></div>
+
+<details id="diagPanel">
+  <summary>🔧 Diagnóstico</summary>
+  <div id="diagLog">Esperando actividad...</div>
+</details>
+
+<canvas id="canvas" hidden></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
 <script>
-'use strict';
-const POSITIVE_FOOD=['food','dish','pizza','cheeseburger','hamburger','hotdog','sandwich','burrito','taco','sushi','spaghetti','carbonara','meat loaf','meatloaf','steak','chicken','fried chicken','salad','caesar salad','soup','vegetable','fruit','apple','banana','orange','lemon','strawberry','broccoli','cucumber','mushroom','bread','bagel','pretzel','cake','ice cream','chocolate','cookie','coffee','espresso','beer','wine'];
-const NEGATIVE_EMPTY=['plate','bowl','cup','coffee mug','glass','goblet','pitcher','tableware','flatware','spoon','fork','knife','tray','table','desk','pot','container','vase','washbasin','ashcan','empty'];
-const defaults={foodThreshold:.18,emptyThreshold:.28,minFoodHits:1,jpegQuality:.7,maxSize:800};
-let model=null, stream=null, animFrame=null, cameraActive=false, currentConfig={...defaults};
-const $=id=>document.getElementById(id), logEl=$('log');
-function log(message){const stamp=new Date().toLocaleTimeString();logEl.textContent+='\n['+stamp+'] '+message;logEl.scrollTop=logEl.scrollHeight}
-function readConfig(){Object.keys(defaults).forEach(k=>{currentConfig[k]=Number($(k).value)});return currentConfig}
-function showError(msg){$('error').textContent=msg;$('error').classList.add('show')}
-function clearError(){$('error').classList.remove('show');$('error').textContent=''}
-function drawCircleOverlay(){if(!cameraActive)return;const canvas=$('overlay'), video=$('video');const w=video.clientWidth||video.videoWidth||800,h=video.clientHeight||video.videoHeight||600;const dpr=window.devicePixelRatio||1;canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);canvas.style.width=w+'px';canvas.style.height=h+'px';const c=canvas.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);const r=Math.min(w,h)*.37;c.fillStyle='rgba(5,10,8,.68)';c.fillRect(0,0,w,h);c.globalCompositeOperation='destination-out';c.beginPath();c.arc(w/2,h/2,r,0,Math.PI*2);c.fill();c.globalCompositeOperation='source-over';c.beginPath();c.arc(w/2,h/2,r,0,Math.PI*2);c.strokeStyle='rgba(216,239,87,.95)';c.lineWidth=2;c.stroke();animFrame=requestAnimationFrame(drawCircleOverlay)}
-function stopCamera(){cameraActive=false;if(animFrame)cancelAnimationFrame(animFrame);animFrame=null;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;$('video').hidden=true;$('overlay').hidden=true;$('capture').classList.remove('visible');$('closeCamera').classList.remove('visible');$('stage').classList.add('empty')}
-function isMobile(){return /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent)||matchMedia('(max-width: 700px)').matches}
-async function openCamera(){clearError();stopCamera();if(!navigator.mediaDevices?.getUserMedia){showError('Este navegador no permite acceder a la cámara.');return}try{try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{exact:'environment'}},audio:false});log('Cámara activa (trasera, facingMode exact)')}catch(e){log('Sin trasera disponible ('+e.name+'), usando frontal');stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});log('Cámara activa (frontal)')}const v=$('video');v.srcObject=stream;v.hidden=false;$('overlay').hidden=false;$('capture').classList.add('visible');$('closeCamera').classList.add('visible');$('stage').classList.remove('empty');try{await v.play()}catch(playErr){log('video.play() bloqueado: '+playErr.name+' — reintenta pulsando en el visor');v.onclick=()=>v.play().catch(()=>{})}cameraActive=true;drawCircleOverlay()}catch(e){showError('No se pudo abrir la cámara. Comprueba los permisos y usa HTTPS o localhost. ('+e.name+')');log('Error de cámara: '+e.message)}}
-function makeMaskedCanvas(source){const sw=source.videoWidth||source.naturalWidth||source.width,sh=source.videoHeight||source.naturalHeight||source.height;if(!sw||!sh)throw Error('La imagen aún no está disponible');const side=Math.min(sw,sh),sx=(sw-side)/2,sy=(sh-side)/2,c=document.createElement('canvas');c.width=c.height=side;const x=c.getContext('2d');x.drawImage(source,sx,sy,side,side,0,0,side,side);x.globalCompositeOperation='destination-in';x.beginPath();x.arc(side/2,side/2,side/2,0,Math.PI*2);x.fill();x.globalCompositeOperation='destination-over';x.fillStyle='#080d0a';x.fillRect(0,0,side,side);return c}
-function resizeAndEncode(masked){const max=readConfig().maxSize, scale=Math.min(1,max/Math.max(masked.width,masked.height)),out=document.createElement('canvas');out.width=Math.round(masked.width*scale);out.height=Math.round(masked.height*scale);out.getContext('2d').drawImage(masked,0,0,out.width,out.height);return out.toDataURL('image/jpeg',readConfig().jpegQuality)}
-function keyword(label,list){const s=label.toLowerCase();return list.some(k=>s.includes(k))}
-async function validateAndProcess(source){clearError();if(!model){showError('MobileNet todavía está cargando. Inténtalo de nuevo en unos segundos.');return} $('loader').classList.add('show');$('decision').textContent='Analizando…';try{const predictions=await model.classify(source,5);logEl.textContent='PREDICCIONES CRUDAS\n'+predictions.map(p=>p.className+' — '+(p.probability*100).toFixed(1)+'%').join('\n');const cfg=readConfig();const food=predictions.filter(p=>p.probability>=cfg.foodThreshold&&keyword(p.className,POSITIVE_FOOD));const empty=predictions.filter(p=>p.probability>=cfg.emptyThreshold&&keyword(p.className,NEGATIVE_EMPTY));let accepted=food.length>=cfg.minFoodHits;if(empty.length&&food.length===0)accepted=false;const reason=accepted?'Aceptado: '+food.map(p=>p.className).join(', '):empty.length?'Rechazado: parece un contenedor/objeto vacío ('+empty[0].className+').':'Rechazado: no se detectó comida con score suficiente.';log('\nDECISIÓN: '+reason);if(!accepted){$('decision').textContent='RECHAZADO';showError(reason);$('result').hidden=true;return}const masked=makeMaskedCanvas(source),data=resizeAndEncode(masked);$('result').src=data;$('result').hidden=false;$('video').hidden=true;$('overlay').hidden=true;$('stage').classList.remove('empty');$('decision').textContent='ACEPTADO · listo para envío simulado';$('size').textContent='JPEG '+Math.round((data.length*3/4)/1024)+' KB aprox. · calidad '+Math.round(cfg.jpegQuality*100)+'%';log('Procesado: máscara circular + redimensionado a '+cfg.maxSize+' px máx.')}catch(e){showError('No se pudo analizar la imagen: '+e.message);log('Error de validación: '+e.message)}finally{$('loader').classList.remove('show')}}
-$('uploadBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=e=>{const file=e.target.files[0];if(!file)return;const img=new Image();img.onload=()=>validateAndProcess(img);img.onerror=()=>showError('El archivo no es una imagen válida.');img.src=URL.createObjectURL(file);stopCamera()};$('cameraBtn').onclick=openCamera;$('closeCamera').onclick=stopCamera;$('capture').onclick=()=>{if(!cameraActive)return;try{validateAndProcess($('video'))}catch(e){showError(e.message)}};window.addEventListener('resize',()=>{if(cameraActive)drawCircleOverlay()});
-$('devToggle').onclick=()=>$('devbar').classList.toggle('closed');document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab,.tabpane').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.tab).classList.add('active')});document.querySelectorAll('.step').forEach(b=>b.onclick=()=>{const i=$(b.dataset.target);i.value=Math.max(Number(i.min),Math.min(Number(i.max),Number(i.value)+Number(b.dataset.step)));readConfig()});$('reset').onclick=()=>{Object.entries(defaults).forEach(([k,v])=>$(k).value=v);readConfig();log('Configuración restablecida')};$('copy').onclick=async()=>{const text=JSON.stringify(readConfig(),null,2);try{await navigator.clipboard.writeText(text);log('Configuración copiada al portapapeles')}catch(e){log(text)}};
-(async()=>{try{model=await mobilenet.load();$('modelStatus').textContent='MobileNet lista';$('statusDetail').textContent='Clasificación local activa · sin backend real';log('Modelo MobileNet cargado correctamente')}catch(e){$('modelStatus').textContent='Modelo no disponible';$('statusDetail').textContent='Revisa tu conexión para cargar el CDN';showError('No se pudo cargar MobileNet desde el CDN.');log('Error de modelo: '+e.message)}})();
+(function(){
+  const $ = id => document.getElementById(id);
+
+  const modelStatus = $('modelStatus');
+  const diagLog = $('diagLog');
+
+  let model = null;
+  let stream = null;
+  let lastObjectUrl = null;
+
+  const CONFIG = {
+    foodThreshold: 0.18,
+    emptyThreshold: 0.28,
+    minFoodHits: 1
+  };
+
+  const POSITIVE_FOOD = [
+    'plate','pizza','hotdog','cheeseburger','burrito','guacamole',
+    'ice cream','trifle','french loaf','bagel','pretzel','meat loaf',
+    'potpie','burrito','consomme','dough','cup','soup bowl',
+    'espresso','banana','strawberry','orange','lemon','fig',
+    'pineapple','custard apple','pomegranate','cucumber','artichoke',
+    'bell pepper','cardoon','mushroom','Granny Smith','broccoli',
+    'cauliflower','zucchini','spaghetti squash','acorn squash',
+    'butternut squash','ear','carbonara','chocolate sauce','dough',
+    'mashed potato','head cabbage','pizza,pizza pie','pretzel',
+    'red wine','sandwich'
+  ];
+
+  function log(msg){
+    const time = new Date().toLocaleTimeString();
+    diagLog.textContent = `[${time}] ${msg}\n` + diagLog.textContent;
+  }
+
+  function showError(msg){
+    const box = $('errorBox');
+    box.textContent = '⚠️ ' + msg;
+    box.style.display = 'block';
+    log('ERROR: ' + msg);
+  }
+
+  function clearError(){
+    $('errorBox').style.display = 'none';
+  }
+
+  function resetResult(){
+    const result = $('result');
+    result.hidden = true;
+    result.removeAttribute('src');
+    $('resultSection').style.display = 'none';
+    $('decision').textContent = 'Sin imagen procesada';
+    $('size').textContent = '—';
+    clearError();
+  }
+
+  async function loadModel(){
+    try{
+      model = await mobilenet.load({version:2, alpha:1.0});
+      modelStatus.textContent = '✅ Modelo de IA listo';
+      log('MobileNet cargado correctamente.');
+    }catch(err){
+      modelStatus.textContent = '❌ No se pudo cargar el modelo de IA';
+      showError('Error cargando el modelo de IA: ' + err.message);
+    }
+  }
+  loadModel();
+
+  // ---------- CÁMARA ----------
+  async function openCamera(){
+    clearError();
+    resetResult();
+    stopCamera();
+
+    $('cameraSection').style.display = 'flex';
+    $('resultSection').style.display = 'none';
+
+    const constraintsList = [
+      { video: { facingMode: { exact: 'environment' } }, audio:false },
+      { video: { facingMode: 'environment' }, audio:false },
+      { video: true, audio:false }
+    ];
+
+    let lastErr = null;
+    for(const constraints of constraintsList){
+      try{
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        $('video').srcObject = stream;
+        log('Cámara iniciada con constraints: ' + JSON.stringify(constraints));
+        return;
+      }catch(err){
+        lastErr = err;
+        log('Fallo al pedir cámara con ' + JSON.stringify(constraints) + ' -> ' + err.message);
+      }
+    }
+    showError('No se pudo acceder a la cámara: ' + (lastErr ? lastErr.message : 'desconocido'));
+    $('cameraSection').style.display = 'none';
+  }
+
+  function stopCamera(){
+    if(stream){
+      stream.getTracks().forEach(t => t.stop());
+      stream = null;
+    }
+  }
+
+  $('cameraBtn').onclick = openCamera;
+
+  $('cancelCameraBtn').onclick = () => {
+    stopCamera();
+    $('cameraSection').style.display = 'none';
+  };
+
+  $('captureBtn').onclick = () => {
+    const video = $('video');
+    const canvas = $('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+
+    stopCamera();
+    $('cameraSection').style.display = 'none';
+
+    const img = new Image();
+    img.onload = () => validateAndProcess(img);
+    img.src = dataUrl;
+  };
+
+  // ---------- SUBIDA DE ARCHIVO ----------
+  $('uploadBtn').onclick = () => $('fileInput').click();
+
+  $('fileInput').onchange = e => {
+    const file = e.target.files[0];
+    if(!file) return;
+
+    resetResult();
+    stopCamera();
+    $('cameraSection').style.display = 'none';
+
+    if(lastObjectUrl) URL.revokeObjectURL(lastObjectUrl);
+
+    const img = new Image();
+    img.onload = () => validateAndProcess(img);
+    img.onerror = () => showError('El archivo no es una imagen válida.');
+    lastObjectUrl = URL.createObjectURL(file);
+    img.src = lastObjectUrl;
+
+    e.target.value = '';
+  };
+
+  $('retryBtn').onclick = () => {
+    resetResult();
+  };
+
+  // ---------- VALIDACIÓN ----------
+  async function validateAndProcess(img){
+    clearError();
+
+    if(!model){
+      showError('El modelo de IA todavía no está listo. Espera unos segundos e inténtalo de nuevo.');
+      return;
+    }
+
+    log(`Imagen cargada: ${img.naturalWidth}x${img.naturalHeight}`);
+
+    try{
+      const predictions = await model.classify(img, 10);
+      log('PREDICCIONES CRUDAS: ' + JSON.stringify(predictions.map(p => `${p.className} (${(p.probability*100).toFixed(1)}%)`)));
+
+      let foodHits = 0;
+      let bestFoodProb = 0;
+      let bestFoodName = '';
+
+      predictions.forEach(p => {
+        const nameLower = p.className.toLowerCase();
+        const isFood = POSITIVE_FOOD.some(f => nameLower.includes(f));
+        if(isFood && p.probability >= CONFIG.foodThreshold){
+          foodHits++;
+          if(p.probability > bestFoodProb){
+            bestFoodProb = p.probability;
+            bestFoodName = p.className;
+          }
+        }
+      });
+
+      const isValidFood = foodHits >= CONFIG.minFoodHits;
+
+      $('result').src = img.src;
+      $('result').hidden = false;
+      $('resultSection').style.display = 'flex';
+
+      $('size').textContent = `${img.naturalWidth} x ${img.naturalHeight}px`;
+
+      if(isValidFood){
+        $('decision').textContent = `✅ Comida detectada: ${bestFoodName} (${(bestFoodProb*100).toFixed(1)}%)`;
+        $('decision').style.color = 'var(--accent2)';
+        log(`VALIDADO como comida: ${bestFoodName} @ ${(bestFoodProb*100).toFixed(1)}%`);
+      }else{
+        $('decision').textContent = '❌ No se detectó comida en la imagen';
+        $('decision').style.color = 'var(--danger)';
+        log('RECHAZADO: no se detectó comida con suficiente confianza.');
+      }
+
+    }catch(err){
+      showError('Error al procesar la imagen: ' + err.message);
+    }
+  }
+
+})();
 </script>
-</body></html>
+
+</body>
+</html>
