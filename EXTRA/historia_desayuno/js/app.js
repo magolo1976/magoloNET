@@ -253,6 +253,7 @@ function configFromControls() {
 }
 
 /* Overlay circular */
+/** Draws the circular framing guide once; does not loop. */
 function drawOverlay() {
   if (!cameraActive) return;
   const canvas = els.overlay;
@@ -278,7 +279,6 @@ function drawOverlay() {
   ctx.beginPath();
   ctx.arc(cx, cy, radius, 0, Math.PI * 2);
   ctx.stroke();
-  animationFrame = requestAnimationFrame(drawOverlay);
 }
 
 /* Cámara */
@@ -341,7 +341,11 @@ async function openCamera() {
       once: true
     });
   }
-  drawOverlay();
+  if (els.video.readyState >= 2) {
+    drawOverlay();
+  } else {
+    els.video.addEventListener('loadedmetadata', drawOverlay, { once: true });
+  }
 }
 
 /* Procesado de imagen */
@@ -485,6 +489,9 @@ function bindEvents() {
   window.addEventListener('resize', () => {
     if (cameraActive) drawOverlay();
   });
+  window.addEventListener('orientationchange', () => {
+    if (cameraActive) setTimeout(drawOverlay, 300);
+  });
   $('devToggle').addEventListener('click', () => {
     const content = $('devContent');
     content.hidden = !content.hidden;
@@ -492,11 +499,16 @@ function bindEvents() {
     $('devToggle').firstChild.textContent = content.hidden ? 'Abrir ajustes ' : 'Cerrar ajustes ';
   });
   document.querySelectorAll('.dev-tab').forEach(tab => tab.addEventListener('click', () => {
+    const pane = document.querySelector(`.dev-pane[data-pane="${tab.dataset.tab}"]`);
+    if (!pane) {
+      log(`ERROR: no existe el panel con data-pane="${tab.dataset.tab}"`);
+      return;
+    }
     document.querySelectorAll('.dev-tab').forEach(item => item.classList.toggle('active', item === tab));
-    document.querySelectorAll('.dev-pane').forEach(pane => {
-      const active = pane.dataset.pane === tab.dataset.tab;
-      pane.classList.toggle('active', active);
-      pane.hidden = !active;
+    document.querySelectorAll('.dev-pane').forEach(p => {
+      const active = p === pane;
+      p.classList.toggle('active', active);
+      p.hidden = !active;
     });
   }));
   document.querySelectorAll('.step').forEach(button => button.addEventListener('click', () => {
