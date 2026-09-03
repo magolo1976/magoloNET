@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Plato — escáner de comida</title>
+  <meta name="theme-color" content="#17201d">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1"></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <header class="dev-panel" id="devPanel">
+    <div class="dev-bar">
+      <span class="dev-mark"><span></span>MODO DEV</span>
+      <button class="dev-toggle" id="devToggle" type="button" aria-expanded="false" aria-controls="devContent">Abrir ajustes <span>↘</span></button>
+    </div>
+    <div class="dev-content" id="devContent" hidden>
+      <nav class="dev-tabs" aria-label="Ajustes de desarrollo">
+        <button class="dev-tab active" type="button" data-tab="detection">Detección</button>
+        <button class="dev-tab" type="button" data-tab="output">Salida</button>
+        <button class="dev-tab" type="button" data-tab="diagnostic">Diagnóstico</button>
+      </nav>
+      <section class="dev-pane active" data-pane="detection">
+        <label class="control"><span>Umbral de comida</span><div class="control-row"><input id="foodThreshold" type="number" min="0" max="1" step=".05" value=".30"><button class="step" data-step="-.05" data-target="foodThreshold" type="button">−</button><button class="step" data-step=".05" data-target="foodThreshold" type="button">+</button></div></label>
+      </section>
+      <section class="dev-pane" data-pane="output" hidden>
+        <label class="control"><span>Calidad JPEG</span><div class="control-row"><input id="jpegQuality" type="number" min=".1" max="1" step=".05" value=".7"><button class="step" data-step="-.05" data-target="jpegQuality" type="button">−</button><button class="step" data-step=".05" data-target="jpegQuality" type="button">+</button></div></label>
+        <label class="control"><span>Tamaño máximo (px)</span><div class="control-row"><input id="maxSize" type="number" min="200" max="2000" step="100" value="800"><button class="step" data-step="-100" data-target="maxSize" type="button">−</button><button class="step" data-step="100" data-target="maxSize" type="button">+</button></div></label>
+      </section>
+      <section class="dev-pane" data-pane="diagnostic" hidden><pre id="log" aria-live="polite">Esperando diagnóstico…</pre></section>
+      <div class="dev-actions"><button id="reset" type="button">Restablecer valores</button><button id="copy" type="button">Copiar configuración JSON</button></div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero">
+      <div class="eyebrow"><span class="pulse"></span> cámara + inteligencia local</div>
+      <h1>Lo que hay<br><em>en el plato.</em></h1>
+      <div class="status-card"><span class="status-dot" id="modelStatus"></span><div><strong>Modelo</strong><p id="statusDetail">Cargando MobileNet…</p></div></div>
+    </section>
+
+    <section class="scanner" aria-label="Escáner de comida">
+      <div class="actions"><button class="button button-primary" id="uploadBtn" type="button"><span>↑</span> Subir archivo</button><input id="fileInput" type="file" accept="image/*" hidden><button class="button button-secondary" id="cameraBtn" type="button"><span>◉</span> Hacer foto</button></div>
+      <div class="stage empty" id="stage">
+        <div class="stage-grid"></div><div class="stage-prompt"><span class="prompt-icon">✳</span><strong>Tu plato, en el centro</strong><small>Sube una imagen o activa la cámara</small></div>
+        <video id="video" autoplay playsinline muted hidden></video><canvas class="overlay" id="overlay" hidden></canvas><img id="result" alt="Imagen procesada" hidden><div class="loader" id="loader" hidden><span></span><span></span><span></span></div><button class="capture" id="capture" type="button" hidden aria-label="Capturar imagen">Capturar</button><button class="close-camera" id="closeCamera" type="button" hidden aria-label="Cerrar cámara">×</button>
+      </div>
+      <div class="meta"><span id="decision">LISTO PARA ESCANEAR</span><span id="size">—</span></div>
+      <div class="error" id="error" role="alert" hidden></div>
+      <p class="footer-note">El análisis ocurre en tu dispositivo. Tus imágenes no salen de aquí.</p>
+    </section>
+  </main>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925" integrity="sha512-d9sL6GJLXn6fInD1+TVXhTcQOsmxeHfmHAvwGDIxp5TO+uo1fiWW7mHomMj4MLRlCsJDTqXzWLHJFFlPCEIj/A==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5"}' crossorigin="anonymous"></script>
+</body>
+</html>
