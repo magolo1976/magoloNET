@@ -4,7 +4,7 @@
    Configuración
    -------------------------------------------------------------------------- */
 const CONFIG = {
-  foodThreshold: 0.20,
+  foodThreshold: 0.05,
   jpegQuality: 0.70,
   maxSize: 800
 };
