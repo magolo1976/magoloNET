@@ -26,10 +26,10 @@
         <button class="dev-tab" type="button" data-tab="diagnostic">Diagnóstico</button>
       </nav>
       <section class="dev-pane active" data-pane="detection">
-        <label class="control"><span>Umbral de comida</span><div class="control-row"><input id="foodThreshold" type="number" min="0" max="1" step=".05" value=".30"><button class="step" data-step="-.05" data-target="foodThreshold" type="button">−</button><button class="step" data-step=".05" data-target="foodThreshold" type="button">+</button></div></label>
+        <label class="control"><span>Umbral de comida</span><div class="control-row"><input id="foodThreshold" type="number" min="0" max="1" step="0.05" value="0.20"><button class="step" data-step="-0.05" data-target="foodThreshold" type="button">−</button><button class="step" data-step="0.05" data-target="foodThreshold" type="button">+</button></div></label>
       </section>
       <section class="dev-pane" data-pane="output" hidden>
-        <label class="control"><span>Calidad JPEG</span><div class="control-row"><input id="jpegQuality" type="number" min=".1" max="1" step=".05" value=".7"><button class="step" data-step="-.05" data-target="jpegQuality" type="button">−</button><button class="step" data-step=".05" data-target="jpegQuality" type="button">+</button></div></label>
+        <label class="control"><span>Calidad JPEG</span><div class="control-row"><input id="jpegQuality" type="number" min="0.1" max="1" step="0.05" value="0.7"><button class="step" data-step="-0.05" data-target="jpegQuality" type="button">−</button><button class="step" data-step="0.05" data-target="jpegQuality" type="button">+</button></div></label>
         <label class="control"><span>Tamaño máximo (px)</span><div class="control-row"><input id="maxSize" type="number" min="200" max="2000" step="100" value="800"><button class="step" data-step="-100" data-target="maxSize" type="button">−</button><button class="step" data-step="100" data-target="maxSize" type="button">+</button></div></label>
       </section>
       <section class="dev-pane" data-pane="diagnostic" hidden><pre id="log" aria-live="polite">Esperando diagnóstico…</pre></section>
