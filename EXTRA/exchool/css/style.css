@@ -19,7 +19,7 @@
   --color-gold-soft: rgba(201, 162, 39, 0.14);
   --color-gold-glow: rgba(201, 162, 39, 0.28);
   
-  --color-green: #059669;
+  --color-green: #10B981;
   --color-green-light: #ecfdf5;
   --color-green-border: #a7f3d0;
   
@@ -452,16 +452,35 @@ img {
 }
 
 .mockup-card-img {
-  height: 170px;
-  background: linear-gradient(135deg, #0B1C3A 0%, #162E59 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 180px;
+  background: #0B1C3A;
   position: relative;
+  overflow: hidden;
 }
 
-.mockup-garment-svg {
-  font-size: 58px;
+.mockup-real-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.mockup-school-tag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(8px);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 700;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  z-index: 2;
 }
 
 .mockup-card-body {
@@ -470,34 +489,74 @@ img {
 
 .mockup-price-tag {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #059669;
+  bottom: 8px;
+  left: 8px;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
   color: #FFFFFF;
-  font-size: 12px;
+  font-size: 17px;
   font-weight: 900;
-  padding: 3px 9px;
+  padding: 5px 14px;
   border-radius: var(--radius-full);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.55), 0 2px 5px rgba(0, 0, 0, 0.2);
+  letter-spacing: -0.3px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  z-index: 2;
 }
 
-.mockup-pill-size {
+.mockup-btn-fav {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  background: rgba(11, 28, 58, 0.85);
-  color: #FFFFFF;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: var(--radius-full);
-  backdrop-filter: blur(4px);
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s;
+  padding: 0;
+  z-index: 2;
+}
+
+.mockup-btn-fav:hover {
+  transform: scale(1.15);
+  background: #FFFFFF;
+}
+
+.mockup-card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 3px;
 }
 
 .mockup-card-title {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   color: #0B1C3A;
-  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mockup-pill-size {
+  background: rgba(16, 185, 129, 0.12);
+  color: #065F46;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .mockup-card-sub {
@@ -894,10 +953,18 @@ img {
 .garment-img-wrap {
   height: 200px;
   position: relative;
-  background: linear-gradient(135deg, #0B1C3A 0%, #162E59 100%);
+  background: #0B1C3A;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+}
+
+.garment-real-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .garment-emoji {
@@ -907,14 +974,43 @@ img {
 
 .garment-badge-price {
   position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: 900;
+  padding: 7px 18px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.55), 0 2px 6px rgba(0, 0, 0, 0.25);
+  letter-spacing: -0.3px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.garment-btn-fav {
+  position: absolute;
   top: 12px;
   right: 12px;
-  background: #059669;
-  color: #FFFFFF;
-  font-size: 12px;
-  font-weight: 900;
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s;
+  padding: 0;
+}
+
+.garment-btn-fav:hover {
+  transform: scale(1.15);
+  background: #FFFFFF;
 }
 
 .garment-badge-school {

@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>exchool | Uniformes escolares y accesorios extraescolares</title>
-  <meta name="description" content="Plataforma privada y exclusiva para la compra, venta y donación de uniformes escolares y accesorios entre familias de tu mismo colegio. Ahorro de hasta el 70% y máxima privacidad.">
+  <meta name="description"
+    content="Plataforma privada y exclusiva para la compra, venta y donación de uniformes escolares y accesorios entre familias de tu mismo colegio. Ahorro de hasta el 70% y máxima privacidad.">
   <meta name="theme-color" content="#0B1C3A">
 
   <!-- Favicon e Iconos -->
-  <link rel="icon" type="image/jpeg" href="img/logo.jpg">
+  <link rel="icon" type="image/png" href="img/logo.png">
 
   <!-- Estilos Separados (Vanilla CSS) -->
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
   <!-- 1. Encabezado y Navegación Principal -->
@@ -20,7 +23,7 @@
     <div class="container">
       <nav class="nav-wrap">
         <a href="#inicio" class="brand-link" id="brand-link">
-          <img src="img/logo.jpg" alt="exchool" class="brand-img">
+          <img src="img/logo.png" alt="exchool" class="brand-img">
           <div class="brand-text">
             <span class="brand-name">exchool</span>
             <span class="brand-tag">Ropa Escolar</span>
@@ -31,7 +34,6 @@
           <li><a href="#inicio" class="nav-link active">Inicio</a></li>
           <li><a href="#como-funciona" class="nav-link">Cómo Funciona</a></li>
           <li><a href="#caracteristicas" class="nav-link">Ventajas</a></li>
-          <li><a href="#catalogo" class="nav-link">Prendas</a></li>
           <li><a href="#faq" class="nav-link">Preguntas</a></li>
         </ul>
 
@@ -49,26 +51,27 @@
   <section class="hero-section" id="inicio">
     <div class="container">
       <div class="hero-grid">
-        
+
         <div class="hero-content">
           <div class="hero-pill">
             <span>✨</span> Economía Circular Escolar Privada
           </div>
-          
+
           <h1 class="hero-title">
             Uniformes escolares y accesorios <span class="highlight">entre familias</span> de tu colegio.
           </h1>
-          
+
           <p class="hero-desc">
-            La plataforma exclusiva para comprar, vender o donar polos, jerséis, faldas, pantalones y equipamiento escolar sin intermediarios, con entrega en mano segura y 100% de privacidad garantizada.
+            La plataforma exclusiva para comprar, vender o donar polos, jerséis, faldas, pantalones y equipamiento
+            escolar sin intermediarios, con entrega en mano segura y 100% de privacidad garantizada.
           </p>
 
           <div class="hero-cta-group">
             <a href="../" class="btn btn-gold btn-lg" id="hero-btn-empezar">
               <span>🚀 Acceder a exchool</span>
             </a>
-            <a href="#catalogo" class="btn btn-outline-gold btn-lg" id="hero-btn-catalogo">
-              <span>👕 Ver catálogo demo</span>
+            <a href="#como-funciona" class="btn btn-outline-gold btn-lg" id="hero-btn-como-funciona">
+              <span>💡 Cómo funciona</span>
             </a>
           </div>
 
@@ -90,7 +93,7 @@
 
         <!-- Maqueta interactiva de la PWA -->
         <div class="hero-mockup-wrapper">
-          
+
           <!-- Badge flotante 1 -->
           <div class="floating-badge badge-1">
             <span class="fb-icon">🔒</span>
@@ -120,32 +123,36 @@
                 <!-- Tarjeta demo dentro de la maqueta -->
                 <div class="mockup-card">
                   <div class="mockup-card-img">
-                    <span class="mockup-garment-svg">👕</span>
-                    <span class="mockup-pill-size">Talla 8 años</span>
+                    <img src="img/polo-real.jpg" alt="Polo Oficial Uniforme Invierno" class="mockup-real-img">
+                    <button class="mockup-btn-fav" aria-label="Favorito" title="Añadir a favoritos">🤍</button>
                     <span class="mockup-price-tag">12.00 €</span>
                   </div>
                   <div class="mockup-card-body">
-                    <div class="mockup-card-title">Polo Oficial Uniforme Invierno</div>
+                    <div class="mockup-card-header-row">
+                      <div class="mockup-card-title">Polo Oficial Uniforme Invierno</div>
+                      <span class="mockup-pill-size">Talla 8 años</span>
+                    </div>
                     <div class="mockup-card-sub">
-                      <span>Estado: Como nuevo</span>
-                      <span>Vendedora: marta_88</span>
+                      <span>Estado: <strong>Como nuevo</strong></span>
                     </div>
                     <a href="../" class="mockup-card-btn">💬 Chatear / Reservar</a>
                   </div>
                 </div>
 
                 <!-- Segunda tarjeta de muestra -->
-                <div class="mockup-card" style="opacity: 0.85;">
-                  <div class="mockup-card-img" style="height: 110px; background: linear-gradient(135deg, #064E3B 0%, #0B1C3A 100%);">
-                    <span class="mockup-garment-svg" style="font-size: 42px;">🎒</span>
-                    <span class="mockup-pill-size">Talla Única</span>
-                    <span class="mockup-price-tag">0.00 € (Donación)</span>
+                <div class="mockup-card" style="opacity: 0.9;">
+                  <div class="mockup-card-img" style="height: 125px;">
+                    <img src="img/mochila-real.jpg" alt="Mochila Reforzada Infantil" class="mockup-real-img">
+                    <button class="mockup-btn-fav" aria-label="Favorito" title="Añadir a favoritos" style="width: 28px; height: 28px; font-size: 13px;">❤️</button>
+                    <span class="mockup-price-tag" style="font-size: 14px; padding: 4px 12px;">0.00 € (Donación)</span>
                   </div>
                   <div class="mockup-card-body">
-                    <div class="mockup-card-title">Mochila Reforzada Infantil</div>
+                    <div class="mockup-card-header-row">
+                      <div class="mockup-card-title">Mochila Reforzada Infantil</div>
+                      <span class="mockup-pill-size">Talla Única</span>
+                    </div>
                     <div class="mockup-card-sub">
-                      <span>Estado: Muy bueno</span>
-                      <span>Donante: paco_fam</span>
+                      <span>Estado: <strong>Muy bueno</strong></span>
                     </div>
                   </div>
                 </div>
@@ -167,18 +174,20 @@
         <span class="section-tag">Proceso Sencillo</span>
         <h2 class="section-title">Cómo funciona exchool</h2>
         <p class="section-subtitle">
-          Diseñado para que cualquier madre, padre o tutor pueda renovar el uniforme de sus hijos en minutos con total confianza.
+          Diseñado para que cualquier madre, padre o tutor pueda renovar el uniforme de sus hijos en minutos con total
+          confianza.
         </p>
       </div>
 
       <div class="steps-grid">
-        
+
         <div class="step-card">
           <div class="step-number">1</div>
           <div class="step-icon-wrap">🏫</div>
           <h3 class="step-title">Selecciona tu Colegio</h3>
           <p class="step-desc">
-            Crea tu cuenta asociándote a tu centro escolar. Cada comunidad está aislada para que solo veas y compartas prendas del uniforme oficial de tu colegio.
+            Crea tu cuenta asociándote a tu centro escolar. Cada comunidad está aislada para que solo veas y compartas
+            prendas del uniforme oficial de tu colegio.
           </p>
         </div>
 
@@ -187,7 +196,8 @@
           <div class="step-icon-wrap">📸</div>
           <h3 class="step-title">Publica o Encuentra</h3>
           <p class="step-desc">
-            Sube fotos de prendas que ya le quedan pequeñas a tus hijos. La plataforma suprime automáticamente metadatos GPS para proteger la ubicación de tu hogar.
+            Sube fotos de prendas que ya le quedan pequeñas a tus hijos. La plataforma suprime automáticamente metadatos
+            GPS para proteger la ubicación de tu hogar.
           </p>
         </div>
 
@@ -196,7 +206,8 @@
           <div class="step-icon-wrap">🤝</div>
           <h3 class="step-title">Doble OK y Entrega</h3>
           <p class="step-desc">
-            Chatea en privado, acuerda la entrega física en la entrada del colegio y confirma con el sistema de Doble OK. Sin costes de envío ni comisiones.
+            Chatea en privado, acuerda la entrega física en la entrada del colegio y confirma con el sistema de Doble
+            OK. Sin costes de envío ni comisiones.
           </p>
         </div>
 
@@ -216,12 +227,13 @@
       </div>
 
       <div class="features-grid">
-        
+
         <div class="feature-box">
           <div class="feature-icon-box">🛡️</div>
           <h3 class="feature-title">Privacidad Familiar Estricta</h3>
           <p class="feature-desc">
-            Sin números de teléfono visibles a desconocidos ni enlaces externos. Toda la interacción se produce en canales protegidos.
+            Sin números de teléfono visibles a desconocidos ni enlaces externos. Toda la interacción se produce en
+            canales protegidos.
           </p>
         </div>
 
@@ -229,7 +241,8 @@
           <div class="feature-icon-box">📍</div>
           <h3 class="feature-title">Purga Automática de GPS</h3>
           <p class="feature-desc">
-            El sistema elimina al 100% las coordenadas GPS y marcas de cámara en el momento en que se sube una foto de una prenda.
+            El sistema elimina al 100% las coordenadas GPS y marcas de cámara en el momento en que se sube una foto de
+            una prenda.
           </p>
         </div>
 
@@ -237,7 +250,8 @@
           <div class="feature-icon-box">🎒</div>
           <h3 class="feature-title">Uniformes Exactos</h3>
           <p class="feature-desc">
-            Filtra con precisión por tipo de prenda (polos, faldas, pantalones, sudaderas, babis, mochilas) y tallas reales de tu colegio.
+            Filtra con precisión por tipo de prenda (polos, faldas, pantalones, sudaderas, babis, mochilas) y tallas
+            reales de tu colegio.
           </p>
         </div>
 
@@ -245,7 +259,8 @@
           <div class="feature-icon-box">💸</div>
           <h3 class="feature-title">Cero Comisiones</h3>
           <p class="feature-desc">
-            El 100% del importe acordado queda entre las dos familias. No hay tarifas de gestión, pasarelas obligatorias ni retenciones.
+            El 100% del importe acordado queda entre las dos familias. No hay tarifas de gestión, pasarelas obligatorias
+            ni retenciones.
           </p>
         </div>
 
@@ -253,7 +268,8 @@
           <div class="feature-icon-box">⚖️</div>
           <h3 class="feature-title">Comunidad Regulada</h3>
           <p class="feature-desc">
-            Sistema de amonestaciones y moderación por administradores para garantizar entregas puntuales y prendas en perfecto estado.
+            Sistema de amonestaciones y moderación por administradores para garantizar entregas puntuales y prendas en
+            perfecto estado.
           </p>
         </div>
 
@@ -271,32 +287,7 @@
 
 
 
-  <!-- 6. Catálogo Interactivo Demo -->
-  <section class="section section-alt" id="catalogo">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Muestra en Vivo</span>
-        <h2 class="section-title">Explora Prendas Escolares</h2>
-        <p class="section-subtitle">
-          Echa un vistazo a la variedad de prendas que las familias comparten a diario en la aplicación.
-        </p>
-      </div>
 
-      <div class="reel-preview-wrap">
-        <div class="filter-pills">
-          <button class="filter-pill active" data-filter="todos">Todos</button>
-          <button class="filter-pill" data-filter="polos">Polos y Camisetas</button>
-          <button class="filter-pill" data-filter="jerseis">Jerséis y Sudaderas</button>
-          <button class="filter-pill" data-filter="pantalones">Pantalones y Faldas</button>
-          <button class="filter-pill" data-filter="mochilas">Mochilas y Accesorios</button>
-        </div>
-
-        <div class="garments-grid" id="garments-grid">
-          <!-- Prendas generadas dinámicamente mediante JS -->
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- 7. Preguntas Frecuentes (FAQ) -->
   <section class="section" id="faq">
@@ -310,14 +301,15 @@
       </div>
 
       <div class="faq-wrap">
-        
+
         <div class="faq-item active">
           <div class="faq-question">
             <span>¿Tiene algún coste utilizar exchool?</span>
             <span class="faq-icon">▼</span>
           </div>
           <div class="faq-answer">
-            No. exchool es una plataforma 100% gratuita para las familias. No cobramos comisiones por compraventa ni suscripciones. El objetivo es fomentar la economía circular y aliviar el gasto anual escolar.
+            No. exchool es una plataforma 100% gratuita para las familias. No cobramos comisiones por compraventa ni
+            suscripciones. El objetivo es fomentar la economía circular y aliviar el gasto anual escolar.
           </div>
         </div>
 
@@ -327,7 +319,9 @@
             <span class="faq-icon">▼</span>
           </div>
           <div class="faq-answer">
-            Las dos familias coordinan la entrega en persona a través del chat privado de la app (por ejemplo, en la puerta del colegio al dejar o recoger a los niños). El pago se realiza directamente en mano o por el medio acordado (Bizum, efectivo).
+            Las dos familias coordinan la entrega en persona a través del chat privado de la app (por ejemplo, en la
+            puerta del colegio al dejar o recoger a los niños). El pago se realiza directamente en mano o por el medio
+            acordado (Bizum, efectivo).
           </div>
         </div>
 
@@ -337,7 +331,9 @@
             <span class="faq-icon">▼</span>
           </div>
           <div class="faq-answer">
-            ¡No hay problema! Durante el formulario de registro puedes pulsar en "Alta nuevo colegio" e indicar el nombre y localidad de tu centro escolar. Podrás acceder de inmediato y el colegio quedará registrado para que otros padres de tu centro se sumen.
+            ¡No hay problema! Durante el formulario de registro puedes pulsar en "Alta nuevo colegio" e indicar el
+            nombre y localidad de tu centro escolar. Podrás acceder de inmediato y el colegio quedará registrado para
+            que otros padres de tu centro se sumen.
           </div>
         </div>
 
@@ -347,7 +343,9 @@
             <span class="faq-icon">▼</span>
           </div>
           <div class="faq-answer">
-            Las cámaras de los teléfonos móviles incrustan coordenadas GPS exactas en las fotografías. Para garantizar la seguridad física de los menores y no revelar la ubicación del domicilio familiar, nuestro servidor purga completamente todos esos metadatos antes de publicar la foto.
+            Las cámaras de los teléfonos móviles incrustan coordenadas GPS exactas en las fotografías. Para garantizar
+            la seguridad física de los menores y no revelar la ubicación del domicilio familiar, nuestro servidor purga
+            completamente todos esos metadatos antes de publicar la foto.
           </div>
         </div>
 
@@ -357,7 +355,8 @@
             <span class="faq-icon">▼</span>
           </div>
           <div class="faq-answer">
-            Por supuesto. Al publicar una prenda puedes establecer el precio en 0.00 €, lo cual destacará la prenda como "Gratis / Donación" para familias que puedan aprovecharla.
+            Por supuesto. Al publicar una prenda puedes establecer el precio en 0.00 €, lo cual destacará la prenda como
+            "Gratis / Donación" para familias que puedan aprovecharla.
           </div>
         </div>
 
@@ -370,7 +369,8 @@
     <div class="cta-banner">
       <h2 class="cta-title">Comienza a ahorrar en el uniforme de tus hijos</h2>
       <p class="cta-subtitle">
-        Únete a las familias de tu colegio que ya comparten uniformes, jerséis, babis y mochilas de forma segura y sostenible.
+        Únete a las familias de tu colegio que ya comparten uniformes, jerséis, babis y mochilas de forma segura y
+        sostenible.
       </p>
       <a href="../" class="btn btn-gold btn-lg">
         <span>🎒 Entrar a la Aplicación</span>
@@ -382,11 +382,12 @@
   <footer class="site-footer">
     <div class="container">
       <div class="footer-grid">
-        
+
         <div>
           <div class="footer-brand-title">exchool</div>
           <p class="footer-desc">
-            La plataforma comunitaria para la reutilización de uniformes escolares y accesorios extraescolares entre familias del mismo colegio.
+            La plataforma comunitaria para la reutilización de uniformes escolares y accesorios extraescolares entre
+            familias del mismo colegio.
           </p>
         </div>
 
@@ -396,7 +397,6 @@
             <li><a href="#inicio" class="footer-link">Inicio</a></li>
             <li><a href="#como-funciona" class="footer-link">Cómo Funciona</a></li>
             <li><a href="#caracteristicas" class="footer-link">Ventajas y Seguridad</a></li>
-            <li><a href="#catalogo" class="footer-link">Prendas Escolares</a></li>
             <li><a href="#faq" class="footer-link">Preguntas Frecuentes</a></li>
           </ul>
         </div>
@@ -406,7 +406,6 @@
           <ul class="footer-list">
             <li><a href="../" class="footer-link">Iniciar Sesión</a></li>
             <li><a href="../" class="footer-link">Crear Nueva Cuenta</a></li>
-            <li><a href="../admin.html" class="footer-link">Puesto de Mando (Admin)</a></li>
           </ul>
         </div>
 
@@ -422,4 +421,5 @@
   <!-- Scripts Separados (Vanilla JS) -->
   <script src="js/main.js"></script>
 </body>
+
 </html>
