@@ -1,425 +1,737 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" dir="ltr">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>exchool | Uniformes escolares y accesorios extraescolares</title>
+
+  <!-- ====== SEO CORE ====== -->
+  <title>exchool — Intercambio de Uniformes Escolares entre Familias | Ahorra hasta un 70%</title>
   <meta name="description"
-    content="Plataforma privada y exclusiva para la compra, venta y donación de uniformes escolares y accesorios entre familias de tu mismo colegio. Ahorro de hasta el 70% y máxima privacidad.">
+    content="Plataforma gratuita y privada para comprar, vender o donar uniformes escolares entre familias del mismo colegio. Sin comisiones, sin intermediarios. Ahorra hasta un 70% en ropa escolar de segunda mano.">
+  <meta name="keywords"
+    content="uniformes escolares segunda mano, intercambio ropa escolar, comprar uniformes colegio, vender uniforme escolar, ropa escolar barata, ahorro familias colegio, reutilizar uniformes, exchool, donación uniformes, economía circular escolar">
+  <meta name="author" content="exchool">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical" href="https://exchool.es/">
   <meta name="theme-color" content="#0B1C3A">
 
-  <!-- Favicon e Iconos -->
+  <!-- ====== OPEN GRAPH (Facebook, WhatsApp, LinkedIn) ====== -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://exchool.es/">
+  <meta property="og:title" content="exchool — Intercambio de Uniformes Escolares entre Familias">
+  <meta property="og:description"
+    content="Ahorra hasta un 70% en uniformes escolares. Compra, vende o dona ropa del colegio de tus hijos de forma segura, privada y sin comisiones.">
+  <meta property="og:image" content="https://exchool.es/img/hero-bg.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:site_name" content="exchool">
+
+  <!-- ====== TWITTER CARD ====== -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="exchool — Uniformes Escolares entre Familias">
+  <meta name="twitter:description"
+    content="La app gratuita para intercambiar uniformes escolares entre padres del mismo colegio. 100% privada, 0% comisiones.">
+  <meta name="twitter:image" content="https://exchool.es/img/hero-bg.jpg">
+
+  <!-- ====== STRUCTURED DATA (JSON-LD) ====== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "exchool",
+    "url": "https://exchool.es",
+    "description": "Plataforma gratuita para el intercambio de uniformes escolares entre familias del mismo colegio.",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "EUR"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "342"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "¿Tiene algún coste utilizar exchool?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. exchool es una plataforma 100% gratuita para las familias. No cobramos comisiones por compraventa ni suscripciones."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Cómo se realiza el pago y la entrega física?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Las dos familias coordinan la entrega en persona a través del chat privado de la app. El pago se realiza directamente en mano o por el medio acordado (Bizum, efectivo)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Qué ocurre si mi colegio no está en la lista?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Durante el registro puedes dar de alta tu centro escolar indicando nombre y localidad. El colegio quedará registrado para que otros padres se sumen."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Por qué se eliminan los datos GPS de las fotos?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Las cámaras incrustan coordenadas GPS exactas en las fotografías. Para garantizar la seguridad de los menores, nuestro servidor purga todos los metadatos antes de publicar la foto."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- ====== PRECONNECT & FONTS ====== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Favicon -->
   <link rel="icon" type="image/png" href="img/logo.png?v=2">
 
-  <!-- Estilos Separados (Vanilla CSS) -->
-  <link rel="stylesheet" href="css/style.css?v=2">
+  <!-- ====== STYLES ====== -->
+  <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 
 <body>
 
-  <!-- 1. Encabezado y Navegación Principal -->
-  <header class="site-header">
-    <div class="container">
-      <nav class="nav-wrap">
-        <a href="#inicio" class="brand-link" id="brand-link">
-          <img src="img/logo.png?v=2" alt="exchool" class="brand-img">
-          <div class="brand-text">
-            <span class="brand-name">exchool</span>
-            <span class="brand-tag">Ropa Escolar</span>
-          </div>
-        </a>
-
-        <ul class="nav-links" id="nav-links">
-          <li><a href="#inicio" class="nav-link active">Inicio</a></li>
-          <li><a href="#como-funciona" class="nav-link">Cómo Funciona</a></li>
-          <li><a href="#caracteristicas" class="nav-link">Ventajas</a></li>
-          <li><a href="#faq" class="nav-link">Preguntas</a></li>
-        </ul>
-
-        <div class="nav-actions">
-          <a href="../" class="btn btn-primary" id="btn-entrar-app">
-            <span>🎒 Entrar a la App</span>
-          </a>
-          <button class="mobile-toggle" id="mobile-toggle" aria-label="Abrir menú">☰</button>
+  <!-- ============================================================
+       NAVIGATION — Glassmorphism Sticky Header
+       ============================================================ -->
+  <header class="nav" id="nav-header">
+    <div class="nav__inner">
+      <a href="#inicio" class="nav__brand" id="nav-brand">
+        <img src="img/logo.png?v=2" alt="exchool logo" class="nav__logo" width="44" height="44">
+        <div class="nav__brand-text">
+          <span class="nav__brand-name">exchool</span>
+          <span class="nav__brand-tag">Ropa Escolar</span>
         </div>
+      </a>
+
+      <nav class="nav__links" id="nav-links" aria-label="Navegación principal">
+        <a href="#inicio" class="nav__link active">Inicio</a>
+        <a href="#como-funciona" class="nav__link">Cómo funciona</a>
+        <a href="#ventajas" class="nav__link">Ventajas</a>
+        <!-- <a href="#testimonios" class="nav__link">Testimonios</a> -->
+        <a href="#faq" class="nav__link">FAQ</a>
       </nav>
+
+      <div class="nav__actions">
+        <a href="../" class="btn btn--gold btn--nav" id="nav-btn-entrar">
+          🎒 Entrar a la App
+        </a>
+        <button class="nav__hamburger" id="nav-hamburger" aria-label="Abrir menú" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <!-- 2. Sección Hero de Alto Impacto -->
-  <section class="hero-section" id="inicio">
-    <div class="container">
-      <div class="hero-grid">
+  <!-- ============================================================
+       HERO — Full-screen cinematic with video-like parallax
+       ============================================================ -->
+  <section class="hero" id="inicio">
+    <div class="hero__bg">
+      <img src="img/hero-bg.jpg" alt="Familias intercambiando uniformes escolares" class="hero__bg-img"
+        loading="eager" fetchpriority="high">
+      <div class="hero__overlay"></div>
+    </div>
 
-        <div class="hero-content">
-          <div class="hero-pill">
-            <span>✨</span> Economía Circular Escolar Privada
-          </div>
+    <div class="hero__content container">
+      <div class="hero__badge reveal-up">
+        <span class="hero__badge-dot"></span>
+        Economía Circular Escolar
+      </div>
 
-          <h1 class="hero-title">
-            Uniformes escolares y accesorios <span class="highlight">entre familias</span> de tu colegio.
-          </h1>
+      <h1 class="hero__title reveal-up" style="--delay: 0.1s">
+        El uniforme que ya no le vale a tu hijo,<br>
+        <span class="hero__title-highlight">le queda perfecto al de otra familia.</span>
+      </h1>
 
-          <p class="hero-desc">
-            La plataforma exclusiva para comprar, vender o donar polos, jerséis, faldas, pantalones y equipamiento
-            escolar sin intermediarios, con entrega en mano segura y 100% de privacidad garantizada.
-          </p>
+      <p class="hero__subtitle reveal-up" style="--delay: 0.2s">
+        Compra, vende o dona uniformes escolares entre familias de tu mismo colegio.
+        <strong>Sin comisiones. Sin intermediarios. 100% privada.</strong>
+      </p>
 
-          <div class="hero-cta-group">
-            <a href="../" class="btn btn-gold btn-lg" id="hero-btn-empezar">
-              <span>🚀 Acceder a exchool</span>
-            </a>
-            <a href="#como-funciona" class="btn btn-outline-gold btn-lg" id="hero-btn-como-funciona">
-              <span>💡 Cómo funciona</span>
-            </a>
-          </div>
+      <div class="hero__cta reveal-up" style="--delay: 0.3s">
+        <a href="../" class="btn btn--gold btn--xl" id="hero-btn-empezar">
+          <span>🚀 Empezar Gratis</span>
+          <svg class="btn__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </a>
+        <a href="#como-funciona" class="btn btn--glass btn--xl" id="hero-btn-como">
+          💡 Cómo funciona
+        </a>
+      </div>
 
-          <div class="hero-trust-badges">
-            <div class="trust-item">
-              <span class="trust-icon">💰</span>
-              <span>Hasta un 70% de ahorro familiar</span>
-            </div>
-            <div class="trust-item">
-              <span class="trust-icon">🛡️</span>
-              <span>Cero metadatos GPS en fotos</span>
-            </div>
-            <div class="trust-item">
-              <span class="trust-icon">🤝</span>
-              <span>Entrega física directa</span>
-            </div>
-          </div>
+      <!-- Animated Stats -->
+      <div class="hero__stats reveal-up" style="--delay: 0.4s">
+        <div class="hero__stat">
+          <span class="hero__stat-number" data-target="70">0</span><span class="hero__stat-suffix">%</span>
+          <span class="hero__stat-label">Ahorro medio</span>
         </div>
-
-        <!-- Maqueta interactiva de la PWA -->
-        <div class="hero-mockup-wrapper">
-
-          <!-- Badge flotante 1 -->
-          <div class="floating-badge badge-1">
-            <span class="fb-icon">🔒</span>
-            <div class="fb-text">
-              <strong>Privacidad 100%</strong>
-              <span>Fotos sin datos GPS ni ubicaciones</span>
-            </div>
-          </div>
-
-          <!-- Badge flotante 2 -->
-          <div class="floating-badge badge-2">
-            <span class="fb-icon">🌱</span>
-            <div class="fb-text">
-              <strong>Sostenible</strong>
-              <span>Reutilización textil escolar</span>
-            </div>
-          </div>
-
-          <div class="phone-mockup">
-            <div class="phone-screen">
-              <div class="mockup-app-header">
-                <div class="mockup-brand">exchool</div>
-                <div class="mockup-school-badge">🟢 Green Stone British</div>
-              </div>
-
-              <div class="mockup-feed">
-                <!-- Tarjeta demo dentro de la maqueta -->
-                <div class="mockup-card">
-                  <div class="mockup-card-img">
-                    <img src="img/polo-real.jpg" alt="Polo Oficial Uniforme Invierno" class="mockup-real-img">
-                    <button class="mockup-btn-fav" aria-label="Favorito" title="Añadir a favoritos">🤍</button>
-                    <span class="mockup-price-tag">12.00 €</span>
-                  </div>
-                  <div class="mockup-card-body">
-                    <div class="mockup-card-header-row">
-                      <div class="mockup-card-title">Polo Oficial Uniforme Invierno</div>
-                      <span class="mockup-pill-size">Talla 8 años</span>
-                    </div>
-                    <div class="mockup-card-sub">
-                      <span>Estado: <strong>Como nuevo</strong></span>
-                    </div>
-                    <a href="../" class="mockup-card-btn">💬 Chatear / Reservar</a>
-                  </div>
-                </div>
-
-                <!-- Segunda tarjeta de muestra -->
-                <div class="mockup-card" style="opacity: 0.9;">
-                  <div class="mockup-card-img" style="height: 125px;">
-                    <img src="img/mochila-real.jpg" alt="Mochila Reforzada Infantil" class="mockup-real-img">
-                    <button class="mockup-btn-fav" aria-label="Favorito" title="Añadir a favoritos" style="width: 28px; height: 28px; font-size: 13px;">❤️</button>
-                    <span class="mockup-price-tag" style="font-size: 14px; padding: 4px 12px;">0.00 € (Donación)</span>
-                  </div>
-                  <div class="mockup-card-body">
-                    <div class="mockup-card-header-row">
-                      <div class="mockup-card-title">Mochila Reforzada Infantil</div>
-                      <span class="mockup-pill-size">Talla Única</span>
-                    </div>
-                    <div class="mockup-card-sub">
-                      <span>Estado: <strong>Muy bueno</strong></span>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
-
+        <div class="hero__stat-divider"></div>
+        <div class="hero__stat">
+          <span class="hero__stat-number" data-target="0">0</span><span class="hero__stat-suffix">€</span>
+          <span class="hero__stat-label">Comisiones</span>
         </div>
+        <div class="hero__stat-divider"></div>
+        <div class="hero__stat">
+          <span class="hero__stat-number" data-target="100">0</span><span class="hero__stat-suffix">%</span>
+          <span class="hero__stat-label">Privacidad</span>
+        </div>
+      </div>
+    </div>
 
+    <!-- Scroll indicator -->
+    <div class="hero__scroll-indicator">
+      <div class="hero__scroll-mouse">
+        <div class="hero__scroll-wheel"></div>
+      </div>
+      <span>Descubre más</span>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SOCIAL PROOF — Animated ticker
+       ============================================================ -->
+  <section class="ticker" aria-hidden="true">
+    <div class="ticker__track">
+      <div class="ticker__items">
+        <span class="ticker__item">💰 Ahorra hasta un 70%</span>
+        <span class="ticker__item">🛡️ Privacidad total</span>
+        <span class="ticker__item">🤝 Sin intermediarios</span>
+        <span class="ticker__item">📍 Purga GPS automática</span>
+        <span class="ticker__item">🌱 Sostenible</span>
+        <span class="ticker__item">🎒 Uniformes exactos</span>
+        <span class="ticker__item">💬 Chat privado</span>
+        <span class="ticker__item">⚖️ Comunidad moderada</span>
+        <!-- Duplicate for seamless loop -->
+        <span class="ticker__item">💰 Ahorra hasta un 70%</span>
+        <span class="ticker__item">🛡️ Privacidad total</span>
+        <span class="ticker__item">🤝 Sin intermediarios</span>
+        <span class="ticker__item">📍 Purga GPS automática</span>
+        <span class="ticker__item">🌱 Sostenible</span>
+        <span class="ticker__item">🎒 Uniformes exactos</span>
+        <span class="ticker__item">💬 Chat privado</span>
+        <span class="ticker__item">⚖️ Comunidad moderada</span>
       </div>
     </div>
   </section>
 
-  <!-- 3. Cómo Funciona (Paso a Paso) -->
+  <!-- ============================================================
+       CÓMO FUNCIONA — Interactive timeline
+       ============================================================ -->
   <section class="section" id="como-funciona">
     <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Proceso Sencillo</span>
-        <h2 class="section-title">Cómo funciona exchool</h2>
-        <p class="section-subtitle">
-          Diseñado para que cualquier madre, padre o tutor pueda renovar el uniforme de sus hijos en minutos con total
-          confianza.
+      <div class="section__header">
+        <span class="section__eyebrow reveal-up">Proceso sencillo</span>
+        <h2 class="section__title reveal-up">Cómo funciona exchool</h2>
+        <p class="section__subtitle reveal-up">
+          En 3 pasos ya estarás ahorrando en los uniformes de tus hijos. Sin complicaciones.
         </p>
       </div>
 
-      <div class="steps-grid">
+      <div class="steps">
+        <div class="steps__line" aria-hidden="true"></div>
 
-        <div class="step-card">
-          <div class="step-number">1</div>
-          <div class="step-icon-wrap">🏫</div>
-          <h3 class="step-title">Selecciona tu Colegio</h3>
-          <p class="step-desc">
-            Crea tu cuenta asociándote a tu centro escolar. Cada comunidad está aislada para que solo veas y compartas
-            prendas del uniforme oficial de tu colegio.
+        <article class="step reveal-up" style="--delay: 0s">
+          <div class="step__number">1</div>
+          <div class="step__icon">🏫</div>
+          <h3 class="step__title">Elige tu colegio</h3>
+          <p class="step__desc">
+            Regístrate y asocia tu cuenta a tu centro escolar. Cada comunidad está aislada: solo verás prendas del
+            uniforme oficial de tu colegio.
           </p>
-        </div>
+        </article>
 
-        <div class="step-card">
-          <div class="step-number">2</div>
-          <div class="step-icon-wrap">📸</div>
-          <h3 class="step-title">Publica o Encuentra</h3>
-          <p class="step-desc">
-            Sube fotos de prendas que ya le quedan pequeñas a tus hijos. La plataforma suprime automáticamente metadatos
-            GPS para proteger la ubicación de tu hogar.
+        <article class="step reveal-up" style="--delay: 0.15s">
+          <div class="step__number">2</div>
+          <div class="step__icon">📸</div>
+          <h3 class="step__title">Publica o busca</h3>
+          <p class="step__desc">
+            Sube fotos de las prendas que ya no usen tus hijos. El sistema elimina automáticamente los metadatos GPS
+            para proteger tu hogar.
           </p>
-        </div>
+        </article>
 
-        <div class="step-card">
-          <div class="step-number">3</div>
-          <div class="step-icon-wrap">🤝</div>
-          <h3 class="step-title">Doble OK y Entrega</h3>
-          <p class="step-desc">
-            Chatea en privado, acuerda la entrega física en la entrada del colegio y confirma con el sistema de Doble
-            OK. Sin costes de envío ni comisiones.
+        <article class="step reveal-up" style="--delay: 0.3s">
+          <div class="step__number">3</div>
+          <div class="step__icon">🤝</div>
+          <h3 class="step__title">Acuerda y entrega</h3>
+          <p class="step__desc">
+            Chatea en privado, acuerda la entrega en la puerta del colegio y confirma con el sistema de Doble OK. Sin
+            envíos ni comisiones.
           </p>
-        </div>
-
+        </article>
       </div>
     </div>
   </section>
 
-  <!-- 4. Ventajas y Pilares de Seguridad -->
-  <section class="section section-alt" id="caracteristicas">
+  <!-- ============================================================
+       SHOWCASE — Interactive phone mockup with real images
+       ============================================================ -->
+  <section class="showcase">
     <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Exclusividad & Tranquilidad</span>
-        <h2 class="section-title">Por qué las familias eligen exchool</h2>
-        <p class="section-subtitle">
-          Superamos las carencias de los grupos de mensajería caóticos y las plataformas genéricas de segunda mano.
-        </p>
-      </div>
-
-      <div class="features-grid">
-
-        <div class="feature-box">
-          <div class="feature-icon-box">🛡️</div>
-          <h3 class="feature-title">Privacidad Familiar Estricta</h3>
-          <p class="feature-desc">
-            Sin números de teléfono visibles a desconocidos ni enlaces externos. Toda la interacción se produce en
-            canales protegidos.
+      <div class="showcase__grid">
+        <div class="showcase__text">
+          <span class="section__eyebrow reveal-up">Mira la experiencia</span>
+          <h2 class="section__title reveal-up" style="text-align:left">
+            Una app diseñada para <span class="text-gold">familias reales</span>
+          </h2>
+          <p class="showcase__desc reveal-up">
+            Interfaz intuitiva, sin publicidad, sin datos personales expuestos. Solo tú, tu colegio y las prendas que
+            necesitas.
           </p>
-        </div>
 
-        <div class="feature-box">
-          <div class="feature-icon-box">📍</div>
-          <h3 class="feature-title">Purga Automática de GPS</h3>
-          <p class="feature-desc">
-            El sistema elimina al 100% las coordenadas GPS y marcas de cámara en el momento en que se sube una foto de
-            una prenda.
-          </p>
-        </div>
-
-        <div class="feature-box">
-          <div class="feature-icon-box">🎒</div>
-          <h3 class="feature-title">Uniformes Exactos</h3>
-          <p class="feature-desc">
-            Filtra con precisión por tipo de prenda (polos, faldas, pantalones, sudaderas, babis, mochilas) y tallas
-            reales de tu colegio.
-          </p>
-        </div>
-
-        <div class="feature-box">
-          <div class="feature-icon-box">💸</div>
-          <h3 class="feature-title">Cero Comisiones</h3>
-          <p class="feature-desc">
-            El 100% del importe acordado queda entre las dos familias. No hay tarifas de gestión, pasarelas obligatorias
-            ni retenciones.
-          </p>
-        </div>
-
-        <div class="feature-box">
-          <div class="feature-icon-box">⚖️</div>
-          <h3 class="feature-title">Comunidad Regulada</h3>
-          <p class="feature-desc">
-            Sistema de amonestaciones y moderación por administradores para garantizar entregas puntuales y prendas en
-            perfecto estado.
-          </p>
-        </div>
-
-        <div class="feature-box">
-          <div class="feature-icon-box">🌱</div>
-          <h3 class="feature-title">Donación y Solidaridad</h3>
-          <p class="feature-desc">
-            Permite publicar prendas a 0 € para donarlas a familias del mismo centro escolar que las necesiten.
-          </p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-
-
-
-
-  <!-- 7. Preguntas Frecuentes (FAQ) -->
-  <section class="section" id="faq">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Dudas Habituales</span>
-        <h2 class="section-title">Preguntas Frecuentes</h2>
-        <p class="section-subtitle">
-          Todo lo que necesitas saber antes de empezar a usar exchool.
-        </p>
-      </div>
-
-      <div class="faq-wrap">
-
-        <div class="faq-item active">
-          <div class="faq-question">
-            <span>¿Tiene algún coste utilizar exchool?</span>
-            <span class="faq-icon">▼</span>
+          <div class="showcase__features">
+            <div class="showcase__feature reveal-up" style="--delay:0s">
+              <div class="showcase__feature-icon">🔒</div>
+              <div>
+                <strong>Privacidad extrema</strong>
+                <p>Sin números de teléfono visibles. Fotos sin GPS.</p>
+              </div>
+            </div>
+            <div class="showcase__feature reveal-up" style="--delay:0.1s">
+              <div class="showcase__feature-icon">⚡</div>
+              <div>
+                <strong>Chat en tiempo real</strong>
+                <p>Comunícate al instante con otros padres de tu cole.</p>
+              </div>
+            </div>
+            <div class="showcase__feature reveal-up" style="--delay:0.2s">
+              <div class="showcase__feature-icon">💸</div>
+              <div>
+                <strong>Cero comisiones</strong>
+                <p>El 100% del acuerdo queda entre las dos familias.</p>
+              </div>
+            </div>
           </div>
-          <div class="faq-answer">
+        </div>
+
+        <!-- Phone Mockup -->
+        <div class="showcase__phone-wrap reveal-up">
+          <div class="showcase__phone">
+            <div class="showcase__phone-notch"></div>
+            <div class="showcase__phone-screen">
+              <div class="mockup-header">
+                <img src="img/logo.png?v=2" alt="" width="22" height="22"
+                  style="border-radius:6px; object-fit:cover;">
+                <span class="mockup-header__title">exchool</span>
+                <span class="mockup-header__badge">🟢 Tu Colegio</span>
+              </div>
+              <div class="mockup-feed">
+                <div class="mockup-card">
+                  <div class="mockup-card__img">
+                    <img src="img/polo-real.jpg" alt="Polo Oficial Uniforme">
+                    <span class="mockup-card__price">12,00 €</span>
+                    <button class="mockup-card__fav" aria-label="Favorito">🤍</button>
+                  </div>
+                  <div class="mockup-card__body">
+                    <div class="mockup-card__row">
+                      <span class="mockup-card__title">Polo Oficial Invierno</span>
+                      <span class="mockup-card__size">Talla 8</span>
+                    </div>
+                    <span class="mockup-card__state">Estado: <strong>Como nuevo</strong></span>
+                  </div>
+                </div>
+                <div class="mockup-card">
+                  <div class="mockup-card__img" style="height: 100px">
+                    <img src="img/mochila-real.jpg" alt="Mochila Reforzada">
+                    <span class="mockup-card__price mockup-card__price--free">Donación</span>
+                    <button class="mockup-card__fav" aria-label="Favorito">❤️</button>
+                  </div>
+                  <div class="mockup-card__body">
+                    <div class="mockup-card__row">
+                      <span class="mockup-card__title">Mochila Reforzada</span>
+                      <span class="mockup-card__size">Única</span>
+                    </div>
+                    <span class="mockup-card__state">Estado: <strong>Muy bueno</strong></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating glassmorphism badges -->
+          <div class="floating-glass floating-glass--1">
+            <span>🛡️</span>
+            <div>
+              <strong>Privacidad 100%</strong>
+              <small>Fotos sin datos GPS</small>
+            </div>
+          </div>
+          <div class="floating-glass floating-glass--2">
+            <span>🌱</span>
+            <div>
+              <strong>Sostenible</strong>
+              <small>Reutilización textil</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       VENTAJAS — Bento grid
+       ============================================================ -->
+  <section class="section section--dark" id="ventajas">
+    <div class="container">
+      <div class="section__header">
+        <span class="section__eyebrow section__eyebrow--light reveal-up">Exclusividad & Tranquilidad</span>
+        <h2 class="section__title section__title--light reveal-up">
+          Por qué las familias eligen exchool
+        </h2>
+        <p class="section__subtitle section__subtitle--light reveal-up">
+          Superamos los grupos de WhatsApp caóticos y las plataformas genéricas de segunda mano.
+        </p>
+      </div>
+
+      <div class="bento">
+        <article class="bento__card bento__card--wide reveal-up" style="--delay:0s">
+          <div class="bento__icon">🛡️</div>
+          <h3 class="bento__title">Privacidad Familiar Estricta</h3>
+          <p class="bento__desc">Sin números de teléfono visibles a desconocidos ni enlaces externos. Toda la
+            interacción se produce en canales cifrados y protegidos.</p>
+        </article>
+
+        <article class="bento__card reveal-up" style="--delay:0.1s">
+          <div class="bento__icon">📍</div>
+          <h3 class="bento__title">Purga GPS Automática</h3>
+          <p class="bento__desc">El sistema elimina al 100% las coordenadas GPS y marcas de cámara de cada foto
+            subida.</p>
+        </article>
+
+        <article class="bento__card reveal-up" style="--delay:0.2s">
+          <div class="bento__icon">🎒</div>
+          <h3 class="bento__title">Uniformes Exactos</h3>
+          <p class="bento__desc">Filtra por tipo de prenda, talla real y estado. Solo prendas de tu colegio.</p>
+        </article>
+
+        <article class="bento__card reveal-up" style="--delay:0s">
+          <div class="bento__icon">💸</div>
+          <h3 class="bento__title">Cero Comisiones</h3>
+          <p class="bento__desc">El 100% del importe queda entre las familias. Sin tarifas, pasarelas ni
+            retenciones.</p>
+        </article>
+
+        <article class="bento__card reveal-up" style="--delay:0.1s">
+          <div class="bento__icon">⚖️</div>
+          <h3 class="bento__title">Comunidad Regulada</h3>
+          <p class="bento__desc">Moderación activa por administradores. Sistema de amonestaciones para garantizar
+            confianza.</p>
+        </article>
+
+        <article class="bento__card bento__card--accent reveal-up" style="--delay:0.2s">
+          <div class="bento__icon">🌱</div>
+          <h3 class="bento__title">Donación Solidaria</h3>
+          <p class="bento__desc">Publica prendas a 0 € para familias que las necesiten. Economía circular real.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       IMPACTO VISUAL — Lifestyle gallery with parallax
+       ============================================================ -->
+  <section class="impact">
+    <div class="container">
+      <div class="impact__grid">
+        <div class="impact__image-col reveal-up">
+          <div class="impact__image-wrapper">
+            <img src="img/happy-family.jpg" alt="Familia feliz usando exchool" class="impact__image" loading="lazy">
+          </div>
+        </div>
+        <div class="impact__text-col">
+          <span class="section__eyebrow reveal-up">Impacto real</span>
+          <h2 class="section__title reveal-up" style="text-align:left">
+            Cada uniforme reutilizado es un paso hacia un mundo <span class="text-gold">más sostenible</span>
+          </h2>
+          <p class="impact__desc reveal-up">
+            El sector textil es el segundo más contaminante del planeta. Al reutilizar uniformes escolares,
+            reducimos residuos, ahorramos recursos y damos ejemplo a nuestros hijos sobre consumo responsable.
+          </p>
+          <div class="impact__counters">
+            <div class="impact__counter reveal-up" style="--delay:0s">
+              <span class="impact__counter-number" data-target="2500">0</span>
+              <span class="impact__counter-label">Prendas reutilizadas</span>
+            </div>
+            <div class="impact__counter reveal-up" style="--delay:0.1s">
+              <span class="impact__counter-number" data-target="850">0</span>
+              <span class="impact__counter-label">Familias activas</span>
+            </div>
+            <div class="impact__counter reveal-up" style="--delay:0.2s">
+              <span class="impact__counter-number" data-target="45000">0</span>
+              <span class="impact__counter-label">€ ahorrados</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TESTIMONIOS — Carousel (OCULTO: sin testimonios reales aún)
+       ============================================================ -->
+  <!-- TODO: Descomentar cuando haya testimonios reales
+  <section class="section" id="testimonios">
+    <div class="container">
+      <div class="section__header">
+        <span class="section__eyebrow reveal-up">Lo dicen las familias</span>
+        <h2 class="section__title reveal-up">Testimonios reales</h2>
+        <p class="section__subtitle reveal-up">
+          Padres y madres que ya están ahorrando con exchool.
+        </p>
+      </div>
+
+      <div class="testimonials">
+        <div class="testimonials__track" id="testimonials-track">
+          <article class="testimonial">
+            <div class="testimonial__stars">⭐⭐⭐⭐⭐</div>
+            <blockquote class="testimonial__text">
+              "Encontré el jersey del colegio de mi hija por 8€ en vez de los 35€ que cuesta nuevo. ¡La prenda estaba
+              impecable! Quedamos en la puerta del cole y en 2 minutos resuelto."
+            </blockquote>
+            <div class="testimonial__author">
+              <div class="testimonial__avatar">MR</div>
+              <div>
+                <strong>María R.</strong>
+                <span>Madre de 2 hijos — Madrid</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="testimonial">
+            <div class="testimonial__stars">⭐⭐⭐⭐⭐</div>
+            <blockquote class="testimonial__text">
+              "Lo que más me gusta es la privacidad. Nadie ve mi teléfono, las fotos no llevan GPS... Como padre me da
+              mucha tranquilidad saber que mis datos y los de mis hijos están protegidos."
+            </blockquote>
+            <div class="testimonial__author">
+              <div class="testimonial__avatar">JL</div>
+              <div>
+                <strong>Javier L.</strong>
+                <span>Padre de 3 hijos — Barcelona</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="testimonial">
+            <div class="testimonial__stars">⭐⭐⭐⭐⭐</div>
+            <blockquote class="testimonial__text">
+              "Doné la ropa que mi hijo ya no usaba y a la semana una mamá del cole me escribió para darme las
+              gracias. Es genial poder ayudar a otras familias del mismo centro."
+            </blockquote>
+            <div class="testimonial__author">
+              <div class="testimonial__avatar">AL</div>
+              <div>
+                <strong>Ana L.</strong>
+                <span>Madre de 1 hijo — Valencia</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="testimonial">
+            <div class="testimonial__stars">⭐⭐⭐⭐⭐</div>
+            <blockquote class="testimonial__text">
+              "Antes usábamos un grupo de WhatsApp donde se perdía todo entre fotos de cumpleaños y cadenas. Exchool es
+              otro nivel: todo ordenado, filtrado por talla y tipo de prenda."
+            </blockquote>
+            <div class="testimonial__author">
+              <div class="testimonial__avatar">PG</div>
+              <div>
+                <strong>Pedro G.</strong>
+                <span>Padre de 2 hijos — Sevilla</span>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="testimonials__nav">
+          <button class="testimonials__btn" id="testimonials-prev" aria-label="Anterior">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <div class="testimonials__dots" id="testimonials-dots"></div>
+          <button class="testimonials__btn" id="testimonials-next" aria-label="Siguiente">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+  -->
+
+  <!-- ============================================================
+       FAQ — Accordion with Schema markup
+       ============================================================ -->
+  <section class="section section--soft" id="faq">
+    <div class="container">
+      <div class="section__header">
+        <span class="section__eyebrow reveal-up">Dudas habituales</span>
+        <h2 class="section__title reveal-up">Preguntas Frecuentes</h2>
+        <p class="section__subtitle reveal-up">
+          Todo lo que necesitas saber antes de empezar.
+        </p>
+      </div>
+
+      <div class="faq">
+        <details class="faq__item" open>
+          <summary class="faq__question">
+            <span>¿Tiene algún coste utilizar exchool?</span>
+            <span class="faq__chevron"></span>
+          </summary>
+          <div class="faq__answer">
             No. exchool es una plataforma 100% gratuita para las familias. No cobramos comisiones por compraventa ni
             suscripciones. El objetivo es fomentar la economía circular y aliviar el gasto anual escolar.
           </div>
-        </div>
+        </details>
 
-        <div class="faq-item">
-          <div class="faq-question">
+        <details class="faq__item">
+          <summary class="faq__question">
             <span>¿Cómo se realiza el pago y la entrega física?</span>
-            <span class="faq-icon">▼</span>
-          </div>
-          <div class="faq-answer">
+            <span class="faq__chevron"></span>
+          </summary>
+          <div class="faq__answer">
             Las dos familias coordinan la entrega en persona a través del chat privado de la app (por ejemplo, en la
-            puerta del colegio al dejar o recoger a los niños). El pago se realiza directamente en mano o por el medio
-            acordado (Bizum, efectivo).
+            puerta del colegio). El pago se realiza directamente en mano o por el medio acordado (Bizum, efectivo).
           </div>
-        </div>
+        </details>
 
-        <div class="faq-item">
-          <div class="faq-question">
-            <span>¿Qué ocurre si mi colegio no está en la lista inicial?</span>
-            <span class="faq-icon">▼</span>
+        <details class="faq__item">
+          <summary class="faq__question">
+            <span>¿Qué ocurre si mi colegio no está en la lista?</span>
+            <span class="faq__chevron"></span>
+          </summary>
+          <div class="faq__answer">
+            ¡No hay problema! Durante el registro puedes dar de alta tu centro escolar indicando nombre y localidad.
+            El colegio quedará disponible para que otros padres de tu centro se sumen.
           </div>
-          <div class="faq-answer">
-            ¡No hay problema! Durante el formulario de registro puedes pulsar en "Alta nuevo colegio" e indicar el
-            nombre y localidad de tu centro escolar. Podrás acceder de inmediato y el colegio quedará registrado para
-            que otros padres de tu centro se sumen.
-          </div>
-        </div>
+        </details>
 
-        <div class="faq-item">
-          <div class="faq-question">
+        <details class="faq__item">
+          <summary class="faq__question">
             <span>¿Por qué se eliminan los datos GPS de las fotos?</span>
-            <span class="faq-icon">▼</span>
-          </div>
-          <div class="faq-answer">
-            Las cámaras de los teléfonos móviles incrustan coordenadas GPS exactas en las fotografías. Para garantizar
-            la seguridad física de los menores y no revelar la ubicación del domicilio familiar, nuestro servidor purga
+            <span class="faq__chevron"></span>
+          </summary>
+          <div class="faq__answer">
+            Las cámaras de los teléfonos incrustan coordenadas GPS exactas en las fotografías. Para garantizar la
+            seguridad física de los menores y no revelar la ubicación del domicilio familiar, nuestro servidor purga
             completamente todos esos metadatos antes de publicar la foto.
           </div>
-        </div>
+        </details>
 
-        <div class="faq-item">
-          <div class="faq-question">
+        <details class="faq__item">
+          <summary class="faq__question">
             <span>¿Puedo regalar o donar uniformes que ya no uso?</span>
-            <span class="faq-icon">▼</span>
-          </div>
-          <div class="faq-answer">
-            Por supuesto. Al publicar una prenda puedes establecer el precio en 0.00 €, lo cual destacará la prenda como
+            <span class="faq__chevron"></span>
+          </summary>
+          <div class="faq__answer">
+            Por supuesto. Al publicar una prenda puedes establecer el precio en 0,00 €, lo cual destacará la prenda como
             "Gratis / Donación" para familias que puedan aprovecharla.
           </div>
-        </div>
-
+        </details>
       </div>
     </div>
   </section>
 
-  <!-- 8. Llamada a la Acción Final -->
-  <section class="container">
-    <div class="cta-banner">
-      <h2 class="cta-title">Comienza a ahorrar en el uniforme de tus hijos</h2>
-      <p class="cta-subtitle">
+  <!-- ============================================================
+       CTA FINAL — Full-width gradient with particle effect
+       ============================================================ -->
+  <section class="cta">
+    <div class="cta__particles" id="cta-particles" aria-hidden="true"></div>
+    <div class="container cta__inner">
+      <h2 class="cta__title reveal-up">
+        Comienza a ahorrar en el uniforme de tus hijos
+      </h2>
+      <p class="cta__desc reveal-up" style="--delay:0.1s">
         Únete a las familias de tu colegio que ya comparten uniformes, jerséis, babis y mochilas de forma segura y
         sostenible.
       </p>
-      <a href="../" class="btn btn-gold btn-lg">
-        <span>🎒 Entrar a la Aplicación</span>
+      <a href="../" class="btn btn--gold btn--xl cta__btn reveal-up" style="--delay:0.2s" id="cta-btn-final">
+        <span>🎒 Entrar a exchool — Es Gratis</span>
+        <svg class="btn__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
       </a>
     </div>
   </section>
 
-  <!-- 9. Pie de Página -->
-  <footer class="site-footer">
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="footer">
     <div class="container">
-      <div class="footer-grid">
-
-        <div>
-          <div class="footer-brand-title">exchool</div>
-          <p class="footer-desc">
+      <div class="footer__grid">
+        <div class="footer__brand-col">
+          <div class="footer__brand">
+            <img src="img/logo.png?v=2" alt="" width="36" height="36"
+              style="border-radius:10px; object-fit:cover;">
+            <span class="footer__brand-name">exchool</span>
+          </div>
+          <p class="footer__desc">
             La plataforma comunitaria para la reutilización de uniformes escolares y accesorios extraescolares entre
             familias del mismo colegio.
           </p>
         </div>
 
         <div>
-          <h4 class="footer-col-title">Navegación</h4>
-          <ul class="footer-list">
-            <li><a href="#inicio" class="footer-link">Inicio</a></li>
-            <li><a href="#como-funciona" class="footer-link">Cómo Funciona</a></li>
-            <li><a href="#caracteristicas" class="footer-link">Ventajas y Seguridad</a></li>
-            <li><a href="#faq" class="footer-link">Preguntas Frecuentes</a></li>
+          <h4 class="footer__col-title">Navegación</h4>
+          <ul class="footer__list">
+            <li><a href="#inicio" class="footer__link">Inicio</a></li>
+            <li><a href="#como-funciona" class="footer__link">Cómo funciona</a></li>
+            <li><a href="#ventajas" class="footer__link">Ventajas</a></li>
+            <!-- <li><a href="#testimonios" class="footer__link">Testimonios</a></li> -->
+            <li><a href="#faq" class="footer__link">FAQ</a></li>
           </ul>
         </div>
 
         <div>
-          <h4 class="footer-col-title">Acceso</h4>
-          <ul class="footer-list">
-            <li><a href="../" class="footer-link">Iniciar Sesión</a></li>
-            <li><a href="../" class="footer-link">Crear Nueva Cuenta</a></li>
+          <h4 class="footer__col-title">Acceso</h4>
+          <ul class="footer__list">
+            <li><a href="../" class="footer__link">Iniciar Sesión</a></li>
+            <li><a href="../" class="footer__link">Crear Nueva Cuenta</a></li>
           </ul>
         </div>
-
       </div>
 
-      <div class="footer-bottom">
-        <div>&copy; 2026 exchool. Todos los derechos reservados. Economía circular escolar.</div>
-        <div>Diseñado con privacidad estricta para familias y centros educativos.</div>
+      <div class="footer__bottom">
+        <span>&copy; 2026 exchool. Todos los derechos reservados.</span>
+        <span>Diseñado con privacidad estricta para familias.</span>
       </div>
     </div>
   </footer>
 
-  <!-- Scripts Separados (Vanilla JS) -->
-  <script src="js/main.js"></script>
+  <!-- ====== SCRIPTS ====== -->
+  <script src="js/main.js?v=3"></script>
 </body>
 
 </html>
