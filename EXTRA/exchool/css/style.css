@@ -150,6 +150,7 @@ img {
   height: 42px;
   border-radius: 12px;
   object-fit: cover;
+  background-color: #ffffff;
   border: 2px solid var(--color-gold);
   box-shadow: var(--shadow-gold);
 }
