@@ -242,7 +242,7 @@ function initParticles() {
       width: ${size}px;
       height: ${size}px;
       border-radius: 50%;
-      background: rgba(212, 169, 23, ${Math.random() * 0.3 + 0.1});
+      background: rgba(196, 144, 0, ${Math.random() * 0.3 + 0.1});
       left: ${Math.random() * 100}%;
       top: ${Math.random() * 100}%;
       animation: particleFloat ${Math.random() * 6 + 4}s ease-in-out infinite;
