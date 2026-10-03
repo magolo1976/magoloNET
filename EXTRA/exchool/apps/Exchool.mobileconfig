@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>PayloadContent</key>
+    <array>
+        <dict>
+            <key>FullScreen</key>
+            <true/>
+            <key>IsRemovable</key>
+            <true/>
+            <key>Label</key>
+            <string>Exchool</string>
+            <key>PayloadDescription</key>
+            <string>Configura el acceso directo e icono de la aplicación Exchool en la pantalla de inicio.</string>
+            <key>PayloadDisplayName</key>
+            <string>Exchool Ropa Escolar</string>
+            <key>PayloadIdentifier</key>
+            <string>com.exchool.webclip</string>
+            <key>PayloadType</key>
+            <string>com.apple.webClip.managed</string>
+            <key>PayloadUUID</key>
+            <string>7F5E5D63-24B6-42C2-834E-1008CE872523</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>Precomposed</key>
+            <true/>
+            <key>URL</key>
+            <string>https://app.exchool.com</string>
+        </dict>
+    </array>
+    <key>PayloadDescription</key>
+    <string>Instalador oficial de la aplicación móvil Exchool para iPhone y iPad.</string>
+    <key>PayloadDisplayName</key>
+    <string>Exchool</string>
+    <key>PayloadIdentifier</key>
+    <string>com.exchool.profile</string>
+    <key>PayloadOrganization</key>
+    <string>Exchool</string>
+    <key>PayloadRemovalDisallowed</key>
+    <false/>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadUUID</key>
+    <string>A1B2C3D4-E5F6-4A5B-8C9D-0E1F2A3B4C5D</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+</dict>
+</plist>
